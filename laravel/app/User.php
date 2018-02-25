@@ -2,8 +2,9 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -15,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'email', 'password', 'api_token', 'first_name', 'last_name', 'phone', 'about', 'vacation_mode'
     ];
 
     /**
@@ -24,6 +25,24 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'api_token',
     ];
+
+    protected $appends = ['cover', 'picture'];
+
+    public function getCoverAttribute()
+    {
+        $path = 'public/users/covers/' . $this->id;
+        if (Storage::exists($path)) {
+            return asset($path);
+        }
+    }
+
+    public function getPictureAttribute()
+    {
+        $path = 'public/users/pictures/' . $this->id;
+        if (Storage::exists($path)) {
+            return asset($path);
+        }
+    }
 }

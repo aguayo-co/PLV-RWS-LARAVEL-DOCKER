@@ -1,0 +1,188 @@
+#%RAML 1.0
+title: Prilov Api
+version: v1
+baseUri: http://api.prilov.com
+types:
+  BaseModel:
+    type: object
+    properties:
+      id:
+        type: number
+        required: false
+      created_at:
+        type: datetime
+        required: false
+      updated_at:
+        type: datetime
+        required: false
+  Email:
+    type: object
+    properties:
+      email: string
+  User:
+    type: [object, BaseModel, Email]
+    properties:
+      id:
+        type: number
+        required: false
+      firstname: string
+      lastname: string
+      password: string
+      phone:
+        type: string
+        required: false
+      cover:
+        type: string
+        required: false
+      picture:
+        type: string
+        required: false
+      about:
+        type: string
+        required: false
+      followers:
+        type: number
+        required: false
+      following:
+        type: number
+        required: false
+      positiveRatings:
+        type: number
+        required: false
+      negativeRatings:
+        type: number
+        required: false
+      neutralRatings:
+        type: number
+        required: false
+      vacationMode:
+        type: boolean
+        required: false
+      shippingMethods:
+        type: ShippingMethod
+        required: false
+  Auth:
+    type: object
+    properties:
+      email: string
+      password: string
+  Token:
+    type: object
+    properties:
+      token: string
+  ShippingMethod:
+    type: object
+    properties:
+      name: string
+      descriptionSeller: string
+      descriptionBuyer: string
+  DetailedAnswer:
+    type: object
+    properties:
+      message: string
+      errors?:
+        type: object
+        properties:
+          /^[a-z_]*$/: string[]
+/users:
+  post:
+    description: "Creates a new User"
+    body:
+      application/json:
+        type: User
+        example:  {
+          firstname: "Marie",
+          lastname: "Curie",
+          email: "marie@curie.com",
+          password: "asd|@123"
+        }
+    responses:
+      201:
+        description: "User was created succesfully"
+      400:
+        description: "There is an error on the input given for user creation"
+        body:
+          application/json:
+            type: DetailedAnswer
+            example:
+              {
+                "message": "The given data was invalid.",
+                "errors": {
+                  "firstname": [
+                    "The firstname field is invalid or empty."
+                  ],
+                  "email": [
+                    "The email field is invalid or empty"
+                  ],
+                  "exists": [
+                    "There is another user registered with the same email"
+                  ],
+                  "password": [
+                    "The password field is invalid or empty"
+                  ]
+                }
+              }
+  /{user-id}:
+  /login:
+    post:
+      description: "Logs in an User"
+      body:
+        application/json:
+          type: Auth
+          example:  {
+            email: "marie@curie.com",
+            password: "asd|@123"
+          }
+      responses:
+        200:
+          body:
+            application/json:
+              type: [User, Token]
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+              example:
+                {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "email": [
+                      "The email field is invalid or empty"
+                    ],
+                    "password": [
+                      "The password field is invalid or empty"
+                    ]
+                  }
+                }
+  /password/recovery/{email}:
+    get:
+      description: "Requires a password recovery link for an user"
+      responses:
+        200:
+          description: "A reset link has been send to the email specified"
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+              example:
+                {
+                  "message": "There was an error on the request",
+                  "errors": {
+                    "attempts": [
+                      "Too many password request for the given email"
+                    ],
+                    "email": [
+                      "The given email is invalid or empty"
+                    ]
+                  }
+                }
+    post:
+      description: "Validates a password reset token"
+      body:
+        application/json:
+          type: Token
+      responses:
+        200:
+          description: "The provided password token is valid"
+        400:
+          description: "The provided password token is invalid"

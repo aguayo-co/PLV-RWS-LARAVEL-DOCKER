@@ -7,11 +7,9 @@ services:
       - php-fpm/.env
     volumes:
       - ./laravel:/srv/caddy/html
-    links:
-      - mysql
 
   mysql:
-    image: mysql:5.7
+    image: mysql:5.6
     restart: always
     env_file:
       - mysql/.env
@@ -31,5 +29,3 @@ services:
     volumes:
       - ./tmp/ssl:/srv/caddy/ssl
       - ./laravel:/srv/caddy/html
-    links:
-      - php-fpm
