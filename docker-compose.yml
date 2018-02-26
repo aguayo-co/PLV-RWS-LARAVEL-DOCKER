@@ -25,6 +25,7 @@ services:
     env_file:
       - caddy/.env
     ports:
+      - 80:80
       - 443:443
     volumes:
       - ./tmp/ssl:/srv/caddy/ssl
