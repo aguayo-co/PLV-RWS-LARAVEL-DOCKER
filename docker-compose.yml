@@ -28,5 +28,6 @@ services:
       - 80:80
       - 443:443
     volumes:
+      - ./tmp/caddy:/srv/caddy/.caddy
       - ./tmp/ssl:/srv/caddy/ssl
       - ./laravel:/srv/caddy/html
