@@ -1,8 +1,1 @@
-{$DOMAIN} {
-  tls {$LETSENCRYPT_CERT} {$LETSENCRYPT_KEY}
-  root /srv/caddy/html/public
-  fastcgi / php-fpm:9000 php
-  rewrite {
-    to {path} {path}/ /index.php?{query}
-  }
-}
+import Caddyfile.{$CADDY_TLS_MODE}
