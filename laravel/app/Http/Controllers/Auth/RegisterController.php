@@ -45,12 +45,12 @@ class RegisterController extends Controller
             'password' => 'required|string|min:6',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'required',
-            'about' => 'required',
-            'picture' => 'required|image',
-            'cover' => 'required|image',
-            'vacation_mode' => 'required|boolean',
-            ]);
+            'phone' => 'string',
+            'about' => 'string',
+            'picture' => 'image',
+            'cover' => 'image',
+            'vacation_mode' => 'boolean',
+        ]);
     }
 
     /**
@@ -61,10 +61,10 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $fill_data = $data;
-        $fill_data['password'] = Hash::make($data['password']);
-        $fill_data['api_token'] = str_random(60);
-        return User::create($fill_data);
+        $fillData = $data;
+        $fillData['password'] = Hash::make($data['password']);
+        $fillData['api_token'] = str_random(60);
+        return User::create($fillData);
     }
 
     /**
@@ -78,23 +78,13 @@ class RegisterController extends Controller
         $this->validator($request->all())->validate();
 
         event(new Registered($user = $this->create($request->all())));
-        $cover = $request->file('cover');
-        $picture = $request->file('picture');
-        $picture->storeAs('public/users/pictures', $user->id);
-        $cover->storeAs('public/users/covers', $user->id);
+        if ($cover = $request->file('cover')) {
+            $cover->storeAs('public/users/covers', $user->id);
+        }
+        if ($picture = $request->file('picture')) {
+            $picture->storeAs('public/users/pictures', $user->id);
+        }
 
-        return $this->registered($request, $user);
-    }
-
-    /**
-     * The user has been registered.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
-     */
-    protected function registered(Request $request, $user)
-    {
         return $user;
     }
 }
