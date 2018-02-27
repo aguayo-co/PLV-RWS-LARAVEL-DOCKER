@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -110,7 +111,11 @@ class LoginController extends Controller
     {
         $this->clearLoginAttempts($request);
 
-        return $this->authenticated($request, $this->guard()->user());
+        $user = $this->guard()->user();
+
+        $this->ensureApiToken($user);
+
+        return $this->authenticated($request, $user);
     }
 
     /**
@@ -158,5 +163,18 @@ class LoginController extends Controller
     protected function guard()
     {
         return Auth::guard('web');
+    }
+
+    /**
+     * Ensure the user has a api_token.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     * @return void
+     */
+    protected function ensureApiToken($user)
+    {
+        if (strlen($user->api_token) != 60) {
+            $user->update(['api_token' => User::generateApiToken()]);
+        }
     }
 }

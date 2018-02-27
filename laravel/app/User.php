@@ -30,6 +30,16 @@ class User extends Authenticatable
         'password', 'remember_token', 'api_token',
     ];
 
+    /**
+     * Generate a random api_token string.
+     *
+     * @return string
+     */
+    public static function generateApiToken()
+    {
+        return uniqid() . str_random(47);
+    }
+
     protected $appends = ['cover', 'picture'];
 
     public function getCoverAttribute()

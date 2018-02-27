@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\User;
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -71,10 +71,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $fillData = $data;
-        $fillData['password'] = Hash::make($data['password']);
-        $fillData['api_token'] = str_random(60);
-        return User::create($fillData);
+        $data['password'] = Hash::make($data['password']);
+        $data['api_token'] = User::generateApiToken();
+        return User::create($data);
     }
 
     /**

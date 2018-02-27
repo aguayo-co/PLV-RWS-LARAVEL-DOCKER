@@ -68,6 +68,7 @@ class UserController extends Controller
         $data = $request->all();
         if (array_key_exists('password', $data)) {
             $data['password'] = Hash::make($data['password']);
+            $data['api_token'] = User::generateApiToken();
         }
 
         $user->fill($data)->save();
