@@ -13,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     * @SuppressWarnings(PHPMD.UnusedLocalVariables)
      */
     public function boot()
     {
@@ -23,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
         # Change the default rendering method for ResetPassword.
         ResetPasswordNotification::$toMailCallback = function ($notifiable, $token) {
             return (new MailMessage)->view(
-                'email.token', ['token' => $token]
+                'email.token',
+                ['token' => $token]
             );
         };
     }
