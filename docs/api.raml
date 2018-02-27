@@ -1,7 +1,16 @@
 #%RAML 1.0
 title: Prilov Api
-version: v1
-baseUri: http://api.prilov.com
+version: 0.4
+baseUri: http://prilov.aguayo.co/api
+securitySchemes:
+  token:
+    type: Pass Through
+    description: "Authentication by header"
+    describedBy:
+      headers:
+        Authorization:
+          description: "Use the Bearer keyword. Example Authorization Bearer [API_key]"
+          type: string
 types:
   BaseModel:
     type: object
@@ -19,14 +28,21 @@ types:
     type: object
     properties:
       email: string
+  Address:
+    type: object
+    properties:
+      address: string
+      region: string
+      zone: string
+      user: number
   User:
     type: [object, BaseModel, Email]
     properties:
       id:
         type: number
         required: false
-      firstname: string
-      lastname: string
+      first_name: string
+      last_name: string
       password: string
       phone:
         type: string
@@ -59,8 +75,28 @@ types:
         type: boolean
         required: false
       shippingMethods:
-        type: ShippingMethod
+        type: ShippingMethod[]
         required: false
+      favoriteAddress:
+        type: Address
+        required: false
+  Product:
+    type: [object, BaseModel]
+    properties:
+      title: string
+      images: string[]
+      description: string
+      category: Category
+      size: Category
+      brand: Category
+      condition: Category
+      color: Color
+      dimensions: string
+      originalPrice: number
+      price: number
+      commission: number
+      owner_id: number
+      state: ProductState
   Auth:
     type: object
     properties:
@@ -84,6 +120,50 @@ types:
         type: object
         properties:
           /^[a-z_]*$/: string[]
+  Category:
+    type: [object, BaseModel]
+    properties:
+      name: string
+      title: string
+      url: string
+      parent: number
+  Color:
+    type: [object, BaseModel]
+    properties:
+      name: string
+      code: string
+  ProductState:
+    type: [object, BaseModel]
+    properties:
+      name: string
+  Menu:
+    type: object
+    properties:
+      name: string
+      items: MenuItem[]
+  MenuItem:
+    type: [object, BaseModel]
+    properties:
+      title: string
+      url:
+        type: string
+        required: false
+      sons:
+        type: MenuItem[]
+        required: false
+      icon:
+        type: string
+        required: false
+  Banner:
+    type: [object, BaseModel]
+    properties:
+      name: string
+      title: string
+      subtitle: string
+      image: string
+      buttonText: string
+      url: string
+
 /users:
   post:
     description: "Creates a new User"
@@ -91,8 +171,8 @@ types:
       application/json:
         type: User
         example:  {
-          firstname: "Marie",
-          lastname: "Curie",
+          first_name: "Marie",
+          last_name: "Curie",
           email: "marie@curie.com",
           password: "asd|@123"
         }
@@ -123,6 +203,48 @@ types:
                 }
               }
   /{user-id}:
+    get:
+      description: "Retrieves the public data of an user"
+      responses:
+        200:
+          body:
+            application/json:
+              type: User
+        404:
+          description: "The user with the specified ID could not be found"
+    put:
+      securedBy: token
+      description: "Updates the information of an user. Authorized role must be owner or administrator"
+      body:
+        application/json:
+          type: User
+      responses:
+        200:
+          description: "The user was updated succesfully"
+          body:
+            application/json:
+              type: User
+        401:
+          description: "Unauthorized request"
+        404:
+          description: "User with the provided ID could not be found"
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+              example:
+                {
+                  "message": "The given data was invalid.",
+                  "errors": {
+                    "email": [
+                      "The email field is invalid or empty"
+                    ],
+                    "password": [
+                      "The password field is invalid or empty"
+                    ]
+                  }
+                }
+
   /login:
     post:
       description: "Logs in an User"
@@ -186,3 +308,201 @@ types:
           description: "The provided password token is valid"
         400:
           description: "The provided password token is invalid"
+
+/menus:
+  post:
+    securedBy: token
+    description: "Creates a new menu"
+    body:
+      application/json:
+        type: Menu
+  /{menu-name}:
+    get:
+      description: "Gets the items of the specified menu"
+      responses:
+        200:
+          description: "Menu retrieved succesfully"
+          body:
+            application/json:
+              type: Menu
+              example:
+                {
+                  "name": "main",
+                  "items": [
+                    {
+                      id: 1,
+                      title: "Moda Femenina",
+                      url: "/moda-femenina",
+                      sons: [
+                        {
+                          id: 2,
+                          "title": "Tops",
+                          "url": "/moda-femenina/tops"
+                        },
+                        {
+                          id: 3,
+                          "title": "Poleras",
+                          "url": "/moda-femenina/poleras"
+                        }
+                      ]
+                    }
+                  ]
+                }
+        404:
+          description: "The specified menu could not be found"
+  /item:
+    post:
+      securedBy: token
+      description: "Creates a new menu item"
+      body:
+        application/json:
+          type: MenuItem
+      responses:
+        201:
+          description: "Item was created succesfully"
+          body:
+            application/json:
+              type: MenuItem
+        401:
+          description: "Unauthorized request"
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+
+/products:
+  post:
+    securedBy: token
+    description: "Creates a new product. Requires authorization of an user with all fields completed"
+    body:
+      application/json:
+        type: Product
+    responses:
+      200:
+        description: "Product created succesfully"
+        body:
+          application/json:
+            type: Product
+      401:
+        description: "Unauthorized request"
+      400:
+        body:
+          application/json:
+            type: DetailedAnswer
+  /{product-id}:
+    get:
+      description: "Get the product with specified ID"
+      responses:
+        200:
+          body:
+            application/json:
+              type: Product
+        404:
+          description: "The product with the specified id could not be found"
+    put:
+      securedBy: token
+      description: "Updates the product with the specified id. Requires authorization of owner or administrator"
+      body:
+        application/json:
+          type: Product
+      responses:
+        200:
+          description: "The product has been updated successfuly"
+          body:
+            application/json:
+              type: Product
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+        404:
+          description: "The product with the specified id could not be found"
+        401:
+          description: "Unauthorized request"
+  /category/{category-name}:
+    get:
+      description: "Gets an array of products with the specified category"
+      responses:
+        200:
+          body:
+            application/json:
+              type: Product[]
+        404:
+          description: "There are not products with the specified category"
+
+/addresses:
+  /{user-id}:
+    get:
+      securedBy: token
+      description: "Get all the addreses of the specified user. Requires authorization by owner or administrator"
+      responses:
+        200:
+          body:
+            application/json:
+              type: Address[]
+        404:
+          description: "User could not be found"
+        401:
+          description: "Unauthorized request"
+    post:
+      securedBy: token
+      description: "Creates a new Address linked to the specified user. Requieres authorization by owner or administrator"
+      body:
+        application/json:
+          type: Address
+      responses:
+        201:
+          description: "The address was added succesfully"
+          body:
+            application/json:
+              type: Address
+        400:
+          body:
+            application/json:
+              type: DetailedAnswer
+        404:
+          description: "User could not be found"
+        401:
+          description: "Unauthorized request"
+/shipping:
+  post:
+    securedBy: token
+    description: "Creates a new shipping method on the platform. Requires admin authorization"
+    body:
+      application/json:
+        type: ShippingMethod
+    responses:
+      201:
+        description: "Shipping method has been added succesfully"
+      401:
+        description: "Unauthorized request"
+      400:
+        body:
+          application/json:
+            type: DetailedAnswer
+/banners:
+  post:
+    securedBy: token
+    description: "Creates a new banner on the platform. Requires admin authorization"
+    body:
+      application/json:
+        type: Banner
+    responses:
+      201:
+        description: "The banner has been added succesfully"
+      401:
+        description: "Unauthorized request"
+      400:
+        body:
+          application/json:
+            type: DetailedAnswer
+  /{banner-name}:
+    get:
+      description: "Retrieves the banner with the specified name"
+      responses:
+        200:
+          body:
+            application/json:
+              type: Banner
+        404:
+          description: "The banner with the specified name could not be found"
