@@ -14,8 +14,6 @@ class MakeProfileFieldsNullableInUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('first_name')->nullable()->change();
-            $table->string('last_name')->nullable()->change();
             $table->string('phone')->nullable()->change();
             $table->text('about')->nullable()->change();
             $table->boolean('vacation_mode')->nullable()->change();
@@ -30,8 +28,6 @@ class MakeProfileFieldsNullableInUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('first_name')->nullable(false)->change();
-            $table->string('last_name')->nullable(false)->change();
             $table->string('phone')->nullable(false)->change();
             $table->text('about')->nullable(false)->change();
             $table->boolean('vacation_mode')->nullable(false)->change();
