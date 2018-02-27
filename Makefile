@@ -9,8 +9,9 @@ docs/api.raml:
 docs/api.html: docs/api.raml
 	raml2html docs/api.raml > docs/api.html
 
-.PHONY: raml-docs
-raml-docs: docs/api.html ## Render api docs with in html.
+.PHONY: raml
+raml: docs/api.html ## Render and open api docs with in html.
+	open docs/api.html
 
 .PHONY: build
 build: pull ## Pull and build docker containers.
