@@ -47,4 +47,14 @@ class User extends Authenticatable
             return asset($path);
         }
     }
+
+    public function getCoverPathAttribute()
+    {
+        return 'public/users/covers/' . $this->id;
+    }
+
+    public function getPicturePathAttribute()
+    {
+        return 'public/users/pictures/' . $this->id;
+    }
 }
