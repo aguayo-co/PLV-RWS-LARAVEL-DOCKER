@@ -40,8 +40,6 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-
-
         if (array_key_exists('email', $data)) {
             $data['exists'] = $data['email'];
         }
