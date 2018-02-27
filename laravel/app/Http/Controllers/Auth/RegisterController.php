@@ -40,17 +40,29 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'string',
-            'about' => 'string',
-            'picture' => 'image',
-            'cover' => 'image',
-            'vacation_mode' => 'boolean',
-        ]);
+
+
+        if (array_key_exists('email', $data)) {
+            $data['exists'] = $data['email'];
+        }
+        return Validator::make(
+            $data,
+            [
+                'exists' => 'unique:users,email',
+                'email' => 'required|string|email|max:255',
+                'password' => 'required|string|min:6',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'phone' => 'string',
+                'about' => 'string',
+                'picture' => 'image',
+                'cover' => 'image',
+                'vacation_mode' => 'boolean',
+            ],
+            [
+                'exists.unique' => trans('validation.email.exists'),
+            ]
+        );
     }
 
     /**
