@@ -1,5 +1,9 @@
 {$DOMAIN} {
   tls {$LETSENCRYPT_CERT} {$LETSENCRYPT_KEY}
+  header / {
+    Access-Control-Allow-Origin {$ACCESS_CONTROL_ALLOW_ORIGIN}
+    Vary "Origin"
+  }
   root /srv/caddy/html/public
   fastcgi / php-fpm:9000 php
   rewrite {
