@@ -14,7 +14,7 @@ raml: docs/api.html ## Render and open api docs with in html.
 	open docs/api.html
 
 .PHONY: build
-build: pull ## Pull and build docker containers.
+build: ## Build docker containers.
 	docker-compose build
 
 .PHONY: pull
