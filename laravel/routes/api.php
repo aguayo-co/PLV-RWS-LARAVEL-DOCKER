@@ -26,6 +26,6 @@ Route::name('api.')->group(function () {
 
     Route::middleware('auth:api')->group(function () {
         Route::get('users', 'Auth\UserController@index')->name('user');
-        Route::get('users/{user}', 'Auth\UserController@user')->name('user');
+        Route::get('users/{user}', 'Auth\UserController@user')->name('user')->where('user', '[0-9]+');
     });
 });
