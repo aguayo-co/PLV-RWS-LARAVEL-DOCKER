@@ -30,5 +30,9 @@ Route::name('api.')->group(function () {
 
         Route::get('addresses/{user}', 'AddressController@show')->name('addresses.get')->where('user', '[0-9]+');
         Route::post('addresses/{user}', 'AddressController@store')->name('address.create');
+
+        Route::post('menus/', 'MenuController@store')->name('menu.create');
+        Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
+        Route::post('menus/item', 'MenuItemController@store')->name('menu.item.create');
     });
 });
