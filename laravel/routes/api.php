@@ -25,6 +25,8 @@ Route::name('api.')->group(function () {
 
     Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
 
+    Route::get('banners/{banner}', 'BannerController@show')->name('banner.get')->where('banner', '[0-9]+');
+
     Route::middleware('auth:api')->group(function () {
         Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', '[0-9]+');
@@ -36,5 +38,7 @@ Route::name('api.')->group(function () {
         Route::post('menus/item', 'MenuItemController@store')->name('menu_item.create');
 
         Route::post('shipping', 'ShippingMethodController@store')->name('shipping_method.create');
+
+        Route::post('banners', 'BannerController@store')->name('banner.create');
     });
 });
