@@ -73,11 +73,12 @@ class UserController extends Controller
 
         $user->fill($data)->save();
 
-        if (array_key_exists('cover', $data) && !$data['cover'] && File::exists($user->cover_path)) {
-            File::delete($user->cover_path);
+        if (array_key_exists('cover', $data)) {
+            $user->cover = $data['cover'];
         }
-        if (array_key_exists('picture', $data) && !$data['picture'] && File::exists($user->picture_path)) {
-            File::delete($user->picture_path);
+
+        if (array_key_exists('picture', $data)) {
+            $user->picture = $data['picture'];
         }
 
         return $user;

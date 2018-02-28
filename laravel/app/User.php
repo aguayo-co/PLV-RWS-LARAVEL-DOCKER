@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
@@ -40,31 +41,58 @@ class User extends Authenticatable
         return uniqid() . str_random(47);
     }
 
+    public const COVERS_BASE_PATH = 'public/users/covers/';
+    public const PICTURES_BASE_PATH = 'public/users/pictures/';
+
     protected $appends = ['cover', 'picture'];
 
-    public function getCoverAttribute()
+    protected function getCoverAttribute()
     {
-        $path = 'public/users/covers/' . $this->id;
+        $path = $this->cover_path;
         if (Storage::exists($path)) {
             return asset($path);
         }
     }
 
-    public function getPictureAttribute()
+    protected function getPictureAttribute()
     {
-        $path = 'public/users/pictures/' . $this->id;
+        $path = $this->picture_path;
         if (Storage::exists($path)) {
             return asset($path);
         }
     }
 
-    public function getCoverPathAttribute()
+    protected function getCoverPathAttribute()
     {
-        return 'public/users/covers/' . $this->id;
+        return $this::COVERS_BASE_PATH . $this->id;
     }
 
-    public function getPicturePathAttribute()
+    protected function getPicturePathAttribute()
     {
-        return 'public/users/pictures/' . $this->id;
+        return $this::PICTURES_BASE_PATH . $this->id;
+    }
+
+    protected function setCoverAttribute(?UploadedFile $cover)
+    {
+        if ($cover === null) {
+            if (Storage::exists($this->cover_path)) {
+                Storage::delete($this->cover_path);
+            }
+            return;
+        }
+
+        $cover->storeAs($this::COVERS_BASE_PATH, $this->id);
+    }
+
+    protected function setPictureAttribute(?UploadedFile $picture)
+    {
+        if ($picture === null) {
+            if (Storage::exists($this->picture_path)) {
+                Storage::delete($this->picture_path);
+            }
+            return;
+        }
+
+        $picture->storeAs($this::PICTURES_BASE_PATH, $this->id);
     }
 }

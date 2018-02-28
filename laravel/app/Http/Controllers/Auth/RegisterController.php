@@ -46,6 +46,7 @@ class RegisterController extends Controller
         return Validator::make(
             $data,
             [
+                # Por requerimiento de front, el error de correo existente debe ser enviado por aparte.
                 'exists' => 'unique:users,email',
                 'email' => 'required|string|email|max:255',
                 'password' => 'required|string|min:6',
@@ -88,12 +89,11 @@ class RegisterController extends Controller
 
         event(new Registered($user = $this->create($request->all())));
         if ($cover = $request->file('cover')) {
-            $cover->storeAs('public/users/covers', $user->id);
+            $user->cover = $cover;
         }
         if ($picture = $request->file('picture')) {
-            $picture->storeAs('public/users/pictures', $user->id);
+            $user->picture = $picture;
         }
-
         return $user;
     }
 }
