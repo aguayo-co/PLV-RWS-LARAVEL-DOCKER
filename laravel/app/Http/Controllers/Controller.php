@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,6 +13,16 @@ use Illuminate\Support\Facades\Validator;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('owner_or_admin:user', ['only' => ['update']]);
+    }
 
     protected function validationRules(?Model $model)
     {
