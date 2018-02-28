@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::name('api.')->group(function () {
-    Route::post('users', 'Auth\RegisterController@register')->name('register');
+    Route::post('users', 'Auth\RegisterController@store')->name('register');
     Route::post('users/login', 'Auth\LoginController@login')->name('login');
 
     Route::get('users/password/recovery/{email}', 'Auth\ForgotPasswordController@sendResetLinkEmail')
@@ -25,9 +25,8 @@ Route::name('api.')->group(function () {
 
 
     Route::middleware('auth:api')->group(function () {
-        Route::get('users', 'Auth\UserController@index')->name('user.current');
-        Route::get('users/{user}', 'Auth\UserController@user')->name('user')->where('user', '[0-9]+');
+        Route::get('users/{user}', 'Auth\UserController@show')->name('user')->where('user', '[0-9]+');
         Route::middleware('owner_or_admin:user')
-          ->patch('users/{user}', 'Auth\UserController@patch')->name('user.put')->where('user', '[0-9]+');
+          ->patch('users/{user}', 'Auth\UserController@update')->name('user.put')->where('user', '[0-9]+');
     });
 });

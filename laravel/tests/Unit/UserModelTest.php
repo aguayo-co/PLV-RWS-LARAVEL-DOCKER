@@ -37,6 +37,15 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $user->toArray());
     }
 
+    public function testEmailTokenIsHidden()
+    {
+        $user = factory(User::class)->create();
+
+
+        $this->assertNotNull($user->email);
+        $this->assertArrayNotHasKey('email', $user->toArray());
+    }
+
     public function testApiTokenLength()
     {
         $apiToken = User::generateApiToken();

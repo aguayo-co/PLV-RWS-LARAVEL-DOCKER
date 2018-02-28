@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +23,9 @@ class RegisterController extends Controller
     |
     */
 
+
+    public $modelClass = User::class;
+
     /**
      * Create a new controller instance.
      *
@@ -32,49 +36,56 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    protected function validationRules(?Model $user)
+    {
+        return [
+            # Por requerimiento de front, el error de correo existente debe ser enviado por aparte.
+            'exists' => 'unique:users,email',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:6',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'string',
+            'about' => 'string',
+            'picture' => 'image',
+            'cover' => 'image',
+            'vacation_mode' => 'boolean',
+        ];
+    }
+    protected function validationMessages()
+    {
+        return [
+            'exists.unique' => trans('validation.email.exists'),
+        ];
+    }
+
     /**
-     * Get a validator for an incoming registration request.
+     * Alter data before validation.
      *
      * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return array
      */
-    protected function validator(array $data)
+    public function alterValidateData($data)
     {
         if (array_key_exists('email', $data)) {
             $data['exists'] = $data['email'];
         }
-        return Validator::make(
-            $data,
-            [
-                # Por requerimiento de front, el error de correo existente debe ser enviado por aparte.
-                'exists' => 'unique:users,email',
-                'email' => 'required|string|email|max:255',
-                'password' => 'required|string|min:6',
-                'first_name' => 'required|string|max:255',
-                'last_name' => 'required|string|max:255',
-                'phone' => 'string',
-                'about' => 'string',
-                'picture' => 'image',
-                'cover' => 'image',
-                'vacation_mode' => 'boolean',
-            ],
-            [
-                'exists.unique' => trans('validation.email.exists'),
-            ]
-        );
+        return $data;
     }
 
     /**
-     * Create a new user instance after a valid registration.
+     * Alter data to be passed to fill method.
      *
      * @param  array  $data
-     * @return \App\User
+     * @return array
      */
-    protected function create(array $data)
+    public function alterFillData($data)
     {
-        $data['password'] = Hash::make($data['password']);
-        $data['api_token'] = User::generateApiToken();
-        return User::create($data);
+        if (array_key_exists('password', $data)) {
+            $data['password'] = Hash::make($data['password']);
+            $data['api_token'] = User::generateApiToken();
+        }
+        return $data;
     }
 
     /**
@@ -83,11 +94,10 @@ class RegisterController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function register(Request $request)
+    public function store(Request $request)
     {
-        $this->validator($request->all())->validate();
-
-        event(new Registered($user = $this->create($request->all())));
+        $user = parent::store($request);
+        event(new Registered($user));
         if ($cover = $request->file('cover')) {
             $user->cover = $cover;
         }
