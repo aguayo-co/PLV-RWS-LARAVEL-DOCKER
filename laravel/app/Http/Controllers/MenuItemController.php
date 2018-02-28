@@ -11,6 +11,16 @@ class MenuItemController extends Controller
 {
     public $modelClass = MenuItem::class;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('role:admin', ['only' => ['store']]);
+    }
+
     protected function validationRules(?Model $menuItem)
     {
         return [
@@ -32,5 +42,4 @@ class MenuItemController extends Controller
     {
         return $menuItem->makeVisible('addresses');
     }
-
 }

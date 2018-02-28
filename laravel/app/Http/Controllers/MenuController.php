@@ -10,6 +10,16 @@ class MenuController extends Controller
 {
     public $modelClass = Menu::class;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('role:admin', ['only' => ['store']]);
+    }
+
     protected function validationRules(?Model $menu)
     {
         return [
