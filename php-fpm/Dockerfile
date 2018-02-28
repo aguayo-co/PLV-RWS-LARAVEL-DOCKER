@@ -6,3 +6,5 @@ RUN apk add --no-cache $PHPIZE_DEPS \
     && apk del $PHPIZE_DEPS
 COPY php-fpm.d/*.conf /usr/local/etc/php-fpm.d/
 COPY conf.d/*.ini /usr/local/etc/php/conf.d
+
+WORKDIR /srv/caddy/html
