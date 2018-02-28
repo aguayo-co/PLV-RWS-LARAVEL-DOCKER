@@ -10,6 +10,12 @@ class AddressController extends Controller
 {
     public $modelClass = Address::class;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('owner_or_admin:user');
+    }
+
     protected function validationRules(?Model $model)
     {
         return [
