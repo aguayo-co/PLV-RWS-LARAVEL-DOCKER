@@ -20,13 +20,13 @@ class OwnerOrAdmin
     {
         $user = Auth::user();
         if (!$user) {
-            abort(Response::HTTP_FORBIDDEN);
+            abort(Response::HTTP_FORBIDDEN, "Must be someone.");
         }
 
         $object = array_values($request->route()->parameters)[0];
 
         if (!$object || !is_a($object, 'Illuminate\Database\Eloquent\Model')) {
-            abort(Response::HTTP_INTERNAL_SERVER_ERROR);
+            abort(Response::HTTP_INTERNAL_SERVER_ERROR, "OwnerOrAdmin: No object detected.");
         }
 
         switch (true) {
@@ -36,7 +36,7 @@ class OwnerOrAdmin
                 return $next($request);
 
             default:
-                abort(Response::HTTP_FORBIDDEN);
+                abort(Response::HTTP_FORBIDDEN, "User must be owner or admin.");
         }
     }
 }
