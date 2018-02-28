@@ -13,6 +13,9 @@ class User extends Authenticatable
     use Notifiable;
     use HasRoles;
 
+    public const COVERS_BASE_PATH = 'public/users/covers/';
+    public const PICTURES_BASE_PATH = 'public/users/pictures/';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -31,6 +34,8 @@ class User extends Authenticatable
         'email', 'password', 'remember_token', 'api_token',
     ];
 
+    protected $appends = ['cover', 'picture'];
+
     /**
      * Generate a random api_token string.
      *
@@ -41,10 +46,13 @@ class User extends Authenticatable
         return uniqid() . str_random(47);
     }
 
-    public const COVERS_BASE_PATH = 'public/users/covers/';
-    public const PICTURES_BASE_PATH = 'public/users/pictures/';
-
-    protected $appends = ['cover', 'picture'];
+    /**
+     * Get the addresses for the user.
+     */
+    public function addresses()
+    {
+        return $this->hasMany('App\Address');
+    }
 
     protected function getCoverAttribute()
     {

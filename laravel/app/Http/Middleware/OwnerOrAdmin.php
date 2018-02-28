@@ -16,15 +16,16 @@ class OwnerOrAdmin
      * @param  string  $model
      * @return mixed
      */
-    public function handle($request, Closure $next, $model)
+    public function handle($request, Closure $next)
     {
         $user = Auth::user();
         if (!$user) {
             abort(Response::HTTP_FORBIDDEN);
         }
 
-        $object = $request->route($model);
-        if (!$object) {
+        $object = array_values($request->route()->parameters)[0];
+
+        if (!$object || !is_a($object, 'Illuminate\Database\Eloquent\Model')) {
             abort(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
