@@ -29,10 +29,12 @@ Route::name('api.')->group(function () {
         Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', '[0-9]+');
 
-        Route::get('addresses/{user}', 'AddressController@show')->name('addresses.get')->where('user', '[0-9]+');
-        Route::post('addresses/{user}', 'AddressController@store')->name('address.create');
+        Route::get('addresses/{user}', 'AddressController@show')->name('user.addresses.get')->where('user', '[0-9]+');
+        Route::post('addresses/{user}', 'AddressController@store')->name('user.address.create');
 
-        Route::post('menus/', 'MenuController@store')->name('menu.create');
-        Route::post('menus/item', 'MenuItemController@store')->name('menu.item.create');
+        Route::post('menus', 'MenuController@store')->name('menu.create');
+        Route::post('menus/item', 'MenuItemController@store')->name('menu_item.create');
+
+        Route::post('shipping', 'ShippingMethodController@store')->name('shipping_method.create');
     });
 });
