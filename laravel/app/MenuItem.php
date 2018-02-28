@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class MenuItem extends Model
 {
     /**
-     * The attributes that are not mass assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'title', 'url', 'icon', 'parent_id', 'menu_id',
+    ];
 
     protected $appends = ['children'];
 

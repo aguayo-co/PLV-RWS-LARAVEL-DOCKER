@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Address extends Model
 {
     /**
-     * The attributes that are not mass assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id', 'address', 'region', 'zone',
+    ];
 
     /**
      * Get the user that owns the address.

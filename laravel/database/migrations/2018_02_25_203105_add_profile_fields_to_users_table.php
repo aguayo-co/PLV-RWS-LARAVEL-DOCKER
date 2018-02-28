@@ -19,7 +19,7 @@ class AddProfileFieldsToUsersTable extends Migration
             $table->string('last_name');
             $table->string('phone');
             $table->text('about');
-            $table->boolean('vacation_mode');
+            $table->boolean('vacation_mode')->default(false);
         });
     }
 

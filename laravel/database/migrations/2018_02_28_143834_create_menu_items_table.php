@@ -17,7 +17,7 @@ class CreateMenuItemsTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('url');
-            $table->string('icon');
+            $table->string('icon')->nullable();
             $table->integer('parent_id')->unsigned()->nullable();
             $table->foreign('parent_id')->references('id')->on('menu_items');
             $table->integer('menu_id')->unsigned()->nullable();

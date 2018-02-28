@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ShippingMethod extends Model
 {
     /**
-     * The attributes that are not mass assignable.
+     * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'name', 'description_seller', 'description_buyer',
+    ];
 }

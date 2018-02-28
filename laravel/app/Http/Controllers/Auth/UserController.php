@@ -22,7 +22,7 @@ class UserController extends Controller
             'password' => 'string|min:6',
             'first_name' => 'string|max:255',
             'last_name' => 'string|max:255',
-            'phone' => 'string',
+            'phone' => 'nullable|string',
             'about' => 'nullable|string',
             'picture' => 'nullable|image',
             'cover' => 'nullable|image',
