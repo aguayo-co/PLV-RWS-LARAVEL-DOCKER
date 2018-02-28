@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.4
+version: 0.4.1
 baseUri: http://prilov.aguayo.co/api
 securitySchemes:
   token:
@@ -140,7 +140,28 @@ types:
     type: object
     properties:
       name: string
-      items: MenuItem[]
+      items:
+        type: object[]
+        example:
+          [
+            {
+              id: 1,
+              title: "Moda Femenina",
+              url: "/moda-femenina",
+              children: [
+                {
+                  id: 2,
+                  "title": "Tops",
+                  "url": "/moda-femenina/tops"
+                },
+                {
+                  id: 3,
+                  "title": "Poleras",
+                  "url": "/moda-femenina/poleras"
+                }
+              ]
+            }
+          ]
   MenuItem:
     type: [object, BaseModel]
     properties:
@@ -148,8 +169,8 @@ types:
       url:
         type: string
         required: false
-      sons:
-        type: MenuItem[]
+      parent:
+        type: number
         required: false
       icon:
         type: string
@@ -212,7 +233,7 @@ types:
               type: User
         404:
           description: "The user with the specified ID could not be found"
-    put:
+    patch:
       securedBy: token
       description: "Updates the information of an user. Authorized role must be owner or administrator"
       body:
@@ -333,7 +354,7 @@ types:
                       id: 1,
                       title: "Moda Femenina",
                       url: "/moda-femenina",
-                      sons: [
+                      children: [
                         {
                           id: 2,
                           "title": "Tops",
@@ -399,7 +420,7 @@ types:
               type: Product
         404:
           description: "The product with the specified id could not be found"
-    put:
+    patch:
       securedBy: token
       description: "Updates the product with the specified id. Requires authorization of owner or administrator"
       body:
@@ -422,6 +443,13 @@ types:
   /category/{category-name}:
     get:
       description: "Gets an array of products with the specified category"
+      queryParameters:
+        items:
+          type: number
+          description: "Number of items to retrieve"
+        page:
+          type: number
+          description: "The page number that should be retrieved accordingly to the number of items requested"
       responses:
         200:
           body:
