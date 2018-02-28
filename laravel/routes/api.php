@@ -23,6 +23,7 @@ Route::name('api.')->group(function () {
         ->name('password.recovery.token');
     Route::post('user/password/reset', 'Auth\ResetPasswordController@reset')->name('password.reset');
 
+    Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
 
     Route::middleware('auth:api')->group(function () {
         Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
@@ -32,7 +33,6 @@ Route::name('api.')->group(function () {
         Route::post('addresses/{user}', 'AddressController@store')->name('address.create');
 
         Route::post('menus/', 'MenuController@store')->name('menu.create');
-        Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
         Route::post('menus/item', 'MenuItemController@store')->name('menu.item.create');
     });
 });
