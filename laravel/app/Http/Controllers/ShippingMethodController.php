@@ -23,7 +23,7 @@ class ShippingMethodController extends Controller
     protected function validationRules(?Model $menuItem)
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|unique:shipping_methods',
             'description_seller' => 'required|string',
             'description_buyer' => 'required|string',
         ];
