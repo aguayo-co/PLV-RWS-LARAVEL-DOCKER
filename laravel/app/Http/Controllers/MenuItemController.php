@@ -15,7 +15,7 @@ class MenuItemController extends Controller
     {
         return [
             'title' => 'required|string',
-            'url' => 'required|string',
+            'url' => 'nullable|string',
             'icon' => 'nullable|string',
             'parent_id' => 'nullable|exists:menu_items,id|required_without:menu_id|empty_with:menu_id',
             'menu_id' => 'nullable|exists:menus,id|required_without:parent_id|empty_with:parent_id',
