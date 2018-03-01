@@ -22,12 +22,4 @@ class Address extends Model
     {
         return $this->belongsTo('App\User');
     }
-
-    /**
-     * Get the user that owns the address.
-     */
-    public function owner()
-    {
-        return $this->user();
-    }
 }

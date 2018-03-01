@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
@@ -43,9 +44,17 @@ class Controller extends BaseController
      */
     protected function validate(array $data, Model $model = null)
     {
+        # This is a hack to ensure we don't pass a string we can't put in the DB.
+        $rules = $this->validationRules($model);
+        foreach ($rules as &$rule) {
+            if (strpos($rule, 'string') !== false && strpos($rule, 'max:') === false) {
+                $rule = $rule . '|max:' . Schema::getFacadeRoot()::$defaultStringLength;
+            }
+        }
+
         return Validator::make(
             $data,
-            $this->validationRules($model),
+            $rules,
             $this->validationMessages()
         )->validate();
     }
@@ -94,7 +103,7 @@ class Controller extends BaseController
         $data = $request->all();
         $this->validate($this->alterValidateData($data));
         $model = (new $this->modelClass)->create($this->alterFillData($data));
-        return $model;
+        return $model->refresh();
     }
 
     /**
@@ -109,6 +118,6 @@ class Controller extends BaseController
         $data = $request->all();
         $this->validate($this->alterValidateData($data), $model);
         $model->fill($this->alterFillData($data))->save();
-        return $model;
+        return $model->refresh();
     }
 }
