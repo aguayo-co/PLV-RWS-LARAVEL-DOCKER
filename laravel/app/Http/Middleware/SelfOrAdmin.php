@@ -17,12 +17,17 @@ class SelfOrAdmin
      */
     public function handle($request, Closure $next)
     {
+        # If not trying to set the user_id, we don't care who you are.
+        if (!$request->user_id) {
+            return $next($request);
+        }
+
         $user = Auth::user();
         if (!$user) {
             abort(Response::HTTP_FORBIDDEN, 'Must be someone.');
         }
 
-        if ($request->user_id && !$user->hasRole('admin') && $user->id != $request->user_id) {
+        if ($user->id != $request->user_id && !$user->hasRole('admin')) {
             abort(Response::HTTP_FORBIDDEN, 'Only admin can set a different user_id.');
         }
 
