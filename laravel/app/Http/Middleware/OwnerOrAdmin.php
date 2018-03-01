@@ -24,10 +24,6 @@ class OwnerOrAdmin
 
         $object = array_values($request->route()->parameters)[0];
 
-        if (!$user->hasRole('admin') && $request->user_id && $user->id != $request->user_id) {
-            abort(Response::HTTP_FORBIDDEN, "Only admin can change the owner.");
-        }
-
         switch (true) {
             case $user->is($object->user):
             case $user->hasRole('admin'):

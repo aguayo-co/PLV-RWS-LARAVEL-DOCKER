@@ -23,7 +23,7 @@ class Controller extends BaseController
     public function __construct()
     {
         $this->middleware('owner_or_admin', ['only' => ['update']]);
-        $this->middleware('self_or_admin', ['only' => ['store']]);
+        $this->middleware('self_or_admin', ['only' => ['update', 'store']]);
     }
 
     protected function validationRules(?Model $model)
