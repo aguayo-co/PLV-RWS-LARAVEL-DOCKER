@@ -26,11 +26,15 @@ class OwnerOrAdmin
         $object = array_values($request->route()->parameters)[0];
 
         if (!$object || !is_a($object, 'Illuminate\Database\Eloquent\Model')) {
-            abort(Response::HTTP_INTERNAL_SERVER_ERROR, "OwnerOrAdmin: No object detected.");
+            abort(Response::HTTP_INTERNAL_SERVER_ERROR, "No object received.");
+        }
+
+        if (!$user->hasRole('admin') && $object->user_id && $request->user_id && $object->user_id != $request->user_id) {
+            abort(Response::HTTP_FORBIDDEN, "Only admin can change the owner.");
         }
 
         switch (true) {
-            case $user->is($object->owner):
+            case $user->is($object->user):
             case $user->hasRole('admin'):
             case $user->is($object):
                 return $next($request);
