@@ -54,53 +54,59 @@ class User extends Authenticatable
         return $this->hasMany('App\Address');
     }
 
-    protected function getCoverAttribute()
-    {
-        $path = $this->cover_path;
-        if (Storage::exists($path)) {
-            return asset($path);
-        }
-    }
-
-    protected function getPictureAttribute()
-    {
-        $path = $this->picture_path;
-        if (Storage::exists($path)) {
-            return asset($path);
-        }
-    }
-
     protected function getCoverPathAttribute()
     {
-        return $this::COVERS_BASE_PATH . $this->id;
+        return $this::COVERS_BASE_PATH . $this->id . '/';
     }
 
     protected function getPicturePathAttribute()
     {
-        return $this::PICTURES_BASE_PATH . $this->id;
+        return $this::PICTURES_BASE_PATH . $this->id . '/';
+    }
+
+    protected function getCoverAttribute()
+    {
+        return $this->getImage($this->cover_path);
+    }
+
+    protected function getPictureAttribute()
+    {
+        return $this->getImage($this->picture_path);
     }
 
     protected function setCoverAttribute(?UploadedFile $cover)
     {
-        if ($cover === null) {
-            if (Storage::exists($this->cover_path)) {
-                Storage::delete($this->cover_path);
-            }
-            return;
+        $this->clearImages($this->cover_path);
+        if ($cover) {
+            $this->setImage($cover, $this->cover_path);
         }
-
-        $cover->storeAs($this::COVERS_BASE_PATH, $this->id);
     }
 
     protected function setPictureAttribute(?UploadedFile $picture)
     {
-        if ($picture === null) {
-            if (Storage::exists($this->picture_path)) {
-                Storage::delete($this->picture_path);
-            }
-            return;
+        $this->clearImages($this->picture_path);
+        if ($picture) {
+            $this->setImage($picture, $this->picture_path);
         }
+    }
 
-        $picture->storeAs($this::PICTURES_BASE_PATH, $this->id);
+    protected function setImage(UploadedFile $image, $path)
+    {
+        $image->storeAs($path, uniqid());
+    }
+
+    protected function getImage($path)
+    {
+        if ($files = Storage::files($path)) {
+            return asset($files[0]);
+        }
+        return;
+    }
+
+    protected function clearImages($path)
+    {
+        foreach (Storage::files($path) as $image) {
+            Storage::delete($image);
+        }
     }
 }

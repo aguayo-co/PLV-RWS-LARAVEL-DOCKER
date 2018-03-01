@@ -106,6 +106,6 @@ class RegisterController extends Controller
         if ($picture = $request->file('picture')) {
             $user->picture = $picture;
         }
-        return $user;
+        return $user->makeVisible('api_token');
     }
 }
