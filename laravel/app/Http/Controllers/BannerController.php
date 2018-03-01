@@ -26,9 +26,24 @@ class BannerController extends Controller
             'name' => 'required|string|unique:banners',
             'title' => 'required|string',
             'subtitle' => 'required|string',
-            'image' => 'required|string',
+            'image' => 'required|image',
             'button_text' => 'required|string',
             'url' => 'required|string',
         ];
+    }
+
+    /**
+     * Handle an update request for a banner.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $banner = parent::store($request);
+        if ($image = $request->file('image')) {
+            $banner->image = $image;
+        }
+        return $banner;
     }
 }
