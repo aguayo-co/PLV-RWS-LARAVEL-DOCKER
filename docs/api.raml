@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.4.1
+version: 0.4.2
 baseUri: http://prilov.aguayo.co/api
 securitySchemes:
   token:
@@ -142,6 +142,7 @@ types:
       name: string
       items:
         type: object[]
+        required: false
         example:
           [
             {
@@ -169,7 +170,10 @@ types:
       url:
         type: string
         required: false
-      parent:
+      parentItem:
+        type: number
+        required: false
+      parentMenu:
         type: number
         required: false
       icon:
@@ -265,6 +269,39 @@ types:
                     ]
                   }
                 }
+    /addresses:
+      get:
+        securedBy: token
+        description: "Get all the addreses of the specified user. Requires authorization by owner or administrator"
+        responses:
+          200:
+            body:
+              application/json:
+                type: Address[]
+          404:
+            description: "User could not be found"
+          401:
+            description: "Unauthorized request"
+      post:
+        securedBy: token
+        description: "Creates a new Address linked to the specified user. Requieres authorization by owner or administrator"
+        body:
+          application/json:
+            type: Address
+        responses:
+          201:
+            description: "The address was added succesfully"
+            body:
+              application/json:
+                type: Address
+          400:
+            body:
+              application/json:
+                type: DetailedAnswer
+          404:
+            description: "User could not be found"
+          401:
+            description: "Unauthorized request"
 
   /login:
     post:
@@ -339,7 +376,7 @@ types:
         type: Menu
   /{menu-name}:
     get:
-      description: "Gets the items of the specified menu"
+      description: "Gets the items of the specified menu by name"
       responses:
         200:
           description: "Menu retrieved succesfully"
@@ -457,41 +494,6 @@ types:
               type: Product[]
         404:
           description: "There are not products with the specified category"
-
-/addresses:
-  /{user-id}:
-    get:
-      securedBy: token
-      description: "Get all the addreses of the specified user. Requires authorization by owner or administrator"
-      responses:
-        200:
-          body:
-            application/json:
-              type: Address[]
-        404:
-          description: "User could not be found"
-        401:
-          description: "Unauthorized request"
-    post:
-      securedBy: token
-      description: "Creates a new Address linked to the specified user. Requieres authorization by owner or administrator"
-      body:
-        application/json:
-          type: Address
-      responses:
-        201:
-          description: "The address was added succesfully"
-          body:
-            application/json:
-              type: Address
-        400:
-          body:
-            application/json:
-              type: DetailedAnswer
-        404:
-          description: "User could not be found"
-        401:
-          description: "Unauthorized request"
 /shipping:
   post:
     securedBy: token
