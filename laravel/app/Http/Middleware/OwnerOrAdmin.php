@@ -13,7 +13,6 @@ class OwnerOrAdmin
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string  $model
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -25,11 +24,7 @@ class OwnerOrAdmin
 
         $object = array_values($request->route()->parameters)[0];
 
-        if (!$object || !is_a($object, 'Illuminate\Database\Eloquent\Model')) {
-            abort(Response::HTTP_INTERNAL_SERVER_ERROR, "No object received.");
-        }
-
-        if (!$user->hasRole('admin') && $object->user_id && $request->user_id && $object->user_id != $request->user_id) {
+        if (!$user->hasRole('admin') && $request->user_id && $user->id != $request->user_id) {
             abort(Response::HTTP_FORBIDDEN, "Only admin can change the owner.");
         }
 
