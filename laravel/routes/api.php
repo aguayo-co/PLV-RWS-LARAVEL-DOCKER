@@ -21,14 +21,14 @@ Route::name('api.')->group(function () {
         ->name('password.recovery.email');
     Route::post('users/password/recovery/{email}', 'Auth\ForgotPasswordController@validateResetToken')
         ->name('password.recovery.token');
-    Route::post('user/password/reset', 'Auth\ResetPasswordController@reset')->name('password.reset');
 
     Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
 
     Route::get('banners/{banner}', 'BannerController@show')->name('banner.get')->where('banner', '[0-9]+');
 
+    Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
+
     Route::middleware('auth:api')->group(function () {
-        Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', '[0-9]+');
 
         Route::get('users/{user}/addresses', 'AddressController@show')->name('user.addresses.get')->where('user', '[0-9]+');
