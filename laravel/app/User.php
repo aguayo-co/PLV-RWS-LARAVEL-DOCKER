@@ -37,13 +37,32 @@ class User extends Authenticatable
     protected $appends = ['cover', 'picture'];
 
     /**
+     * Store files temporarily while creating a user.
+     */
+    protected $temp_cover;
+    protected $temp_picture;
+
+    /**
      * Generate a random api_token string.
      *
      * @return string
      */
-    public static function generateApiToken()
+    protected static function generateApiToken()
     {
         return uniqid() . str_random(47);
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        self::created(function ($user) {
+            if ($user->temp_cover) {
+                $user->cover = $user->temp_cover;
+            }
+            if ($user->temp_picture) {
+                $user->picture = $user->temp_picture;
+            }
+        });
     }
 
     /**
@@ -56,11 +75,17 @@ class User extends Authenticatable
 
     protected function getCoverPathAttribute()
     {
+        if (!$this->id) {
+            return;
+        }
         return $this::COVERS_BASE_PATH . $this->id . '/';
     }
 
     protected function getPicturePathAttribute()
     {
+        if (!$this->id) {
+            return;
+        }
         return $this::PICTURES_BASE_PATH . $this->id . '/';
     }
 
@@ -76,6 +101,10 @@ class User extends Authenticatable
 
     protected function setCoverAttribute(?UploadedFile $cover)
     {
+        if (!$this->id) {
+            $this->temp_cover = $cover;
+            return;
+        }
         $this->clearImages($this->cover_path);
         if ($cover) {
             $this->setImage($cover, $this->cover_path);
@@ -84,6 +113,10 @@ class User extends Authenticatable
 
     protected function setPictureAttribute(?UploadedFile $picture)
     {
+        if (!$this->id) {
+            $this->temp_picture = $picture;
+            return;
+        }
         $this->clearImages($this->picture_path);
         if ($picture) {
             $this->setImage($picture, $this->picture_path);
@@ -105,8 +138,6 @@ class User extends Authenticatable
 
     protected function clearImages($path)
     {
-        foreach (Storage::files($path) as $image) {
-            Storage::delete($image);
-        }
+        Storage::deleteDirectory($path);
     }
 }
