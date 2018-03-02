@@ -19,7 +19,7 @@ class OwnerOrAdmin
     {
         $user = Auth::user();
         if (!$user) {
-            abort(Response::HTTP_FORBIDDEN, "Must be someone.");
+            abort(Response::HTTP_FORBIDDEN, 'Must be someone.');
         }
 
         $object = array_values($request->route()->parameters)[0];
@@ -31,7 +31,7 @@ class OwnerOrAdmin
                 return $next($request);
 
             default:
-                abort(Response::HTTP_FORBIDDEN, "User must be owner or admin.");
+                abort(Response::HTTP_FORBIDDEN, 'User must be owner or admin.');
         }
     }
 }

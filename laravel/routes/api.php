@@ -31,7 +31,8 @@ Route::name('api.')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', '[0-9]+');
 
-        Route::get('users/{user}/addresses', 'AddressController@show')->name('user.addresses.get')->where('user', '[0-9]+');
+        Route::get('users/{user}/addresses', 'AddressController@show')
+            ->name('user.addresses.get')->where('user', '[0-9]+');
         Route::post('users/{user}/addresses', 'AddressController@store')->name('user.address.create');
 
         Route::post('menus', 'MenuController@store')->name('menu.create');

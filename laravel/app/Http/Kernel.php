@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             'throttle:60,1',
+            'wants_json',
             'bindings',
         ],
     ];
@@ -62,6 +63,7 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
 
+        'wants_json' => \App\Http\Middleware\WantsJson::class,
         'owner_or_admin' => \App\Http\Middleware\OwnerOrAdmin::class,
         'self_or_admin' => \App\Http\Middleware\SelfOrAdmin::class,
     ];
