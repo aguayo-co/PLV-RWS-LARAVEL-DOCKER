@@ -4,14 +4,11 @@ namespace Tests\Unit;
 
 use App\User;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class UserModelTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function testPasswordIsHidden()
     {
         $user = factory(User::class)->create();
@@ -23,7 +20,6 @@ class UserModelTest extends TestCase
     public function testApiTokenIsHidden()
     {
         $user = factory(User::class)->create();
-
 
         $this->assertNotNull($user->api_token);
         $this->assertArrayNotHasKey('api_token', $user->toArray());
@@ -57,43 +53,5 @@ class UserModelTest extends TestCase
         $apiTokenA = User::generateApiToken();
         $apiTokenB = User::generateApiToken();
         $this->assertNotSame($apiTokenA, $apiTokenB);
-    }
-
-    public function testCoverImagePersisted()
-    {
-        Storage::fake();
-        $user = factory(User::class)->create();
-
-        $user->cover = UploadedFile::fake()->image('cover');
-        $this->assertTrue(Storage::exists($user->cover_path));
-    }
-
-    public function testPictureImagePersisted()
-    {
-        Storage::fake();
-        $user = factory(User::class)->create();
-
-        $user->picture = UploadedFile::fake()->image('picture');
-        $this->assertTrue(Storage::exists($user->picture_path));
-    }
-
-    public function testPictureDeleted()
-    {
-        Storage::fake();
-        $user = factory(User::class)->create();
-
-        $user->picture = UploadedFile::fake()->image('picture');
-        $user->picture = null;
-        $this->assertFalse(Storage::exists($user->picture_path));
-    }
-
-    public function testCoverDeleted()
-    {
-        Storage::fake();
-        $user = factory(User::class)->create();
-
-        $user->cover = UploadedFile::fake()->image('cover');
-        $user->cover = null;
-        $this->assertFalse(Storage::exists($user->picture_path));
     }
 }
