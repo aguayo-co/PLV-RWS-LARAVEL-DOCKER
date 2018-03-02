@@ -52,12 +52,16 @@ class MenuItem extends Model
     public function setMenuIdAttribute($menuId)
     {
         $this->attributes['menu_id'] = $menuId;
-        $this->attributes['parent_id'] = null;
+        if ($menuId) {
+            $this->attributes['parent_id'] = null;
+        }
     }
 
     public function setParentIdAttribute($parentId)
     {
         $this->attributes['parent_id'] = $parentId;
-        $this->attributes['menu_id'] = null;
+        if ($parentId) {
+            $this->attributes['menu_id'] = null;
+        }
     }
 }
