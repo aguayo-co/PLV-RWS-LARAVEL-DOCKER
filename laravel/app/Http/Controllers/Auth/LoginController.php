@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Model;
 use App\User;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
@@ -31,6 +32,14 @@ class LoginController extends Controller
     {
         parent::__construct();
         $this->middleware('guest');
+    }
+
+    protected function validationRules(?Model $model)
+    {
+        return [
+            $this->username() => 'required|string',
+            'password' => 'required|string',
+        ];
     }
 
     /**
@@ -72,10 +81,7 @@ class LoginController extends Controller
      */
     protected function validateLogin(Request $request)
     {
-        $this->validate($request, [
-            $this->username() => 'required|string',
-            'password' => 'required|string',
-        ]);
+        $this->validate($request->all());
     }
 
     /**
