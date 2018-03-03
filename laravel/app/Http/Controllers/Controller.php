@@ -26,6 +26,10 @@ class Controller extends BaseController
          * Only an admin or the owner can update models.
          */
         $this->middleware('owner_or_admin', ['only' => ['update']]);
+
+        /**
+         * The value of user_id mus be the same as the logged user.
+         */
         $this->middleware('self_or_admin', ['only' => ['update', 'store']]);
     }
 

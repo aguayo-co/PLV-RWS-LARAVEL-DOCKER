@@ -14,7 +14,7 @@ class MenuItemController extends Controller
     protected function validationRules(?Model $menuItem)
     {
         return [
-            'title' => 'required|string',
+            'name' => 'required|string',
             'url' => 'nullable|string',
             'icon' => 'nullable|string',
             'parent_id' => 'nullable|exists:menu_items,id|required_without:menu_id|empty_with:menu_id',

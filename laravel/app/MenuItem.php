@@ -12,7 +12,7 @@ class MenuItem extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'url', 'icon', 'parent_id', 'menu_id',
+        'name', 'url', 'icon', 'parent_id', 'menu_id',
     ];
 
     protected $appends = ['children'];

@@ -6,7 +6,7 @@ use App\MenuItem;
 
 $factory->define(MenuItem::class, function (Faker $faker) {
     return [
-        'title' => $faker->sentence,
+        'name' => $faker->sentence,
         'url' => $faker->url,
         'icon' => $faker->url,
         'menu_id' => Menu::all()->random()->id,
