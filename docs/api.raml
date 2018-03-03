@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.5.1
+version: 0.5.2
 baseUri: https://prilov.aguayo.co/api
 
 securitySchemes:
@@ -120,9 +120,8 @@ types:
       menu_id?: number
       icon?: string
   Banner:
-    type: [BaseModel]
+    type: [Property]
     properties:
-      name: string
       title: string
       subtitle: string
       image: string
