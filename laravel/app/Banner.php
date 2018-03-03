@@ -25,7 +25,7 @@ class Banner extends Model
     {
         $path = $this->image_path;
         if (Storage::exists($path)) {
-            return asset($path);
+            return asset(Storage::url($path));
         }
     }
 

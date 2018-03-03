@@ -131,7 +131,7 @@ class User extends Authenticatable
     protected function getImage($path)
     {
         if ($files = Storage::files($path)) {
-            return asset($files[0]);
+            return asset(Storage::url($files[0]));
         }
         return;
     }

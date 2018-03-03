@@ -49,7 +49,7 @@ class Product extends Model
     {
         $images = [];
         foreach (Storage::files($this->image_path) as $image) {
-            $images[] = asset($image);
+            $images[] = asset(Storage::url($image));
         }
         return $images;
     }
