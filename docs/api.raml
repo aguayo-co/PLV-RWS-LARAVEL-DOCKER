@@ -1,7 +1,7 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.5.0
-baseUri: http://prilov.aguayo.co/api
+version: 0.5.1
+baseUri: https://prilov.aguayo.co/api
 
 securitySchemes:
   token:
@@ -107,37 +107,17 @@ types:
         properties:
           /^[a-z_]*$/: string[]
   Menu:
-    type: object
+    type: [BaseModel]
     properties:
       name: string
-      items?: object[]
-        example:
-          [
-            {
-              id: 1,
-              name: "Moda Femenina",
-              url: "/moda-femenina",
-              items: [
-                {
-                  id: 2,
-                  "name": "Tops",
-                  "url": "/moda-femenina/tops"
-                },
-                {
-                  id: 3,
-                  "name": "Poleras",
-                  "url": "/moda-femenina/poleras"
-                }
-              ]
-            }
-          ]
+      items?: MenuItem[]
   MenuItem:
     type: [BaseModel]
     properties:
       name: string
       url?: string
-      parentItem?: number
-      parentMenu?: number
+      parent_id?: number
+      menu_id?: number
       icon?: string
   Banner:
     type: [BaseModel]
@@ -146,7 +126,7 @@ types:
       title: string
       subtitle: string
       image: string
-      buttonText: string
+      button_text: string
       url: string
 
 /users:
