@@ -24,7 +24,7 @@ class Menu extends Model
      */
     public function getRouteKeyName()
     {
-        return 'name';
+        return 'slug';
     }
 
     /**
@@ -41,5 +41,11 @@ class Menu extends Model
     public function getItemsAttribute()
     {
         return $this->items()->get();
+    }
+
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name'] = $name;
+        $this->attributes['slug'] = str_slug($name);
     }
 }

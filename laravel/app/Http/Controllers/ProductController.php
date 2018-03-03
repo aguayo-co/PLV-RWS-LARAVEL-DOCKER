@@ -40,7 +40,7 @@ class ProductController extends Controller
                     $query->whereNotNull('parent_id');
                 }),
             ],
-            'color_ids' => $required,
+            'color_ids' => $required . 'max:2',
             'color_ids.*' => 'exists:colors,id',
             'condition_id' => $required . 'exists:conditions,id',
             'status_id' => $required . 'exists:statuses,id',
@@ -86,5 +86,14 @@ class ProductController extends Controller
         $product->images = $request->file('images');
         $product->colors()->attach($request->color_ids);
         return $product;
+    }
+
+    protected function categories(Request $request, Model $category)
+    {
+        return Product::where('category_id', $category->id)
+            ->orWhereHas('category', function ($query) use ($category) {
+                $query->where('parent_id', $category->id);
+            })
+            ->get();
     }
 }

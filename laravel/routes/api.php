@@ -2,6 +2,12 @@
 
 use Illuminate\Http\Request;
 
+/**
+ * Per Str::slug.
+ */
+const SLUG_REGEX = '[-\pL\pN\s]+';
+const ID_REGEX = '[0-9]+';
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,11 +31,13 @@ Route::name('api.')->group(function () {
             ->name('password.recovery.token');
     });
 
-    Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', '[0-9]+');
+    Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
 
     Route::get('menus/{menu}', 'MenuController@show')->name('menu.get');
-    Route::get('banners/{banner}', 'BannerController@show')->name('banner.get')->where('banner', '[0-9]+');
-    Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', '[0-9]+');
+    Route::get('banners/{banner}', 'BannerController@show')->name('banner.get')->where('banner', ID_REGEX);
+    Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);
+    Route::get('products/category/{category}', 'ProductController@categories')
+        ->name('products.category.get')->where('category', SLUG_REGEX);
 
     Route::get('colors', 'ColorController@index')->name('colors');
     Route::get('brands', 'BrandController@index')->name('brands');
@@ -38,14 +46,16 @@ Route::name('api.')->group(function () {
     Route::get('categories', 'CategoryController@index')->name('categories');
 
     Route::middleware('auth:api')->group(function () {
-        Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', '[0-9]+');
+        Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
 
         Route::get('users/{user}/addresses', 'AddressController@show')
-            ->name('user.addresses.get')->where('user', '[0-9]+');
-        Route::post('users/{user}/addresses', 'AddressController@store')->name('user.address.create');
+            ->name('user.addresses.get')->where('user', ID_REGEX);
+        Route::post('users/{user}/addresses', 'AddressController@store')
+            ->name('user.address.create')->where('user', ID_REGEX);
 
         Route::post('products', 'ProductController@store')->name('product.create');
-        Route::patch('products/{product}', 'ProductController@update')->name('product.update');
+        Route::patch('products/{product}', 'ProductController@update')
+            ->name('product.update')->where('product', ID_REGEX);
 
         Route::middleware('role:admin')->group(function () {
             Route::post('menus', 'MenuController@store')->name('menu.create');

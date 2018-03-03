@@ -21,6 +21,11 @@ class Banner extends Model
 
     protected $appends = ['image'];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     protected function getImageAttribute()
     {
         $path = $this->image_path;
