@@ -20,8 +20,8 @@ class CampaignController extends Controller
         $required = !$campaign ? 'required|' : '';
         $ignore = $campaign ? ',' . $campaign->id : '';
         return [
-            'name' => $required . 'string|unique:campaigns' . $ignore,
-            'slug' => $required . 'string|unique:campaigns' . $ignore,
+            'name' => $required . 'string|unique:campaigns,name' . $ignore,
+            'slug' => $required . 'string|unique:campaigns,slug' . $ignore,
         ];
     }
 }

@@ -25,12 +25,17 @@ class RouteServiceProvider extends ServiceProvider
     {
         parent::boot();
 
-        Route::model('user', \App\User::class);
-        Route::model('menu', \App\Menu::class);
         Route::model('banner', \App\Banner::class);
-        Route::model('product', \App\Product::class);
+        Route::model('brand', \App\Brand::class);
+        Route::model('campaign', \App\Campaign::class);
         Route::model('category', \App\Category::class);
-        Route::model('campaign', \App\Category::class);
+        Route::model('color', \App\Color::class);
+        Route::model('condition', \App\Condition::class);
+        Route::model('menu', \App\Menu::class);
+        Route::model('product', \App\Product::class);
+        Route::model('shipping_method', \App\ShippingMethod::class);
+        Route::model('status', \App\Status::class);
+        Route::model('user', \App\User::class);
     }
 
     /**

@@ -10,12 +10,14 @@ class ShippingMethodController extends Controller
 {
     public $modelClass = ShippingMethod::class;
 
-    protected function validationRules(?Model $menuItem)
+    protected function validationRules(?Model $shippingMethod)
     {
+        $required = !$shippingMethod ? 'required|' : '';
+        $ignore = $shippingMethod ? ',' . $shippingMethod->id : '';
         return [
-            'name' => 'required|string|unique:shipping_methods',
-            'description_seller' => 'required|string',
-            'description_buyer' => 'required|string',
+            'name' => $required . 'string|unique:shipping_methods,name' . $ignore,
+            'description_seller' => $required . 'string',
+            'description_buyer' => $required . 'string',
         ];
     }
 }

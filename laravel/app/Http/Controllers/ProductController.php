@@ -82,11 +82,11 @@ class ProductController extends Controller
             ->orWhereHas('category', function ($query) use ($category) {
                 $query->where('parent_id', $category->id);
             })
-            ->get();
+            ->simplePaginate($request->items);
     }
 
     protected function withCampaign(Request $request, Model $campaign)
     {
-        return $campaign->products();
+        return $campaign->products()->simplePaginate($request->items);
     }
 }

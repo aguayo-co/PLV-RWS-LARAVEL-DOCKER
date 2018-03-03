@@ -20,8 +20,8 @@ class BrandController extends Controller
         $required = !$brand ? 'required|' : '';
         $ignore = $brand ? ',' . $brand->id : '';
         return [
-            'name' => $required . 'string|unique:brands' . $ignore,
-            'slug' => $required . 'string|unique:brands' . $ignore,
+            'name' => $required . 'string|unique:brands,name' . $ignore,
+            'slug' => $required . 'string|unique:brands,slug' . $ignore,
             'url' => 'nullable|string',
         ];
     }

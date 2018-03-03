@@ -21,8 +21,8 @@ class BannerController extends Controller
         $required = !$banner ? 'required|' : '';
         $ignore = $banner ? ',' . $banner->id : '';
         return [
-            'name' => $required . 'string|unique:banner' . $ignore,
-            'slug' => $required . 'string|unique:banner' . $ignore,
+            'name' => $required . 'string|unique:banners' . $ignore,
+            'slug' => $required . 'string|unique:banners' . $ignore,
             'title' => $required . 'string',
             'subtitle' => $required . 'string',
             'image' => $required . 'image',

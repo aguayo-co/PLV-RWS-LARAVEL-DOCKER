@@ -82,21 +82,23 @@ class Controller extends BaseController
     /**
      * Display all the resources.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         $alter = $this->alterIndexQuery();
-        return call_user_func($this->modelClass . '::when', $alter, $alter)->get();
+        return call_user_func($this->modelClass . '::when', $alter, $alter)->simplePaginate($request->items);
     }
 
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Model $model)
+    public function show(Request $request, Model $model)
     {
         return $model;
     }

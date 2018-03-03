@@ -20,8 +20,8 @@ class ConditionController extends Controller
         $required = !$condition ? 'required|' : '';
         $ignore = $condition ? ',' . $condition->id : '';
         return [
-            'name' => $required . 'string|unique:conditions' . $ignore,
-            'slug' => $required . 'string|unique:conditions' . $ignore,
+            'name' => $required . 'string|unique:conditions,name' . $ignore,
+            'slug' => $required . 'string|unique:conditions,slug' . $ignore,
         ];
     }
 }

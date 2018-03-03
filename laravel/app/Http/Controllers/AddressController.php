@@ -41,11 +41,12 @@ class AddressController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  Illuminate\Database\Eloquent\Model $user
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Model $user)
+    public function show(Request $request, Model $user)
     {
-        return $user->addresses()->get();
+        return $user->addresses()->simplePaginate();
     }
 }

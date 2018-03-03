@@ -41,12 +41,14 @@ Route::name('api.')->group(function () {
     Route::get('products/campaign/{campaign}', 'ProductController@withCampaign')
         ->name('products.campaign.get')->where('campaign', SLUG_REGEX);
 
-    Route::get('colors', 'ColorController@index')->name('colors');
+    Route::get('shipping_methods', 'ShippingMethodController@index')->name('shipping_methods');
+
     Route::get('brands', 'BrandController@index')->name('brands');
+    Route::get('campaigns', 'CampaignController@index')->name('campaigns');
+    Route::get('categories', 'CategoryController@index')->name('categories');
+    Route::get('colors', 'ColorController@index')->name('colors');
     Route::get('conditions', 'ConditionController@index')->name('conditions');
     Route::get('statuses', 'StatusController@index')->name('statuses');
-    Route::get('categories', 'CategoryController@index')->name('categories');
-    Route::get('campaigns', 'CampaignController@index')->name('campaigns');
 
     Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
@@ -64,11 +66,13 @@ Route::name('api.')->group(function () {
             Route::post('menus', 'MenuController@store')->name('menu.create');
             Route::post('menus/item', 'MenuItemController@store')->name('menu_item.create');
 
-            Route::post('shipping', 'ShippingMethodController@store')->name('shipping_method.create');
+            Route::post('shipping_methods', 'ShippingMethodController@store')->name('shipping_method.create');
+            Route::patch('shipping_methods/{shipping_method}', 'ShippingMethodController@update')
+                ->name('shipping_method.update')->where('shipping_method.update', ID_REGEX);
 
             Route::post('banners', 'BannerController@store')->name('banner.create');
             Route::post('brands', 'BrandController@store')->name('brand.create');
-            Route::post('campaign', 'CampaignController@store')->name('campaign.create');
+            Route::post('campaigns', 'CampaignController@store')->name('campaign.create');
             Route::post('categories', 'CategoryController@store')->name('category.create');
             Route::post('colors', 'ColorController@store')->name('color.create');
             Route::post('conditions', 'ConditionController@store')->name('condition.create');
@@ -76,7 +80,7 @@ Route::name('api.')->group(function () {
 
             Route::patch('banners/{banner}', 'BannerController@update')->name('banner.update');
             Route::patch('brands/{brand}', 'BrandController@update')->name('brand.update');
-            Route::patch('campaign/{campaign}', 'CampaignController@update')->name('campaign.update');
+            Route::patch('campaigns/{campaign}', 'CampaignController@update')->name('campaign.update');
             Route::patch('categories/{category}', 'CategoryController@update')->name('category.update');
             Route::patch('colors/{color}', 'ColorController@update')->name('color.update');
             Route::patch('conditions/{condition}', 'ConditionController@update')->name('condition.update');

@@ -20,8 +20,8 @@ class StatusController extends Controller
         $required = !$status ? 'required|' : '';
         $ignore = $status ? ',' . $status->id : '';
         return [
-            'name' => $required . 'string|unique:statuses' . $ignore,
-            'slug' => $required . 'string|unique:statuses' . $ignore,
+            'name' => $required . 'string|unique:statuses,name' . $ignore,
+            'slug' => $required . 'string|unique:statuses,slug' . $ignore,
         ];
     }
 }
