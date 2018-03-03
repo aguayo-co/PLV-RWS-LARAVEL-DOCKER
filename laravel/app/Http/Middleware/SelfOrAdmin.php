@@ -31,6 +31,11 @@ class SelfOrAdmin
             abort(Response::HTTP_FORBIDDEN, 'Only admin can set a different user_id.');
         }
 
+        $object = array_get(array_values($request->route()->parameters), 0);
+        if ($object && $object->user_id != $request->user_id && !$user->hasRole('admin')) {
+            abort(Response::HTTP_FORBIDDEN, 'Only admin can change the user_id.');
+        }
+
         return $next($request);
     }
 }

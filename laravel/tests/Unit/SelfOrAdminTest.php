@@ -23,7 +23,9 @@ class SelfOrAdminTest extends TestCase
         };
         $this->route = Mockery::mock();
         $this->user = factory(User::class)->create();
-        $this->request = Mockery::mock();
+        $this->request = Mockery::mock([
+            'route' => $this->route,
+        ]);
     }
 
     public function testAccessAllowedIfNoUserId()
@@ -55,11 +57,26 @@ class SelfOrAdminTest extends TestCase
         $this->middleware->handle($this->request, $this->closure);
     }
 
+    public function testAccessDeniedForUserChange()
+    {
+        Auth::setUser($this->user);
+        $this->request->user_id = $this->user->id;
+
+        $addressUser = factory(User::class)->create();
+        $address = factory(Address::class)->make(['user_id' => $addressUser->id]);
+        $this->route->parameters = [$address];
+
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Only admin can change the user_id.');
+        $this->middleware->handle($this->request, $this->closure);
+    }
+
     public function testAccessAllowedForSameUser()
     {
         Auth::setUser($this->user);
         $this->request->user_id = $this->user->id;
 
+        $this->route->parameters = [];
         $response = $this->middleware->handle($this->request, $this->closure);
 
         $this->assertEquals($response, $this->request);
@@ -73,7 +90,9 @@ class SelfOrAdminTest extends TestCase
         $this->user->assignRole('admin');
         $this->request->user_id = $this->user->id + 1;
 
+        $this->route->parameters = [];
         $response = $this->middleware->handle($this->request, $this->closure);
+
         $this->assertEquals($response, $this->request);
     }
 }

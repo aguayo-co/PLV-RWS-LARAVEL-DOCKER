@@ -22,9 +22,9 @@ class OwnerOrAdmin
             abort(Response::HTTP_FORBIDDEN, 'Must be someone.');
         }
 
-        $object = array_values($request->route()->parameters)[0];
-
+        $object = array_get(array_values($request->route()->parameters), 0);
         switch (true) {
+            case !$object:
             case $user->is($object->user):
             case $user->hasRole('admin'):
             case $user->is($object):
