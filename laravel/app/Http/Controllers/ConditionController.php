@@ -17,9 +17,11 @@ class ConditionController extends Controller
 
     protected function validationRules(?Model $condition)
     {
+        $required = !$condition ? 'required|' : '';
+        $ignore = $condition ? ',' . $condition->id : '';
         return [
-            'name' => 'required|string|unique:conditions',
-            'slug' => 'required|string|unique:conditions',
+            'name' => $required . 'string|unique:conditions' . $ignore,
+            'slug' => $required . 'string|unique:conditions' . $ignore,
         ];
     }
 }

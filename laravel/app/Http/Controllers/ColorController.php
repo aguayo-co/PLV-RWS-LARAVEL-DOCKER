@@ -17,9 +17,11 @@ class ColorController extends Controller
 
     protected function validationRules(?Model $color)
     {
+        $required = !$color ? 'required|' : '';
+        $ignore = $color ? ',' . $color->id : '';
         return [
-            'name' => 'required|string|unique:colors',
-            'slug' => 'required|string|unique:colors',
+            'name' => $required . 'string|unique:colors' . $ignore,
+            'slug' => $required . 'string|unique:colors' . $ignore,
         ];
     }
 }

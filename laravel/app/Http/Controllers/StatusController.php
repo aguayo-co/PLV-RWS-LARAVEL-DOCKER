@@ -17,9 +17,11 @@ class StatusController extends Controller
 
     protected function validationRules(?Model $status)
     {
+        $required = !$status ? 'required|' : '';
+        $ignore = $status ? ',' . $status->id : '';
         return [
-            'name' => 'required|string|unique:statuses',
-            'slug' => 'required|string|unique:statuses',
+            'name' => $required . 'string|unique:statuses' . $ignore,
+            'slug' => $required . 'string|unique:statuses' . $ignore,
         ];
     }
 }

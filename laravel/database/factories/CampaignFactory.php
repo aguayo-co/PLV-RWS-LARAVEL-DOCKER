@@ -2,7 +2,7 @@
 
 use Faker\Generator as Faker;
 
-$factory->define(App\Color::class, function (Faker $faker) {
+$factory->define(App\Campaign::class, function (Faker $faker) {
     return [
         'name' => $faker->sentence(2),
     ];

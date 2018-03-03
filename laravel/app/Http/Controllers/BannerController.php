@@ -10,27 +10,29 @@ class BannerController extends Controller
 {
     public $modelClass = Banner::class;
 
-    protected function validationRules(?Model $menuItem)
+    public function alterValidateData($data)
     {
+        $data['slug'] = str_slug(array_get($data, 'name'));
+        return $data;
+    }
+
+    protected function validationRules(?Model $banner)
+    {
+        $required = !$banner ? 'required|' : '';
+        $ignore = $banner ? ',' . $banner->id : '';
         return [
-            'name' => 'required|string|unique:banners',
-            'title' => 'required|string',
-            'subtitle' => 'required|string',
-            'image' => 'required|image',
-            'button_text' => 'required|string',
-            'url' => 'required|string',
+            'name' => $required . 'string|unique:banner' . $ignore,
+            'slug' => $required . 'string|unique:banner' . $ignore,
+            'title' => $required . 'string',
+            'subtitle' => $required . 'string',
+            'image' => $required . 'image',
+            'button_text' => $required . 'string',
+            'url' => $required . 'string',
         ];
     }
 
-    /**
-     * Handle an update request for a banner.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
+    public function postStore(Request $request, Model $banner)
     {
-        $banner = parent::store($request);
         if ($image = $request->file('image')) {
             $banner->image = $image;
         }

@@ -17,9 +17,11 @@ class BrandController extends Controller
 
     protected function validationRules(?Model $brand)
     {
+        $required = !$brand ? 'required|' : '';
+        $ignore = $brand ? ',' . $brand->id : '';
         return [
-            'name' => 'required|string|unique:brands',
-            'slug' => 'required|string|unique:brands',
+            'name' => $required . 'string|unique:brands' . $ignore,
+            'slug' => $required . 'string|unique:brands' . $ignore,
             'url' => 'nullable|string',
         ];
     }

@@ -48,7 +48,7 @@ class Controller extends BaseController
      * Validate given data.
      *
      * @param  array  $data
-     * @param  \App\User  $user
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validate(array $data, Model $model = null)
@@ -93,10 +93,34 @@ class Controller extends BaseController
     /**
      * Display the specified resource.
      *
-     * @param  Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Model $model)
+    {
+        return $model;
+    }
+
+    /**
+     * After update actions.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function postUpdate(Request $request, Model $model)
+    {
+        return $model;
+    }
+
+    /**
+     * After store actions.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function postStore(Request $request, Model $model)
     {
         return $model;
     }
@@ -134,6 +158,7 @@ class Controller extends BaseController
         $data = $request->all();
         $this->validate($this->alterValidateData($data));
         $model = call_user_func($this->modelClass . '::create', $this->alterFillData($data));
+        $model = $this->postStore($request, $model);
         return $model->fresh();
     }
 
@@ -141,7 +166,7 @@ class Controller extends BaseController
      * Handle an update request for a user.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  Illuminate\Database\Eloquent\Model $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Model $model)
@@ -149,6 +174,7 @@ class Controller extends BaseController
         $data = $request->all();
         $this->validate($this->alterValidateData($data), $model);
         $model->fill($this->alterFillData($data))->save();
+        $model = $this->postUpdate($request, $model);
         return $model->fresh();
     }
 }

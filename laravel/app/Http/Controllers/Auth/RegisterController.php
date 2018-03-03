@@ -79,15 +79,8 @@ class RegisterController extends Controller
         return $data;
     }
 
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(Request $request)
+    public function postStore(Request $request, Model $user)
     {
-        $user = parent::store($request);
         event(new Registered($user));
         if ($cover = $request->file('cover')) {
             $user->cover = $cover;

@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.5.2
+version: 0.5.3
 baseUri: https://prilov.aguayo.co/api
 
 securitySchemes:
@@ -465,7 +465,13 @@ types:
         body:
           application/json:
             type: DetailedAnswer
-  /{banner-name}:
+  /{banner-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Banner
     get:
       description: "Retrieves the banner with the specified name"
       responses:
@@ -498,7 +504,14 @@ types:
       200:
         body:
           application/json:
-            type: Category[]
+            type: Property[]
+  /{color-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Property
 
 /brands:
   post:
@@ -522,7 +535,14 @@ types:
       200:
         body:
           application/json:
-            type: Category[]
+            type: Brand[]
+  /{brand-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Brand
 
 /conditions:
   post:
@@ -546,7 +566,14 @@ types:
       200:
         body:
           application/json:
-            type: Category[]
+            type: Property[]
+  /{status-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Property
 
 /statuses:
   post:
@@ -570,7 +597,14 @@ types:
       200:
         body:
           application/json:
-            type: Category[]
+            type: Property[]
+  /{status-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Property
 
 /categories:
   post:
@@ -595,3 +629,41 @@ types:
         body:
           application/json:
             type: Category[]
+  /{category-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Category
+
+/campaigns:
+  post:
+    securedBy: [token: { scopes: [ admin ] }]
+    description: "Creates a product campaign."
+    body:
+      application/json:
+        type: Property
+    responses:
+      201:
+        description: "The campaign has been added succesfully"
+      401:
+        description: "Unauthorized request"
+      400:
+        body:
+          application/json:
+            type: DetailedAnswer
+  get:
+    description: "Get all the campaigns with subcategories."
+    responses:
+      200:
+        body:
+          application/json:
+            type: Property[]
+  /{campaign-slug}:
+    patch:
+      securedBy: [token: { scopes: [ admin ] }]
+      description: "Updates the model."
+      body:
+        application/json:
+          type: Property

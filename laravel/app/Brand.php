@@ -15,6 +15,11 @@ class Brand extends Model
         'name', 'url',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function products()
     {
         return $this->hasMany('App\Product');

@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Color extends Model
+class Campaign extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -22,7 +22,7 @@ class Color extends Model
 
     public function products()
     {
-        return $this->hasMany('App\Product');
+        return $this->HasMany('App\Product');
     }
 
     public function setNameAttribute($name)

@@ -65,16 +65,8 @@ class UserController extends Controller
         return $data;
     }
 
-    /**
-     * Handle an update request for a user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\User  $user
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(Request $request, Model $user)
+    public function postUpdate(Request $request, Model $user)
     {
-        $user = parent::update($request, $user);
         $data = $request->all();
         if (array_key_exists('cover', $data)) {
             $user->cover = $data['cover'];

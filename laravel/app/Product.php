@@ -28,9 +28,24 @@ class Product extends Model
         'status_id',
     ];
 
-    protected $with = ['brand', 'colors', 'category.parent', 'condition', 'status'];
+    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status'];
 
     protected $appends = ['images'];
+
+    /**
+     * Store files temporarily while creating a product.
+     */
+    protected $temp_images;
+
+    public static function boot()
+    {
+        parent::boot();
+        self::created(function ($product) {
+            if ($product->temp_images) {
+                $product->images = $product->temp_images;
+            }
+        });
+    }
 
     /**
      * Get the user that owns the address.
@@ -56,6 +71,10 @@ class Product extends Model
 
     protected function setImagesAttribute(array $images)
     {
+        if (!$this->id) {
+            $this->temp_images = $images;
+            return;
+        }
         foreach ($images as $image) {
             $image->storeAs($this->image_path, uniqid());
         }
@@ -73,6 +92,11 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo('App\Brand');
+    }
+
+    public function campaigns()
+    {
+        return $this->belongsToMany('App\Campaign');
     }
 
     public function category()

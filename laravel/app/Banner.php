@@ -21,26 +21,55 @@ class Banner extends Model
 
     protected $appends = ['image'];
 
+    /**
+     * Store file temporarily while creating a banner.
+     */
+    protected $temp_image;
+
+
     public function getRouteKeyName()
     {
         return 'slug';
     }
 
+    public static function boot()
+    {
+        parent::boot();
+        self::created(function ($banner) {
+            if ($banner->temp_image) {
+                $banner->image = $banner->temp_image;
+            }
+        });
+    }
+
     protected function getImageAttribute()
     {
         $path = $this->image_path;
-        if (Storage::exists($path)) {
-            return asset(Storage::url($path));
+        if ($files = Storage::files($path)) {
+            return asset(Storage::url($files[0]));
         }
+        return;
     }
 
     protected function getImagePathAttribute()
     {
-        return $this::IMAGES_BASE_PATH . $this->id;
+        return $this::IMAGES_BASE_PATH . $this->id . '/';
     }
 
     protected function setImageAttribute(UploadedFile $image)
     {
-        $image->storeAs($this::IMAGES_BASE_PATH, $this->id);
+        if (!$this->id) {
+            $this->temp_image = $image;
+            return;
+        }
+        $path = $this->image_path;
+        Storage::deleteDirectory($path);
+        $image->storeAs($path, uniqid());
+    }
+
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name'] = $name;
+        $this->attributes['slug'] = str_slug($name);
     }
 }
