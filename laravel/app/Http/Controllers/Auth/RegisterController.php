@@ -26,17 +26,6 @@ class RegisterController extends Controller
 
     public $modelClass = User::class;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('guest');
-    }
-
     protected function validationRules(?Model $user)
     {
         return [

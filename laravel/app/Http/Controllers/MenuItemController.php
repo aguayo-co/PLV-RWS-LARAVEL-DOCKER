@@ -11,17 +11,6 @@ class MenuItemController extends Controller
 {
     public $modelClass = MenuItem::class;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('role:admin', ['only' => ['store']]);
-    }
-
     protected function validationRules(?Model $menuItem)
     {
         return [
@@ -31,16 +20,5 @@ class MenuItemController extends Controller
             'parent_id' => 'nullable|exists:menu_items,id|required_without:menu_id|empty_with:menu_id',
             'menu_id' => 'nullable|exists:menus,id|required_without:parent_id|empty_with:parent_id',
         ];
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  Illuminate\Database\Eloquent\Model $menu_item
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Model $menuItem)
-    {
-        return $menuItem->makeVisible('addresses');
     }
 }

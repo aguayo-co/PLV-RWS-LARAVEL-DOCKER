@@ -22,6 +22,9 @@ class Controller extends BaseController
      */
     public function __construct()
     {
+        /**
+         * Only an admin or the owner can update models.
+         */
         $this->middleware('owner_or_admin', ['only' => ['update']]);
         $this->middleware('self_or_admin', ['only' => ['update', 'store']]);
     }
@@ -35,6 +38,7 @@ class Controller extends BaseController
     {
         return [];
     }
+
     /**
 
      * Validate given data.
@@ -48,7 +52,7 @@ class Controller extends BaseController
         # This is a hack to ensure we don't pass a string we can't put in the DB.
         $rules = $this->validationRules($model);
         foreach ($rules as &$rule) {
-            if (strpos($rule, 'string') !== false && strpos($rule, 'max:') === false) {
+            if (is_string($rule) && strpos($rule, 'string') !== false && strpos($rule, 'max:') === false) {
                 $rule = $rule . '|max:' . Schema::getFacadeRoot()::$defaultStringLength;
             }
         }
@@ -58,6 +62,28 @@ class Controller extends BaseController
             $rules,
             $this->validationMessages()
         )->validate();
+    }
+
+
+    /**
+     * Return a Closure to be applied to the index query.
+     *
+     * @return Closure
+     */
+    protected function alterIndexQuery()
+    {
+        return;
+    }
+
+    /**
+     * Display all the resources.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index()
+    {
+        $alter = $this->alterIndexQuery();
+        return call_user_func($this->modelClass . '::when', $alter, $alter)->get();
     }
 
     /**
@@ -103,8 +129,8 @@ class Controller extends BaseController
     {
         $data = $request->all();
         $this->validate($this->alterValidateData($data));
-        $model = (new $this->modelClass)->create($this->alterFillData($data));
-        return $model->refresh();
+        $model = call_user_func($this->modelClass . '::create', $this->alterFillData($data));
+        return $model->fresh();
     }
 
     /**
@@ -119,6 +145,6 @@ class Controller extends BaseController
         $data = $request->all();
         $this->validate($this->alterValidateData($data), $model);
         $model->fill($this->alterFillData($data))->save();
-        return $model->refresh();
+        return $model->fresh();
     }
 }

@@ -23,17 +23,6 @@ class LoginController extends Controller
 
     use ThrottlesLogins;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('guest');
-    }
-
     protected function validationRules(?Model $model)
     {
         return [

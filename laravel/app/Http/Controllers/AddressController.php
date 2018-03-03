@@ -13,7 +13,7 @@ class AddressController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('owner_or_admin:user');
+        $this->middleware('owner_or_admin');
     }
 
     protected function validationRules(?Model $model)

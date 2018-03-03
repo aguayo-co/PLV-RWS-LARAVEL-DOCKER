@@ -10,17 +10,6 @@ class BannerController extends Controller
 {
     public $modelClass = Banner::class;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('role:admin', ['only' => ['store']]);
-    }
-
     protected function validationRules(?Model $menuItem)
     {
         return [

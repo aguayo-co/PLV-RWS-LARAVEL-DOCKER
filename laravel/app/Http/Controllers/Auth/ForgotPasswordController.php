@@ -22,17 +22,6 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->middleware('guest');
-    }
-
     protected function validationRules(?Model $model)
     {
         $rules = ['email' => 'required|email'];
