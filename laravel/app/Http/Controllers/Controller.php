@@ -133,7 +133,7 @@ class Controller extends BaseController
      * @param  array  $data
      * @return array
      */
-    public function alterValidateData($data)
+    public function alterValidateData($data, Model $model = null)
     {
         return $data;
     }
@@ -174,7 +174,7 @@ class Controller extends BaseController
     public function update(Request $request, Model $model)
     {
         $data = $request->all();
-        $this->validate($this->alterValidateData($data), $model);
+        $this->validate($this->alterValidateData($data, $model), $model);
         $model->fill($this->alterFillData($data))->save();
         $model = $this->postUpdate($request, $model);
         return $model->fresh();

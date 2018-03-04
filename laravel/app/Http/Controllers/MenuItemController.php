@@ -11,14 +11,23 @@ class MenuItemController extends Controller
 {
     public $modelClass = MenuItem::class;
 
+    public function alterValidateData($data, Model $menuItem = null)
+    {
+        $data['id'] = $menuItem ? $menuItem->id : false;
+        return $data;
+    }
+
     protected function validationRules(?Model $menuItem)
     {
+        $required = !$menuItem ? 'required|' : '';
+        $requiredMenuId = !$menuItem ? 'required_without:parent_id|' : '';
+        $requiredParentId = !$menuItem ? 'required_without:menu_id|' : '';
         return [
-            'name' => 'required|string',
+            'name' => $required . 'string',
             'url' => 'nullable|string',
             'icon' => 'nullable|string',
-            'parent_id' => 'nullable|exists:menu_items,id|required_without:menu_id|empty_with:menu_id',
-            'menu_id' => 'nullable|exists:menus,id|required_without:parent_id|empty_with:parent_id',
+            'parent_id' => $requiredParentId . 'empty_with:menu_id|exists:menu_items,id|different:id',
+            'menu_id' => $requiredMenuId . 'empty_with:parent_id|exists:menus,id',
         ];
     }
 }

@@ -9,7 +9,7 @@ class ColorController extends Controller
 {
     public $modelClass = Color::class;
 
-    public function alterValidateData($data)
+    public function alterValidateData($data, Model $color = null)
     {
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;

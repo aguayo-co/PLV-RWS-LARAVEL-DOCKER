@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.5.4
+version: 0.6.0
 baseUri: https://prilov.aguayo.co/api
 
 securitySchemes:
@@ -13,55 +13,74 @@ securitySchemes:
           description: "Use the Bearer keyword. Example Authorization Bearer [API_key]"
           type: string
 
+
 types:
-  BaseModel:
+  BaseObject:
     type: object
     properties:
-      id?: number
+      id?: datetime
       created_at?: datetime
       updated_at?: datetime
   Property:
-    type: [BaseModel]
+    type: BaseObject
     properties:
       name: string
       slug?: string
+
+  Banner:
+    type: Property
+    properties:
+      title: string
+      subtitle: string
+      image: string
+      button_text: string
+      url: string
   Brand:
-    type: [Property]
+    type: Property
     properties:
       url: string
+  Campaign:
+    type: Property
   Category:
-    type: [Property]
+    type: Property
     properties:
       parent?: number
+  Color:
+    type: Property
+  Condition:
+    type: Property
+  Status:
+    type: Property
+
   Address:
-    type: object
+    type: BaseObject
     properties:
+      user_id: integer
       address: string
       region: string
       zone: string
-      user: number
   User:
-    type: [BaseModel]
+    type: BaseObject
     properties:
-      id?: integer
       email: string
       first_name: string
       last_name: string
       password: string
+      about?: string
       phone?: string
       cover?: file
       picture?: file
-      about?: string
-      followers?: number
-      following?: number
-      positiveRatings?: number
-      negativeRatings?: number
-      neutralRatings?: number
-      vacationMode?: boolean
-      shippingMethods?: ShippingMethod[]
-      favoriteAddress?: Address
+      favorite_address_id?: integer
+  UserExpanded:
+    type: [User]
+    properties:
+      addresses: Address[]
+  UserLogged:
+    type: User
+    properties:
+      api_token: string
   Product:
-    type: [BaseModel]
+    type: BaseObject
     properties:
       title: string
       images: file[]
@@ -70,19 +89,22 @@ types:
       originalPrice: number
       price: number
       commission: number
-      user?: User
       user_id: integer
-      brand?: Brand
       brand_id: integer
-      category?: Category
       category_id: integer
-      colors?: Property[]
       color_ids: integer[]
-      condition?: Property
       condition_id: integer
-      status?: Property
       status_id: integer
+  ProductExpanded:
+    type: Product
+    properties:
+      user?: User
+      brand?: Brand
+      category?: Category
+      colors?: Property[]
+      condition?: Property
       size?: Property
+      status?: Property
   Auth:
     type: object
     properties:
@@ -93,7 +115,7 @@ types:
     properties:
       token: string
   ShippingMethod:
-    type: object
+    type: BaseObject
     properties:
       name: string
       descriptionSeller: string
@@ -107,140 +129,56 @@ types:
         properties:
           /^[a-z_]*$/: string[]
   Menu:
-    type: [BaseModel]
+    type: BaseObject
     properties:
       name: string
       items?: MenuItem[]
   MenuItem:
-    type: [BaseModel]
+    type: BaseObject
     properties:
       name: string
       url?: string
       parent_id?: number
       menu_id?: number
       icon?: string
-  Banner:
-    type: [Property]
-    properties:
-      title: string
-      subtitle: string
-      image: string
-      button_text: string
-      url: string
+
+resourceTypes:
+  collection:
+    post:
+      is: [ singleItemPost ]
+    get:
+      description: Get all the <<resourcePathName|!pluralize|!uppercamelcase>>
+      is: [ paginated ]
+
+  singleItem:
+    patch:
+      is: [ singleItemResponse, dataError ]
+      securedBy: [token: { scopes: [ admin ] }]
+      description: Update the given <<resourcePathName|!singularize|!uppercamelcase>>
+      body:
+        multipart/form-data:
+          type: <<resourcePathName|!singularize|!uppercamelcase>>
+        application/json:
+          type: <<resourcePathName|!singularize|!uppercamelcase>>
+    get:
+      is: [ singleItemResponse ]
+      description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
 
 /users:
   post:
-    description: "Creates a new User"
-    body:
-      application/json:
-        type: User
-        example:  {
-          first_name: "Marie",
-          last_name: "Curie",
-          email: "marie@curie.com",
-          password: "asd|@123"
-        }
-    responses:
-      201:
-        description: "User was created succesfully"
-      400:
-        description: "There is an error on the input given for user creation"
-        body:
-          application/json:
-            type: DetailedAnswer
-            example:
-              {
-                "message": "The given data was invalid.",
-                "errors": {
-                  "firstname": [
-                    "The firstname field is invalid or empty."
-                  ],
-                  "email": [
-                    "The email field is invalid or empty"
-                  ],
-                  "exists": [
-                    "There is another user registered with the same email"
-                  ],
-                  "password": [
-                    "The password field is invalid or empty"
-                  ]
-                }
-              }
+    is: [ singleItemPost ]
   /{user-id}:
+    type: singleItem
     get:
-      description: "Retrieves the public data of an user"
       responses:
         200:
           body:
             application/json:
-              type: User
-        404:
-          description: "The user with the specified ID could not be found"
+              type: UserExpanded
     patch:
-      securedBy: [token: { scopes: [ admin, owner ] }]
-      description: "Updates the information of an user."
-      body:
-        application/json:
-          type: User
-      responses:
-        200:
-          description: "The user was updated succesfully"
-          body:
-            application/json:
-              type: User
-        401:
-          description: "Unauthorized request"
-        404:
-          description: "User with the provided ID could not be found"
-        400:
-          body:
-            application/json:
-              type: DetailedAnswer
-              example:
-                {
-                  "message": "The given data was invalid.",
-                  "errors": {
-                    "email": [
-                      "The email field is invalid or empty"
-                    ],
-                    "password": [
-                      "The password field is invalid or empty"
-                    ]
-                  }
-                }
+      securedBy: [token: { scopes: [ owner ] }]
     /addresses:
-      get:
-        securedBy: [token: { scopes: [ admin, owner ] }]
-        description: "Get all the addreses of the specified user."
-        responses:
-          200:
-            body:
-              application/json:
-                type: Address[]
-          404:
-            description: "User could not be found"
-          401:
-            description: "Unauthorized request"
-      post:
-        securedBy: [token: { scopes: [ admin, owner ] }]
-        description: "Creates a new Address linked to the specified user."
-        body:
-          application/json:
-            type: Address
-        responses:
-          201:
-            description: "The address was added succesfully"
-            body:
-              application/json:
-                type: Address
-          400:
-            body:
-              application/json:
-                type: DetailedAnswer
-          404:
-            description: "User could not be found"
-          401:
-            description: "Unauthorized request"
+      type: collection
 
   /login:
     post:
@@ -252,27 +190,12 @@ types:
             email: "marie@curie.com",
             password: "asd|@123"
           }
+      if: [ singleItemResponse ]
       responses:
         200:
           body:
             application/json:
-              type: [User, Token]
-        400:
-          body:
-            application/json:
-              type: DetailedAnswer
-              example:
-                {
-                  "message": "The given data was invalid.",
-                  "errors": {
-                    "email": [
-                      "The email field is invalid or empty"
-                    ],
-                    "password": [
-                      "The password field is invalid or empty"
-                    ]
-                  }
-                }
+              type: UserLogged
   /password/recovery/{email}:
     get:
       description: "Requires a password recovery link for an user"
@@ -307,175 +230,77 @@ types:
           description: "The provided password token is invalid"
 
 /menus:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a new menu"
-    body:
-      application/json:
-        type: Menu
-  /{menu-slug}:
-    get:
-      description: "Gets the items of the specified menu by name"
-      responses:
-        200:
-          description: "Menu retrieved succesfully"
-          body:
-            application/json:
-              type: Menu
-              example:
-                {
-                  "name": "Main Menu",
-                  "slug": "main-menu",
-                  "items": [
-                    {
-                      id: 1,
-                      name: "Moda Femenina",
-                      url: "/moda-femenina",
-                      children: [
-                        {
-                          id: 2,
-                          "name": "Tops",
-                          "url": "/moda-femenina/tops"
-                        },
-                        {
-                          id: 3,
-                          "name": "Poleras",
-                          "url": "/moda-femenina/poleras"
-                        }
-                      ]
-                    }
-                  ]
-                }
-        404:
-          description: "The specified menu could not be found"
-  /item:
-    post:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Creates a new menu item"
-      body:
-        application/json:
-          type: MenuItem
-      responses:
-        201:
-          description: "Item was created succesfully"
-          body:
-            application/json:
-              type: MenuItem
-        401:
-          description: "Unauthorized request"
-        400:
-          body:
-            application/json:
-              type: DetailedAnswer
+  type: collection
+  /{menu-id}:
+    type: singleItem
+/menu_item:
+  type: collection
+  /{menu_item-id}:
+    type: singleItem
 
 /products:
-  post:
-    securedBy: token
-    description: "Creates a new product. Requires authorization of an user with all fields completed"
-    body:
-      application/json:
-        type: Product
-    responses:
-      200:
-        description: "Product created succesfully"
-        body:
-          application/json:
-            type: Product
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
+  type: collection
   /{product-id}:
+    type: singleItem
     get:
-      description: "Get the product with specified ID"
       responses:
         200:
           body:
             application/json:
-              type: Product
-        404:
-          description: "The product with the specified id could not be found"
+              type: ProductExpanded
     patch:
-      securedBy: [token: { scopes: [ admin, owner ] }]
-      description: "Updates the product with the specified id."
-      body:
-        application/json:
-          type: Product
-      responses:
-        200:
-          description: "The product has been updated successfuly"
-          body:
-            application/json:
-              type: Product
-        400:
-          body:
-            application/json:
-              type: DetailedAnswer
-        404:
-          description: "The product with the specified id could not be found"
-        401:
-          description: "Unauthorized request"
+      securedBy: [token: { scopes: [ owner ] }]
   /category/{category-slug}:
     get:
       description: "Gets a paginated result of products with the specified category"
-      queryParameters:
-        items:
-          type: number
-          description: "Number of items to retrieve"
-        page:
-          type: number
-          description: "The page number that should be retrieved accordingly to the number of items requested"
+      is: [ paginated ]
       responses:
-        200:
-          body:
-            application/json:
-              example:
-                {
-                  "current_page": 3,
-                  "data": [object, object, object...],
-                  "first_page_url": "URL-TO-PAGE-1?page=1",
-                  "from": 7,
-                  "next_page_url": "URL-TO-NEXT-PAGE?page=4",
-                  "path": "BASE-URL",
-                  "per_page": "3",
-                  "prev_page_url": "URL-TO-PREVIOUS-PAGE?page=2",
-                  "to": 9
-                }
         404:
-          description: "There are not products with the specified category"
+          description: "Category not found."
   /campaign/{campaign-slug}:
     get:
       description: "Gets a paginated result of products with the specified campaign"
-      queryParameters:
-        items:
-          type: number
-          description: "Number of items to retrieve"
-        page:
-          type: number
-          description: "The page number that should be retrieved accordingly to the number of items requested"
+      is: [ paginated ]
       responses:
-        200:
-          body:
-            application/json:
-              example:
-                {
-                  "current_page": 3,
-                  "data": [object, object, object...],
-                  "first_page_url": "URL-TO-PAGE-1?page=1",
-                  "from": 7,
-                  "next_page_url": "URL-TO-NEXT-PAGE?page=4",
-                  "path": "BASE-URL",
-                  "per_page": "3",
-                  "prev_page_url": "URL-TO-PREVIOUS-PAGE?page=2",
-                  "to": 9
-                }
         404:
-          description: "There are not products with the specified category"
+          description: "Campaign not found."
+
 /shipping_methods:
-  get:
-    description: "Gets a paginated result of Shipping methods."
+  type: collection
+  /{shipping_method-id}:
+    type: singleItem
+
+/banners:
+  type: collection
+  /{banner-slug}:
+    type: singleItem
+/brands:
+  type: collection
+  /{brand-slug}:
+    type: singleItem
+/campaigns:
+  type: collection
+  /{campaign-slug}:
+    type: singleItem
+/categories:
+  type: collection
+  /{category-slug}:
+    type: singleItem
+/colors:
+  type: collection
+  /{color-slug}:
+    type: singleItem
+/conditions:
+  type: collection
+  /{condition-slug}:
+    type: singleItem
+/statuses:
+  type: collection
+  /{status-slug}:
+    type: singleItem
+
+traits:
+  paginated:
     queryParameters:
       items:
         type: number
@@ -487,255 +312,64 @@ types:
       200:
         body:
           application/json:
+            type: object
             example:
               {
                 "current_page": 3,
-                "data": [object, object, object],
+                "data": [
+                  <<resourcePathName|!singularize|!uppercamelcase>>-1,
+                  <<resourcePathName|!singularize|!uppercamelcase>>-2,
+                  {},
+                  <<resourcePathName|!singularize|!uppercamelcase>>-n
+                ],
                 "first_page_url": "URL-TO-PAGE-1?page=1",
-                "from": 7,
+                "from": 31,
                 "next_page_url": "URL-TO-NEXT-PAGE?page=4",
                 "path": "BASE-URL",
-                "per_page": "3",
+                "per_page": 15,
                 "prev_page_url": "URL-TO-PREVIOUS-PAGE?page=2",
-                "to": 9
+                "to": 45
               }
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a new shipping method on the platform. Requires admin authorization"
-    body:
-      application/json:
-        type: ShippingMethod
-    responses:
-      201:
-        description: "Shipping method has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  /{shipping_method-id}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: ShippingMethod
-/banners:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a new banner on the platform. Requires admin authorization"
-    body:
-      application/json:
-        type: Banner
-    responses:
-      201:
-        description: "The banner has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  /{banner-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Banner
-    get:
-      description: "Retrieves the banner with the specified name"
-      responses:
-        200:
-          body:
-            application/json:
-              type: Banner
-        404:
-          description: "The banner with the specified name could not be found"
 
-/colors:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a color."
-    body:
-      application/json:
-        type: Property
+  dataError:
     responses:
-      201:
-        description: "The color has been added succesfully"
-      401:
-        description: "Unauthorized request"
       400:
+        description: "Invalid data provided."
         body:
           application/json:
             type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the colors."
+            example:
+              {
+                "message": "The given data was invalid.",
+                "errors": {
+                  "field_name_1": [
+                    "Invalid data provided for field_name_1."
+                  ],
+                  "field_name_2": [
+                    "field_name_2 is required."
+                  ]
+                }
+              }
+
+  singleItemResponse:
     responses:
       200:
         body:
           application/json:
-            type: Property[]
-  /{color-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Property
+            type: <<resourcePathName|!singularize|!uppercamelcase>>
+      404:
+        description: "<<resourcePathName|!singularize|!uppercamelcase>> not found."
 
-/brands:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a brand."
+  singleItemPost:
+    description: Create a new <<resourcePathName|!singularize|!uppercamelcase>>
     body:
+      multipart/form-data:
+        type: <<resourcePathName|!singularize|!uppercamelcase>>
       application/json:
-        type: Brand
-    responses:
-      201:
-        description: "The brand has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the brands."
+        type: <<resourcePathName|!singularize|!uppercamelcase>>
+    is: [ dataError ]
     responses:
       200:
         body:
           application/json:
-            type: Brand[]
-  /{brand-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Brand
-
-/conditions:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a product condition."
-    body:
-      application/json:
-        type: Property
-    responses:
-      201:
-        description: "The condition has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the conditions."
-    responses:
-      200:
-        body:
-          application/json:
-            type: Property[]
-  /{status-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Property
-
-/statuses:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a product status."
-    body:
-      application/json:
-        type: Property
-    responses:
-      201:
-        description: "The status has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the statuses."
-    responses:
-      200:
-        body:
-          application/json:
-            type: Property[]
-  /{status-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Property
-
-/categories:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a product category."
-    body:
-      application/json:
-        type: Category
-    responses:
-      201:
-        description: "The status has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the categories with subcategories."
-    responses:
-      200:
-        body:
-          application/json:
-            type: Category[]
-  /{category-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Category
-
-/campaigns:
-  post:
-    securedBy: [token: { scopes: [ admin ] }]
-    description: "Creates a product campaign."
-    body:
-      application/json:
-        type: Property
-    responses:
-      201:
-        description: "The campaign has been added succesfully"
-      401:
-        description: "Unauthorized request"
-      400:
-        body:
-          application/json:
-            type: DetailedAnswer
-  get:
-    description: "Gets a paginated result of all the campaigns with subcategories."
-    responses:
-      200:
-        body:
-          application/json:
-            type: Property[]
-  /{campaign-slug}:
-    patch:
-      securedBy: [token: { scopes: [ admin ] }]
-      description: "Updates the model."
-      body:
-        application/json:
-          type: Property
+            type: <<resourcePathName|!singularize|!uppercamelcase>>

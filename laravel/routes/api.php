@@ -2,12 +2,6 @@
 
 use Illuminate\Http\Request;
 
-/**
- * Per Str::slug.
- */
-const SLUG_REGEX = '[-\pL\pN\s]+';
-const ID_REGEX = '[0-9]+';
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,6 +12,8 @@ const ID_REGEX = '[0-9]+';
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+include_once 'helpers.php';
 
 Route::name('api.')->group(function () {
 
@@ -34,21 +30,26 @@ Route::name('api.')->group(function () {
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
 
     Route::get('menus/{menu}', 'MenuController@show')->name('menu.get')->where('banner', SLUG_REGEX);
-    Route::get('banners/{banner}', 'BannerController@show')->name('banner.get')->where('banner', SLUG_REGEX);
+
+
+    Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);
     Route::get('products/category/{category}', 'ProductController@withCategory')
         ->name('products.category.get')->where('category', SLUG_REGEX);
     Route::get('products/campaign/{campaign}', 'ProductController@withCampaign')
         ->name('products.campaign.get')->where('campaign', SLUG_REGEX);
 
-    Route::get('shipping_methods', 'ShippingMethodController@index')->name('shipping_methods');
+    create_routes('ShippingMethod', ID_REGEX);
+    create_routes('Menu', SLUG_REGEX);
+    create_routes('MenuItem', ID_REGEX);
 
-    Route::get('brands', 'BrandController@index')->name('brands');
-    Route::get('campaigns', 'CampaignController@index')->name('campaigns');
-    Route::get('categories', 'CategoryController@index')->name('categories');
-    Route::get('colors', 'ColorController@index')->name('colors');
-    Route::get('conditions', 'ConditionController@index')->name('conditions');
-    Route::get('statuses', 'StatusController@index')->name('statuses');
+    create_routes('Banner', SLUG_REGEX);
+    create_routes('Brand', SLUG_REGEX);
+    create_routes('Campaign', SLUG_REGEX);
+    create_routes('Category', SLUG_REGEX);
+    create_routes('Color', SLUG_REGEX);
+    create_routes('Condition', SLUG_REGEX);
+    create_routes('Status', SLUG_REGEX);
 
     Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
@@ -61,30 +62,5 @@ Route::name('api.')->group(function () {
         Route::post('products', 'ProductController@store')->name('product.create');
         Route::patch('products/{product}', 'ProductController@update')
             ->name('product.update')->where('product', ID_REGEX);
-
-        Route::middleware('role:admin')->group(function () {
-            Route::post('menus', 'MenuController@store')->name('menu.create');
-            Route::post('menus/item', 'MenuItemController@store')->name('menu_item.create');
-
-            Route::post('shipping_methods', 'ShippingMethodController@store')->name('shipping_method.create');
-            Route::patch('shipping_methods/{shipping_method}', 'ShippingMethodController@update')
-                ->name('shipping_method.update')->where('shipping_method.update', ID_REGEX);
-
-            Route::post('banners', 'BannerController@store')->name('banner.create');
-            Route::post('brands', 'BrandController@store')->name('brand.create');
-            Route::post('campaigns', 'CampaignController@store')->name('campaign.create');
-            Route::post('categories', 'CategoryController@store')->name('category.create');
-            Route::post('colors', 'ColorController@store')->name('color.create');
-            Route::post('conditions', 'ConditionController@store')->name('condition.create');
-            Route::post('statuses', 'StatusController@store')->name('status.create');
-
-            Route::patch('banners/{banner}', 'BannerController@update')->name('banner.update');
-            Route::patch('brands/{brand}', 'BrandController@update')->name('brand.update');
-            Route::patch('campaigns/{campaign}', 'CampaignController@update')->name('campaign.update');
-            Route::patch('categories/{category}', 'CategoryController@update')->name('category.update');
-            Route::patch('colors/{color}', 'ColorController@update')->name('color.update');
-            Route::patch('conditions/{condition}', 'ConditionController@update')->name('condition.update');
-            Route::patch('statuses/{status}', 'StatusController@update')->name('status.update');
-        });
     });
 });

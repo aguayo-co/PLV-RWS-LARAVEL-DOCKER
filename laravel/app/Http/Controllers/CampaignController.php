@@ -9,7 +9,7 @@ class CampaignController extends Controller
 {
     public $modelClass = Campaign::class;
 
-    public function alterValidateData($data)
+    public function alterValidateData($data, Model $campaign = null)
     {
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;

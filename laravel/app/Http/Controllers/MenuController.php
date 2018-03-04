@@ -10,10 +10,19 @@ class MenuController extends Controller
 {
     public $modelClass = Menu::class;
 
+    public function alterValidateData($data, Model $menu = null)
+    {
+        $data['slug'] = str_slug(array_get($data, 'name'));
+        return $data;
+    }
+
     protected function validationRules(?Model $menu)
     {
+        $required = !$menu ? 'required|' : '';
+        $ignore = $menu ? ',' . $menu->id : '';
         return [
-            'name' => 'required|string|unique:menus',
+            'name' => $required . 'string|unique:menus,name' . $ignore,
+            'slug' => $required . 'string|unique:menus,slug' . $ignore,
         ];
     }
 }

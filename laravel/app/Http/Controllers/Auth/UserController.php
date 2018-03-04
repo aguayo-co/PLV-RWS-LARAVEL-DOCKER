@@ -42,7 +42,7 @@ class UserController extends Controller
      * @param  array  $data
      * @return array
      */
-    public function alterValidateData($data)
+    public function alterValidateData($data, Model $user = null)
     {
         if (array_key_exists('email', $data)) {
             $data['exists'] = $data['email'];

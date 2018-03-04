@@ -32,6 +32,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('color', \App\Color::class);
         Route::model('condition', \App\Condition::class);
         Route::model('menu', \App\Menu::class);
+        Route::model('menu_item', \App\MenuItem::class);
         Route::model('product', \App\Product::class);
         Route::model('shipping_method', \App\ShippingMethod::class);
         Route::model('status', \App\Status::class);

@@ -10,8 +10,9 @@ class CategoryController extends Controller
 {
     public $modelClass = Category::class;
 
-    public function alterValidateData($data)
+    public function alterValidateData($data, Model $category = null)
     {
+        $data['id'] = $category ? $category->id : false;
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;
     }
@@ -25,6 +26,7 @@ class CategoryController extends Controller
             'slug' => $required . 'string|unique:categories,slug' . $ignore,
             'parent_id' => [
                 'nullable',
+                'different:id',
                 Rule::exists('categories', 'id')->where(function ($query) {
                     $query->whereNull('parent_id');
                 }),
