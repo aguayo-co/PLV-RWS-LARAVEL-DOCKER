@@ -35,6 +35,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = ['cover', 'picture'];
+    protected $with = ['roles:id,name'];
 
     /**
      * Store files temporarily while creating a user.

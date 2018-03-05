@@ -57,7 +57,7 @@ class CategoryController extends Controller
     protected function alterIndexQuery()
     {
         return function ($query) {
-            return $query->whereNull('parent_id')->with('children');
+            return $query->whereNull('parent_id');
         };
     }
 }

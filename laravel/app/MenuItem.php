@@ -15,7 +15,7 @@ class MenuItem extends Model
         'name', 'url', 'icon', 'parent_id', 'menu_id',
     ];
 
-    protected $appends = ['children'];
+    protected $with = ['children'];
 
     /**
      * Get the menu this item belongs to.
@@ -39,14 +39,6 @@ class MenuItem extends Model
     public function children()
     {
         return $this->hasMany('App\MenuItem', 'parent_id');
-    }
-
-    /**
-     * Get the children for the item.
-     */
-    public function getChildrenAttribute()
-    {
-        return $this->children()->get();
     }
 
     public function setMenuIdAttribute($menuId)

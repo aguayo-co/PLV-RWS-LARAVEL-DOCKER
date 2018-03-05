@@ -15,7 +15,7 @@ class Menu extends Model
         'name',
     ];
 
-    protected $appends = ['items'];
+    protected $with = ['items'];
 
     /**
      * Get the route key for the model.
@@ -33,14 +33,6 @@ class Menu extends Model
     public function items()
     {
         return $this->hasMany('App\MenuItem');
-    }
-
-    /**
-     * Get the children for the item.
-     */
-    public function getItemsAttribute()
-    {
-        return $this->items()->get();
     }
 
     public function setNameAttribute($name)
