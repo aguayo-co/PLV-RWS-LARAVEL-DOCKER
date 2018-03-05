@@ -57,6 +57,21 @@ documentation:
 
     En todo caso las respuestas serán JSON.
 
+    ##### Peticiones PATCH:
+
+    Las peticiones PATCH no permiten el envío de datos usando `Content-Type: multipart/form-data`, por
+    lo que se debe enviar una petición POST, con un campo adicional que le informe al API que es una petición
+    PATCH:
+
+    ```
+    Content-Disposition: form-data; name="_method"
+    PATCH
+    ```
+
+    Las peticiones PATCH sólo actualizan los campos que recibe. Si un campo no es enviado, este no se modifica
+    en la base de datos.
+    Si un campo va vacío, este se elimina de la base de datos.
+
 - title: Colecciones
   content: |
     Las peticiones que traigan colecciones de datos vendrán paginadas y tendrán la siguiente estructura:
@@ -90,7 +105,7 @@ documentation:
 
 - title: Autenticación
   content: |
-    Existen 2 tipos de usuarios en le portal:
+    Existen 2 tipos de usuarios en el portal:
 
       - Autenticado
       - No Autenticado
@@ -104,7 +119,7 @@ documentation:
     Cada usuario tiene un token único de 60 caracteres que se cambia cada vez que el usuario genera una
     contraseña nueva.
 
-    Para obtener le token, se debe hacer una petición al la ruta de logueo con las credenciales de el usuario.
+    Para obtener el token, se debe hacer una petición al la ruta de logueo con las credenciales de el usuario.
     Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:
 
     ```
