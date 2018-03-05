@@ -96,7 +96,7 @@ documentation:
     }
     ```
 
-    Estas peticiones recoben dos parámetros por URL que controlan la página y la cantidad de objetos por página:
+    Estas peticiones reciben dos parámetros por URL que controlan la página y la cantidad de objetos por página:
 
     - page
     - items
@@ -119,7 +119,7 @@ documentation:
     Cada usuario tiene un token único de 60 caracteres que se cambia cada vez que el usuario genera una
     contraseña nueva.
 
-    Para obtener el token, se debe hacer una petición al la ruta de logueo con las credenciales de el usuario.
+    Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario.
     Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:
 
     ```
@@ -239,9 +239,10 @@ types:
   UserExpanded:
     type: [User]
     properties:
-      addresses: Address[]
+      addresses?: Address[]
+      roles?: string[]
   UserLogged:
-    type: User
+    type: UserExpanded
     properties:
       api_token: string
   Product:
@@ -316,7 +317,7 @@ resourceTypes:
       description: Get all the <<resourcePathName|!pluralize|!uppercamelcase>>
       is: [ paginated ]
     post:
-      is: [ singleItemPost ]
+      is: [ createItemPost ]
       securedBy: [token: { scopes: [ admin ] }]
 
   singleItem:
@@ -350,7 +351,7 @@ resourceTypes:
 
 /users:
   post:
-    is: [ expanded, singleItemPost ]
+    is: [ logged, createItemPost ]
   /{user-id}:
     type: singleItem
     get:
@@ -363,6 +364,7 @@ resourceTypes:
 
   /login:
     post:
+      is: [ logged, dataError ]
       description: "Logs in an User"
       body:
         application/json:
@@ -371,12 +373,6 @@ resourceTypes:
             email: "marie@curie.com",
             password: "asd|@123"
           }
-      if: [ singleItemResponse ]
-      responses:
-        200:
-          body:
-            application/json:
-              type: UserLogged
   /password/recovery/{email}:
     get:
       description: "Requires a password recovery link for an user"
@@ -525,7 +521,6 @@ traits:
               }
 
   singleItemResponse:
-    is: [ dataError ]
     responses:
       200:
         body:
@@ -534,7 +529,7 @@ traits:
       404:
         description: "<<resourcePathName|!singularize|!uppercamelcase>> not found."
 
-  singleItemPost:
+  createItemPost:
     description: Create a new <<resourcePathName|!singularize|!uppercamelcase>>
     body:
       multipart/form-data:
@@ -554,3 +549,9 @@ traits:
         body:
           application/json:
             type: <<resourcePathName|!singularize|!uppercamelcase>>Expanded
+  logged:
+    responses:
+      200:
+        body:
+          application/json:
+            type: UserLogged
