@@ -33,7 +33,7 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $user->toArray());
     }
 
-    public function testEmailTokenIsHidden()
+    public function testEmailIsHidden()
     {
         $user = factory(User::class)->create();
 
