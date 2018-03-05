@@ -325,7 +325,7 @@ resourceTypes:
       is: [ singleItemResponse ]
       description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
     patch:
-      is: [ singleItemResponse, dataError ]
+      is: [ singleItemResponse, responseError ]
       securedBy: [token: { scopes: [ admin ] }]
       description: Update the given <<resourcePathName|!singularize|!uppercamelcase>>
       body:
@@ -334,7 +334,7 @@ resourceTypes:
         application/json:
           type: <<resourcePathName|!singularize|!uppercamelcase>>
     delete:
-      is: [ dataError ]
+      is: [ responseError ]
       securedBy: [token: { scopes: [ admin ] }]
       description: Delete the given <<resourcePathName|!singularize|!uppercamelcase>>
       responses:
@@ -364,7 +364,7 @@ resourceTypes:
 
   /login:
     post:
-      is: [ logged, dataError ]
+      is: [ logged, responseError ]
       description: "Logs in an User"
       body:
         application/json:
@@ -500,7 +500,7 @@ traits:
           application/json:
             type: <<resourcePathName|!singularize|!uppercamelcase>>[]
 
-  dataError:
+  responseError:
     responses:
       4XX:
         description: "Invalid request."
@@ -536,7 +536,7 @@ traits:
         type: <<resourcePathName|!singularize|!uppercamelcase>>
       application/json:
         type: <<resourcePathName|!singularize|!uppercamelcase>>
-    is: [ dataError ]
+    is: [ responseError ]
     responses:
       200:
         body:
