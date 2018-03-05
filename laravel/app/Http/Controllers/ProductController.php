@@ -58,14 +58,12 @@ class ProductController extends Controller
 
     public function postUpdate(Request $request, Model $product)
     {
-        $product->colors()->sync($request->color_ids);
         $product->campaigns()->sync($request->campaign_ids);
         return parent::postUpdate($request, $product);
     }
 
     public function postStore(Request $request, Model $product)
     {
-        $product->colors()->attach($request->color_ids);
         $product->campaigns()->attach($request->campaign_ids);
         return parent::postStore($request, $product);
     }

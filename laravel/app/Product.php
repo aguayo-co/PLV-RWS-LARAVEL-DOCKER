@@ -28,11 +28,12 @@ class Product extends Model
         'status_id',
         'images',
         'delete_images',
+        'color_ids',
     ];
 
     protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status'];
 
-    protected $appends = ['images'];
+    protected $appends = ['images', 'color_ids'];
 
     /**
      * Store files temporarily while creating a product.
@@ -55,6 +56,16 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo('App\User');
+    }
+
+    protected function getColorIdsAttribute()
+    {
+        return $this->colors->pluck('id')->all();
+    }
+
+    protected function setColorIdsAttribute(array $colorIds)
+    {
+        $this->colors()->sync($colorIds);
     }
 
     protected function getImagePathAttribute()
