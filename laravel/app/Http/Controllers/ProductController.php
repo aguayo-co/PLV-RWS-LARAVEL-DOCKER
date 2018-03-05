@@ -44,8 +44,9 @@ class ProductController extends Controller
             'color_ids.*' => 'exists:colors,id',
             'condition_id' => $required . 'exists:conditions,id',
             'status_id' => $required . 'exists:statuses,id',
-            'images' => $required,
+            'images' => $required . 'array',
             'images.*' => 'image',
+            'delete_images' => 'array',
             'delete_images.*' => 'string',
         ];
     }
@@ -58,21 +59,14 @@ class ProductController extends Controller
     public function postUpdate(Request $request, Model $product)
     {
         $product->colors()->sync($request->color_ids);
-        $product->colors()->sync($request->campaign_ids);
-        if ($images = $request->file('images')) {
-            $product->images = $images;
-        }
-        if ($deleteImages = $request->delete_images) {
-            $product->delete_images = $deleteImages;
-        }
+        $product->campaigns()->sync($request->campaign_ids);
         return parent::postUpdate($request, $product);
     }
 
     public function postStore(Request $request, Model $product)
     {
-        $product->images = $request->file('images');
         $product->colors()->attach($request->color_ids);
-        $product->colors()->attach($request->campaign_ids);
+        $product->campaigns()->attach($request->campaign_ids);
         return parent::postStore($request, $product);
     }
 

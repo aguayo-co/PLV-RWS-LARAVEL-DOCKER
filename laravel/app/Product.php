@@ -26,6 +26,8 @@ class Product extends Model
         'category_id',
         'condition_id',
         'status_id',
+        'images',
+        'delete_images',
     ];
 
     protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status'];
