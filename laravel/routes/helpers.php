@@ -6,7 +6,7 @@
 const SLUG_REGEX = '[-\pL\pN\s]+';
 const ID_REGEX = '[0-9]+';
 
-function create_routes($model, $regex)
+function create_admin_routes($model, $regex)
 {
     $plural = str_plural($model);
     $snakes = snake_case($plural);
@@ -19,5 +19,7 @@ function create_routes($model, $regex)
         Route::post($snakes, $model . 'Controller@store')->name($snake . '.create');
         Route::patch($snakes . '/{' . $snake . '}', $model . 'Controller@update')
             ->name($snake . '.update')->where($snake, SLUG_REGEX);
+        Route::delete($snakes . '/{' . $snake . '}', $model . 'Controller@delete')
+            ->name($snake . '.delete')->where($snake, SLUG_REGEX);
     });
 }

@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.6.1
+version: 0.7.0
 baseUri: https://prilov.aguayo.co/api
 documentation:
 - title: Introducción
@@ -312,13 +312,17 @@ types:
 
 resourceTypes:
   collection:
-    post:
-      is: [ singleItemPost ]
     get:
       description: Get all the <<resourcePathName|!pluralize|!uppercamelcase>>
       is: [ paginated ]
+    post:
+      is: [ singleItemPost ]
+      securedBy: [token: { scopes: [ admin ] }]
 
   singleItem:
+    get:
+      is: [ singleItemResponse ]
+      description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
     patch:
       is: [ singleItemResponse, dataError ]
       securedBy: [token: { scopes: [ admin ] }]
@@ -328,9 +332,21 @@ resourceTypes:
           type: <<resourcePathName|!singularize|!uppercamelcase>>
         application/json:
           type: <<resourcePathName|!singularize|!uppercamelcase>>
-    get:
-      is: [ singleItemResponse ]
-      description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
+    delete:
+      is: [ dataError ]
+      securedBy: [token: { scopes: [ admin ] }]
+      description: Delete the given <<resourcePathName|!singularize|!uppercamelcase>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: DetailedAnswer
+              example:
+                {
+                  "message": "Object deleted"
+                }
+
+
 
 /users:
   post:
@@ -490,8 +506,8 @@ traits:
 
   dataError:
     responses:
-      400:
-        description: "Invalid data provided."
+      4XX:
+        description: "Invalid request."
         body:
           application/json:
             type: DetailedAnswer
@@ -509,6 +525,7 @@ traits:
               }
 
   singleItemResponse:
+    is: [ dataError ]
     responses:
       200:
         body:

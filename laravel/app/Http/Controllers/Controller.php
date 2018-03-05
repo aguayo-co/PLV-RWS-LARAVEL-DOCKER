@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
 
 class Controller extends BaseController
 {
@@ -25,7 +27,7 @@ class Controller extends BaseController
         /**
          * Only an admin or the owner can update models.
          */
-        $this->middleware('owner_or_admin', ['only' => ['update']]);
+        $this->middleware('owner_or_admin', ['only' => ['update', 'delete']]);
 
         /**
          * The value of user_id mus be the same as the logged user.
@@ -165,7 +167,7 @@ class Controller extends BaseController
     }
 
     /**
-     * Handle an update request for a user.
+     * Handle an update request for a model.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Database\Eloquent\Model  $model
@@ -178,5 +180,22 @@ class Controller extends BaseController
         $model->fill($this->alterFillData($data))->save();
         $model = $this->postUpdate($request, $model);
         return $model->fresh();
+    }
+
+    /**
+     * Handle a delete request for a model.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function delete(Request $request, Model $model)
+    {
+        try {
+            $model->delete();
+        } catch (QueryException $exception) {
+            abort(Response::HTTP_CONFLICT, 'Model has related data associated.');
+        }
+        return ['message' => 'Object deleted'];
     }
 }

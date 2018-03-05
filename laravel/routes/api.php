@@ -29,8 +29,18 @@ Route::name('api.')->group(function () {
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
 
-    Route::get('menus/{menu}', 'MenuController@show')->name('menu.get')->where('banner', SLUG_REGEX);
+    create_admin_routes('Menu', SLUG_REGEX);
+    create_admin_routes('MenuItem', ID_REGEX);
 
+    create_admin_routes('ShippingMethod', ID_REGEX);
+
+    create_admin_routes('Banner', SLUG_REGEX);
+    create_admin_routes('Brand', SLUG_REGEX);
+    create_admin_routes('Campaign', SLUG_REGEX);
+    create_admin_routes('Category', SLUG_REGEX);
+    create_admin_routes('Color', SLUG_REGEX);
+    create_admin_routes('Condition', SLUG_REGEX);
+    create_admin_routes('Status', SLUG_REGEX);
 
     Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);
@@ -38,18 +48,6 @@ Route::name('api.')->group(function () {
         ->name('products.category.get')->where('category', SLUG_REGEX);
     Route::get('products/campaign/{campaign}', 'ProductController@withCampaign')
         ->name('products.campaign.get')->where('campaign', SLUG_REGEX);
-
-    create_routes('ShippingMethod', ID_REGEX);
-    create_routes('Menu', SLUG_REGEX);
-    create_routes('MenuItem', ID_REGEX);
-
-    create_routes('Banner', SLUG_REGEX);
-    create_routes('Brand', SLUG_REGEX);
-    create_routes('Campaign', SLUG_REGEX);
-    create_routes('Category', SLUG_REGEX);
-    create_routes('Color', SLUG_REGEX);
-    create_routes('Condition', SLUG_REGEX);
-    create_routes('Status', SLUG_REGEX);
 
     Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
@@ -62,5 +60,10 @@ Route::name('api.')->group(function () {
         Route::post('products', 'ProductController@store')->name('product.create');
         Route::patch('products/{product}', 'ProductController@update')
             ->name('product.update')->where('product', ID_REGEX);
+
+        Route::middleware('role:admin')->group(function () {
+            Route::delete('products/{product}', 'ProductController@delete')
+                ->name('product.delete')->where('product', ID_REGEX);
+        });
     });
 });
