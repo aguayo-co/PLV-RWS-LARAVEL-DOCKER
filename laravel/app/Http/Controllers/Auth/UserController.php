@@ -3,16 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
 
 class UserController extends Controller
 {
-
     protected function validationRules(?Model $user)
     {
         return [
@@ -48,32 +42,5 @@ class UserController extends Controller
             $data['exists'] = $data['email'];
         }
         return $data;
-    }
-
-    /**
-     * Alter data to be passed to fill method.
-     *
-     * @param  array  $data
-     * @return array
-     */
-    public function alterFillData($data)
-    {
-        if (array_key_exists('password', $data)) {
-            $data['password'] = Hash::make($data['password']);
-            $data['api_token'] = User::generateApiToken();
-        }
-        return $data;
-    }
-
-    public function postUpdate(Request $request, Model $user)
-    {
-        $data = $request->all();
-        if (array_key_exists('cover', $data)) {
-            $user->cover = $data['cover'];
-        }
-        if (array_key_exists('picture', $data)) {
-            $user->picture = $data['picture'];
-        }
-        return $user;
     }
 }

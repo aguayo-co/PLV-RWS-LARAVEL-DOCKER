@@ -30,12 +30,4 @@ class BannerController extends Controller
             'url' => $required . 'string',
         ];
     }
-
-    public function postStore(Request $request, Model $banner)
-    {
-        if ($image = $request->file('image')) {
-            $banner->image = $image;
-        }
-        return $banner;
-    }
 }

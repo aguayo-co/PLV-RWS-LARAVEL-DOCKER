@@ -7,9 +7,6 @@ use App\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -64,30 +61,9 @@ class RegisterController extends Controller
         return $data;
     }
 
-    /**
-     * Alter data to be passed to fill method.
-     *
-     * @param  array  $data
-     * @return array
-     */
-    public function alterFillData($data)
-    {
-        if (array_key_exists('password', $data)) {
-            $data['password'] = Hash::make($data['password']);
-            $data['api_token'] = User::generateApiToken();
-        }
-        return $data;
-    }
-
     public function postStore(Request $request, Model $user)
     {
         event(new Registered($user));
-        if ($cover = $request->file('cover')) {
-            $user->cover = $cover;
-        }
-        if ($picture = $request->file('picture')) {
-            $user->picture = $picture;
-        }
-        return $user->makeVisible('api_token');
+        return parent::postStore($request, $user)->makeVisible('api_token');
     }
 }

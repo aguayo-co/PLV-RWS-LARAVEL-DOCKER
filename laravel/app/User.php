@@ -7,6 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -22,7 +23,15 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'api_token', 'first_name', 'last_name', 'phone', 'about', 'vacation_mode'
+        'about',
+        'cover',
+        'email',
+        'first_name',
+        'last_name',
+        'password',
+        'phone',
+        'picture',
+        'vacation_mode',
     ];
 
     /**
@@ -64,6 +73,15 @@ class User extends Authenticatable
                 $user->picture = $user->temp_picture;
             }
         });
+    }
+
+    /**
+     * Refresh api_token when password changes.
+     */
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::make($password);
+        $this->attributes['api_token'] = User::generateApiToken();
     }
 
     /**

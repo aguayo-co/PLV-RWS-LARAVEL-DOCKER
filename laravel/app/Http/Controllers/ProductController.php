@@ -65,7 +65,7 @@ class ProductController extends Controller
         if ($deleteImages = $request->delete_images) {
             $product->delete_images = $deleteImages;
         }
-        return $product;
+        return parent::postUpdate($request, $product);
     }
 
     public function postStore(Request $request, Model $product)
@@ -73,7 +73,7 @@ class ProductController extends Controller
         $product->images = $request->file('images');
         $product->colors()->attach($request->color_ids);
         $product->colors()->attach($request->campaign_ids);
-        return $product;
+        return parent::postStore($request, $product);
     }
 
     protected function withCategory(Request $request, Model $category)

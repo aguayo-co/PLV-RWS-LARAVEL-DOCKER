@@ -114,7 +114,7 @@ class Controller extends BaseController
      */
     public function postUpdate(Request $request, Model $model)
     {
-        return $model;
+        return $model->fresh();
     }
 
     /**
@@ -126,7 +126,7 @@ class Controller extends BaseController
      */
     public function postStore(Request $request, Model $model)
     {
-        return $model;
+        return $model->fresh();
     }
 
     /**
@@ -163,7 +163,7 @@ class Controller extends BaseController
         $this->validate($this->alterValidateData($data));
         $model = call_user_func($this->modelClass . '::create', $this->alterFillData($data));
         $model = $this->postStore($request, $model);
-        return $model->fresh();
+        return $model;
     }
 
     /**
@@ -179,7 +179,7 @@ class Controller extends BaseController
         $this->validate($this->alterValidateData($data, $model), $model);
         $model->fill($this->alterFillData($data))->save();
         $model = $this->postUpdate($request, $model);
-        return $model->fresh();
+        return $model;
     }
 
     /**
