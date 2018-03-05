@@ -1,7 +1,158 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.6.0
+version: 0.6.1
 baseUri: https://prilov.aguayo.co/api
+documentation:
+- title: Introducción
+  content: |
+    Esta es una breve introducción sobre los conceptos generales que se trabajan en el api, y algunas
+    convenciones que se manejan en todas las peticiones.
+
+- title: Formato de datos
+  content: |
+    Este api trabaja con respuestas JSON. Las descripciones de los objetos tienen todos los campos
+    de los mismos, algunos de los cuales son de sólo lectura, pero no está especificado en cada elemento.
+
+    Los siguientes campos son siempre de sólo lectura:
+    - id
+    - created_at
+    - updated_at
+
+- title: Asociación de datos
+  content: |
+    Cuando un modelo tenga un campo que referencia a otro o a si mismo, estos campos tendrán terminación *_id*.
+    En algunos de los casos, las repsuestas incluirán un campo adicional no especificado con el modelo relacionado
+    expandido, así:
+    ```json
+    {
+      "id": 1,
+      "name": "I have an associated element",
+      "child_id": 2,
+      "child": {
+        "id": 2,
+        "name": "I have a parent."
+      }
+    }
+    ```
+
+- title: Peticiones
+  content: |
+    Las peticiones al API deben aceptar respuestas JSON. EN caso de no aceptarlas el API mostrará un error.
+    Para especificar que la petición acepta JSON, se debe enviar el encabezado:
+
+    ```
+    Accept: application/json
+    ```
+
+    #### Peticiones POST y PATCH:
+
+    Cuando la petición quiera modificar información en el servidor, puede enviar la información en formato JSON o
+    en multipart/form-data. Este último es necesairo para el envío de archivos. Esto se especifica con los
+    encabezados correspondientes:
+
+    ```
+    Content-Type: application/json
+    Content-Type: multipart/form-data
+    ```
+
+    En todo caso las respuestas serán JSON.
+
+- title: Colecciones
+  content: |
+    Las peticiones que traigan colecciones de datos vendrán paginadas y tendrán la siguiente estructura:
+
+    ```json
+    {
+      "current_page": 3,
+      "data": [
+        objeto,
+        objeto,
+        objeto,
+        ...
+        objeto
+      ],
+      "first_page_url": "https://prilov.aguayo.co/api/colors?page=1",
+      "from": 31,
+      "next_page_url": "https://prilov.aguayo.co/api/colors?page=4",
+      "path": "https://prilov.aguayo.co/api/colors",
+      "per_page": 15,
+      "prev_page_url": "https://prilov.aguayo.co/api/colors?page=2",
+      "to": 45
+    }
+    ```
+
+    Estas peticiones recoben dos parámetros por URL que controlan la página y la cantidad de objetos por página:
+
+    - page
+    - items
+
+    Ejemplo: *https://prilov.aguayo.co/api/colors?page=5&items25*
+
+- title: Autenticación
+  content: |
+    Existen 2 tipos de usuarios en le portal:
+
+      - Autenticado
+      - No Autenticado
+
+    Un usuario se considera autenticado cuando envía una petición con un token Bearer como encabezado:
+
+    ```
+    Authorization: Bearer TOKEN
+    ```
+
+    Cada usuario tiene un token único de 60 caracteres que se cambia cada vez que el usuario genera una
+    contraseña nueva.
+
+    Para obtener le token, se debe hacer una petición al la ruta de logueo con las credenciales de el usuario.
+    Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:
+
+    ```
+    {
+      "id": 8,
+      "api_token": "1234567890qwertyuiop1234567890qwertyuiop1234567890qwertyuiop"
+      ...
+    }
+    ```
+
+- title: Errores y validaciones
+  content: |
+    Cuando la petición no es exitosa por que la validación de datos no es correcta, las respuesta incluye
+    información sobre que datos no pasaron la validación, incluyendo cada campo que no fue exitoso. Ejemplo:
+
+    ```
+    {
+      "message": "The given data was invalid.",
+      "errors": {
+        "email": [
+          "El campo email no corresponde con una dirección de e-mail válida."
+        ],
+        "cover": [
+          "El campo cover debe ser una imagen."
+        ]
+      }
+    }
+    ```
+
+    Un caso especial es la validación de correo electrónico, que cuando ya existe uno registrado en el portal
+    el error se envía en el campo "exists".
+
+    ```
+    {
+      "message": "The given data was invalid.",
+      "exists": [
+        "Hay otro usuario registrado con el mismo correo."
+      ]
+    }
+    ```
+
+- title: Permisos y autorizaciones
+  content: |
+    Cada usuario podrá modificar los de los que sea dueño.
+    Los usuarios pueden tener roles asignados que les permiten efectuar operaciones adicionales en el portal.
+
+    El rol más importante es 'admin' que permite crear y modificar cualquier objeto en el portal, y cambiar el dueño
+    de los objetos.
 
 securitySchemes:
   token:
@@ -12,7 +163,6 @@ securitySchemes:
         Authorization:
           description: "Use the Bearer keyword. Example Authorization Bearer [API_key]"
           type: string
-
 
 types:
   BaseObject:
@@ -132,6 +282,9 @@ types:
     type: BaseObject
     properties:
       name: string
+  MenuExpanded:
+    type: Menu
+    properties:
       items?: MenuItem[]
   MenuItem:
     type: BaseObject
@@ -166,17 +319,14 @@ resourceTypes:
 
 /users:
   post:
-    is: [ singleItemPost ]
+    is: [ expanded, singleItemPost ]
   /{user-id}:
     type: singleItem
     get:
-      responses:
-        200:
-          body:
-            application/json:
-              type: UserExpanded
+      is: [ expanded ]
     patch:
       securedBy: [token: { scopes: [ owner ] }]
+      is: [ expanded ]
     /addresses:
       type: collection
 
@@ -231,8 +381,16 @@ resourceTypes:
 
 /menus:
   type: collection
+  get:
+    is: [ expanded ]
+  post:
+    is: [ expanded ]
   /{menu-id}:
     type: singleItem
+    get:
+      is: [ expanded ]
+    patch:
+      is: [ expanded ]
 /menu_item:
   type: collection
   /{menu_item-id}:
@@ -240,16 +398,17 @@ resourceTypes:
 
 /products:
   type: collection
+  get:
+    is: [ expanded ]
+  post:
+    is: [ expanded ]
   /{product-id}:
     type: singleItem
     get:
-      responses:
-        200:
-          body:
-            application/json:
-              type: ProductExpanded
+      is: [ expanded ]
     patch:
       securedBy: [token: { scopes: [ owner ] }]
+      is: [ expanded ]
   /category/{category-slug}:
     get:
       description: "Gets a paginated result of products with the specified category"
@@ -312,24 +471,7 @@ traits:
       200:
         body:
           application/json:
-            type: object
-            example:
-              {
-                "current_page": 3,
-                "data": [
-                  <<resourcePathName|!singularize|!uppercamelcase>>-1,
-                  <<resourcePathName|!singularize|!uppercamelcase>>-2,
-                  {},
-                  <<resourcePathName|!singularize|!uppercamelcase>>-n
-                ],
-                "first_page_url": "URL-TO-PAGE-1?page=1",
-                "from": 31,
-                "next_page_url": "URL-TO-NEXT-PAGE?page=4",
-                "path": "BASE-URL",
-                "per_page": 15,
-                "prev_page_url": "URL-TO-PREVIOUS-PAGE?page=2",
-                "to": 45
-              }
+            type: <<resourcePathName|!singularize|!uppercamelcase>>[]
 
   dataError:
     responses:
@@ -373,3 +515,10 @@ traits:
         body:
           application/json:
             type: <<resourcePathName|!singularize|!uppercamelcase>>
+
+  expanded:
+    responses:
+      200:
+        body:
+          application/json:
+            type: <<resourcePathName|!singularize|!uppercamelcase>>Expanded
