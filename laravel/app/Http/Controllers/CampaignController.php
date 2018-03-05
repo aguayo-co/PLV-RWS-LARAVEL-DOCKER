@@ -21,7 +21,7 @@ class CampaignController extends Controller
         $ignore = $campaign ? ',' . $campaign->id : '';
         return [
             'name' => $required . 'string|unique:campaigns,name' . $ignore,
-            'slug' => $required . 'string|unique:campaigns,slug' . $ignore,
+            'slug' => 'string|unique:campaigns,slug' . $ignore,
         ];
     }
 }

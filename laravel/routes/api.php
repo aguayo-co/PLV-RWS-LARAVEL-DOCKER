@@ -32,7 +32,7 @@ Route::name('api.')->group(function () {
     create_admin_routes('Menu', SLUG_REGEX);
     create_admin_routes('MenuItem', ID_REGEX);
 
-    create_admin_routes('ShippingMethod', ID_REGEX);
+    create_admin_routes('ShippingMethod', SLUG_REGEX);
 
     create_admin_routes('Banner', SLUG_REGEX);
     create_admin_routes('Brand', SLUG_REGEX);
@@ -43,7 +43,8 @@ Route::name('api.')->group(function () {
     create_admin_routes('Status', SLUG_REGEX);
 
     Route::get('products', 'ProductController@index')->name('products');
-    Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);
+    Route::get('products/{product}/{slug?}', 'ProductController@show')
+        ->name('product.get')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
     Route::get('products/category/{category}', 'ProductController@withCategory')
         ->name('products.category.get')->where('category', SLUG_REGEX);
     Route::get('products/campaign/{campaign}', 'ProductController@withCampaign')
@@ -58,12 +59,12 @@ Route::name('api.')->group(function () {
             ->name('user.address.create')->where('user', ID_REGEX);
 
         Route::post('products', 'ProductController@store')->name('product.create');
-        Route::patch('products/{product}', 'ProductController@update')
-            ->name('product.update')->where('product', ID_REGEX);
+        Route::patch('products/{product}/{slug?}', 'ProductController@update')
+            ->name('product.update')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
 
         Route::middleware('role:admin')->group(function () {
-            Route::delete('products/{product}', 'ProductController@delete')
-                ->name('product.delete')->where('product', ID_REGEX);
+            Route::delete('products/{product}/{slug?}', 'ProductController@delete')
+                ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
         });
     });
 });

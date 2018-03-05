@@ -18,6 +18,7 @@ class CreateProductsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->text('description');
             $table->text('dimensions');
             $table->unsignedDecimal('original_price', 12, 2);

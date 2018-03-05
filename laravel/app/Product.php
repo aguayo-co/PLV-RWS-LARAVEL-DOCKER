@@ -131,4 +131,10 @@ class Product extends Model
     {
         return $this->belongsTo('App\Status');
     }
+
+    public function setTitleAttribute($title)
+    {
+        $this->attributes['title'] = $title;
+        $this->attributes['slug'] = str_slug($title);
+    }
 }

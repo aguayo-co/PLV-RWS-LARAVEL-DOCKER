@@ -416,7 +416,7 @@ resourceTypes:
     is: [ expanded ]
   post:
     is: [ expanded ]
-  /{menu-id}:
+  /{menu-slug}:
     type: singleItem
     get:
       is: [ expanded ]
@@ -433,7 +433,7 @@ resourceTypes:
     is: [ expanded ]
   post:
     is: [ expanded ]
-  /{product-id}:
+  /{product-id}/{product-slug}:
     type: singleItem
     get:
       is: [ expanded ]
@@ -487,7 +487,7 @@ resourceTypes:
 
 /shipping_methods:
   type: collection
-  /{shipping_method-id}:
+  /{shipping_method-slug}:
     type: singleItem
 
 /banners:

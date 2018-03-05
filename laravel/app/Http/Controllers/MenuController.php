@@ -22,7 +22,7 @@ class MenuController extends Controller
         $ignore = $menu ? ',' . $menu->id : '';
         return [
             'name' => $required . 'string|unique:menus,name' . $ignore,
-            'slug' => $required . 'string|unique:menus,slug' . $ignore,
+            'slug' => 'string|unique:menus,slug' . $ignore,
         ];
     }
 }

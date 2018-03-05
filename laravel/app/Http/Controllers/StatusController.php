@@ -21,7 +21,7 @@ class StatusController extends Controller
         $ignore = $status ? ',' . $status->id : '';
         return [
             'name' => $required . 'string|unique:statuses,name' . $ignore,
-            'slug' => $required . 'string|unique:statuses,slug' . $ignore,
+            'slug' => 'string|unique:statuses,slug' . $ignore,
         ];
     }
 }

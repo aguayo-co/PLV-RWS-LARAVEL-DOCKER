@@ -21,7 +21,7 @@ class ConditionController extends Controller
         $ignore = $condition ? ',' . $condition->id : '';
         return [
             'name' => $required . 'string|unique:conditions,name' . $ignore,
-            'slug' => $required . 'string|unique:conditions,slug' . $ignore,
+            'slug' => 'string|unique:conditions,slug' . $ignore,
         ];
     }
 }

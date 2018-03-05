@@ -22,18 +22,26 @@ class ProductController extends Controller
         $this->middleware('role:seller|admin', ['only' => ['store', 'update']]);
     }
 
+    public function alterValidateData($data, Model $product = null)
+    {
+        $data['slug'] = str_slug(array_get($data, 'title'));
+        return $data;
+    }
+
     protected function validationRules(?Model $product)
     {
         $required = !$product ? 'required|' : '';
         return [
             'user_id' => $required . 'exists:users,id',
             'title' => $required . 'string',
+            'slug' => 'string',
             'description' => $required . 'string',
             'dimensions' => $required . 'string',
             'original_price' => $required . 'numeric|between:0,999999999.99',
             'price' => $required . 'numeric|between:0,999999999.99',
             'commission' => $required . 'numeric|between:0,100',
             'brand_id' => $required . 'exists:brands,id',
+            # Sólo permite una categoría que tenga padre.
             'category_id' => [
                 trim($required, '|'),
                 Rule::exists('categories', 'id')->where(function ($query) {

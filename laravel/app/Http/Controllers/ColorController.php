@@ -21,7 +21,7 @@ class ColorController extends Controller
         $ignore = $color ? ',' . $color->id : '';
         return [
             'name' => $required . 'string|unique:colors,name' . $ignore,
-            'slug' => $required . 'string|unique:colors,slug' . $ignore,
+            'slug' => 'string|unique:colors,slug' . $ignore,
         ];
     }
 }

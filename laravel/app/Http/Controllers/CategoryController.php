@@ -23,7 +23,7 @@ class CategoryController extends Controller
         $ignore = $category ? ',' . $category->id : '';
         $rules = [
             'name' => $required . 'string|unique:categories,name' . $ignore,
-            'slug' => $required . 'string|unique:categories,slug' . $ignore,
+            'slug' => 'string|unique:categories,slug' . $ignore,
             'parent_id' => [
                 'nullable',
                 'different:id',
