@@ -56,11 +56,13 @@ documentation:
     ```
 
     En todo caso las respuestas serán JSON.
+    En las descripciones de los métodos no se especifica que acepten `multipart/form-data`, pero en todos en los que
+    se acepta `application/json`, es válido usar cualquierda de los dos.
 
     ##### Peticiones PATCH:
 
     Las peticiones PATCH no permiten el envío de datos usando `Content-Type: multipart/form-data`, por
-    lo que se debe enviar una petición POST, con un campo adicional "_method" que le informe al API que es una
+    lo que se debe enviar una petición POST, con un campo adicional `_method` que le informe al API que es una
     petición PATCH:
 
     ```
@@ -68,9 +70,12 @@ documentation:
     PATCH
     ```
 
-    Las peticiones PATCH sólo actualizan los campos que recibe. Si un campo no es enviado, este no se modifica
-    en la base de datos.
-    Si un campo va vacío, este se elimina de la base de datos.
+    Si la petición se envía con datos JSON, entonces sí se puede efectuar con método PATCH.
+
+    Las peticiones PATCH sólo actualizan los campos que recibe.
+
+    - Si un campo no es enviado, este no se modifica en la base de datos.
+    - Si un campo va vacío, este se elimina de la base de datos.
 
 - title: Colecciones
   content: |
@@ -250,6 +255,7 @@ types:
     properties:
       title: string
       images: file[]
+      delete_images?: string[]
       description: string
       dimensions: string
       originalPrice: number
@@ -329,8 +335,6 @@ resourceTypes:
       securedBy: [token: { scopes: [ admin ] }]
       description: Update the given <<resourcePathName|!singularize|!uppercamelcase>>
       body:
-        multipart/form-data:
-          type: <<resourcePathName|!singularize|!uppercamelcase>>
         application/json:
           type: <<resourcePathName|!singularize|!uppercamelcase>>
     delete:
@@ -434,6 +438,31 @@ resourceTypes:
     get:
       is: [ expanded ]
     patch:
+      description: |
+        Update the given Product
+
+        ##### Eliminación de imágenes
+
+        Para eliminar imágenes de los productos se debe pasar un arreglo con los nombres de las imagenes en le campo
+        **delete_images**. Cada nombre debe inluir la extension, si el archivo tiene una, pero no la ruta al mismo.
+
+        ###### Ejemplo:
+
+        Para eliminar estas dos imágenes:
+
+        - `https://prilov.aguayo.co/storage/products/images/1/qwe1234567890`
+        - `https://prilov.aguayo.co/storage/products/images/1/asd0987654321.gif`
+
+        Se debe pasar:
+
+        ````
+        {
+          "delete_images": [
+            "qwe1234567890",
+            "asd0987654321.gif"
+          ]
+        }
+        ```
       securedBy: [token: { scopes: [ owner ] }]
       is: [ expanded ]
   /category/{category-slug}:
