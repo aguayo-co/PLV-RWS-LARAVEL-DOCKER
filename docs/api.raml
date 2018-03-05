@@ -60,8 +60,8 @@ documentation:
     ##### Peticiones PATCH:
 
     Las peticiones PATCH no permiten el envío de datos usando `Content-Type: multipart/form-data`, por
-    lo que se debe enviar una petición POST, con un campo adicional que le informe al API que es una petición
-    PATCH:
+    lo que se debe enviar una petición POST, con un campo adicional "_method" que le informe al API que es una
+    petición PATCH:
 
     ```
     Content-Disposition: form-data; name="_method"
