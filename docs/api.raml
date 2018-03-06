@@ -282,10 +282,6 @@ types:
     properties:
       email: string
       password: string
-  Token:
-    type: object
-    properties:
-      token: string
   ShippingMethod:
     type: BaseObject
     properties:
@@ -400,15 +396,29 @@ resourceTypes:
                   }
                 }
     post:
+      is: [ responseError ]
       description: "Validates a password reset token"
       body:
         application/json:
-          type: Token
+          type: object
+          properties:
+            token: string
       responses:
         200:
           description: "The provided password token is valid"
-        400:
-          description: "The provided password token is invalid"
+  /users/password/reset/{email}:
+    post:
+      is: [ responseError ]
+      description: "Validates a password reset token"
+      body:
+        application/json:
+          type: object
+          properties:
+            password: string
+            token: string
+      responses:
+        200:
+          description: "The provided password token is valid"
 
 /menus:
   type: collection
