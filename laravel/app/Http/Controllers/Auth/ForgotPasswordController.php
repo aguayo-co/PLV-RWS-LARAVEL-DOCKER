@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
 
 class ForgotPasswordController extends Controller
 {
@@ -52,7 +51,7 @@ class ForgotPasswordController extends Controller
 
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResponse($response)
-                    : $this->sendFailedResponse($response, Response::HTTP_NOT_FOUND);
+                    : abort(Response::HTTP_NOT_FOUND, trans($response));
     }
 
     /**
@@ -64,20 +63,19 @@ class ForgotPasswordController extends Controller
      */
     public function validateResetToken(Request $request, $email)
     {
-        $user = $this->broker()->getUser(['email' => $email]);
-
-        if (is_null($user)) {
-            return $this->sendFailedResponse(Password::INVALID_USER, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         $request->merge(['email' => $email]);
         $this->validate($request->all());
 
-        if (!$this->broker()->tokenExists($user, $request->token)) {
-            return $this->sendFailedResponse(Password::INVALID_TOKEN, Response::HTTP_UNPROCESSABLE_ENTITY);
+        $user = $this->broker()->getUser(['email' => $email]);
+        if (is_null($user)) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_USER));
         }
 
-        return $this->sendResponse('');
+        if (!$this->broker()->tokenExists($user, $request->token)) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_TOKEN));
+        }
+
+        return $this->sendResponse('passwords.token.valid');
     }
 
     /**
@@ -89,18 +87,6 @@ class ForgotPasswordController extends Controller
     protected function sendResponse($response)
     {
         return Response(['message' => trans($response)]);
-    }
-
-    /**
-     * Get the response for a failed password reset link.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function sendFailedResponse($response, $code)
-    {
-        return Response(['message' => trans($response)], $code);
     }
 
     /**

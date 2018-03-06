@@ -25,6 +25,8 @@ Route::name('api.')->group(function () {
             ->name('password.recovery.email');
         Route::post('users/password/recovery/{email}', 'Auth\ForgotPasswordController@validateResetToken')
             ->name('password.recovery.token');
+        Route::post('users/password/reset/{email}', 'Auth\ResetPasswordController@reset')
+            ->name('password.reset');
     });
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
