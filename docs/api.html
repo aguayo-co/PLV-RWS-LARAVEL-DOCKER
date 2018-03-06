@@ -198,12 +198,12 @@ PATCH
   "to": 45
 }
 </code></pre><p>Estas peticiones reciben dos parámetros por URL que controlan la página y la cantidad de objetos por página:</p><ul><li>page</li><li>items</li></ul><p>Ejemplo: <em><a href="https://prilov.aguayo.co/api/colors?page=5&amp;items25">https://prilov.aguayo.co/api/colors?page=5&amp;items25</a></em></p><h3 id="autenticaci_n"><a href="#autenticaci_n">Autenticación</a></h3><p>Existen 2 tipos de usuarios en el portal:</p><ul><li>Autenticado</li><li>No Autenticado</li></ul><p>Un usuario se considera autenticado cuando envía una petición con un token Bearer como encabezado:</p><pre><code>Authorization: Bearer TOKEN
-</code></pre><p>Cada usuario tiene un token único de 60 caracteres que se cambia cada vez que el usuario genera una contraseña nueva.</p><p>Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario. Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:</p><pre><code>{
+</code></pre><p>Cada sesión de usuario tendrá un tóken diferente, de esta forma el usuario puede estar autenticado en multiples dispositivos a la vez.</p><p>Cuando un usuario cambia de contraseña, todos los tokens serán invalidados.</p><p>Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario. Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:</p><pre><code>{
   "id": 8,
-  "api_token": "1234567890qwertyuiop1234567890qwertyuiop1234567890qwertyuiop"
+  "api_token": "..."
   ...
 }
-</code></pre><h3 id="errores_y_validaciones"><a href="#errores_y_validaciones">Errores y validaciones</a></h3><p>Cuando la petición no es exitosa por que la validación de datos no es correcta, las respuesta incluye información sobre que datos no pasaron la validación, incluyendo cada campo que no fue exitoso. Ejemplo:</p><pre><code>{
+</code></pre><p>Adicionalmente el token es enviado cuando un usuario:</p><ul><li>Se registra</li><li>Cambia su contraseña</li><li>Resetea su contraseña</li></ul><h3 id="errores_y_validaciones"><a href="#errores_y_validaciones">Errores y validaciones</a></h3><p>Cuando la petición no es exitosa por que la validación de datos no es correcta, las respuesta incluye información sobre que datos no pasaron la validación, incluyendo cada campo que no fue exitoso. Ejemplo:</p><pre><code>{
   "message": "The given data was invalid.",
   "errors": {
     "email": [

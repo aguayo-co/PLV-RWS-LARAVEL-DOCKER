@@ -121,8 +121,10 @@ documentation:
     Authorization: Bearer TOKEN
     ```
 
-    Cada usuario tiene un token único de 60 caracteres que se cambia cada vez que el usuario genera una
-    contraseña nueva.
+    Cada sesión de usuario tendrá un tóken diferente, de esta forma el usuario puede estar
+    autenticado en multiples dispositivos a la vez.
+
+    Cuando un usuario cambia de contraseña, todos los tokens serán invalidados.
 
     Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario.
     Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:
@@ -130,10 +132,15 @@ documentation:
     ```
     {
       "id": 8,
-      "api_token": "1234567890qwertyuiop1234567890qwertyuiop1234567890qwertyuiop"
+      "api_token": "..."
       ...
     }
     ```
+
+    Adicionalmente el token es enviado cuando un usuario:
+    - Se registra
+    - Cambia su contraseña
+    - Resetea su contraseña
 
 - title: Errores y validaciones
   content: |
