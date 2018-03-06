@@ -23,7 +23,8 @@ class SliderController extends Controller
         return [
             'name' => $required . 'string|unique:sliders,name' . $ignore,
             'slug' => 'string|unique:sliders,slug' . $ignore,
-            'large_text' => $required . 'string',
+            'priority' => $required . 'integer|between:0,100',
+            'main_text' => $required . 'string',
             'small_text' => 'nullable|string',
             'orientation' => $required . 'string',
             'font_color' => $required . 'string',

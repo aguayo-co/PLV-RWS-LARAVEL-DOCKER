@@ -19,7 +19,7 @@ class Slider extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'large_text', 'small_text', 'button_text', 'url', 'image', 'orientation', 'font_color'
+        'name', 'main_text', 'small_text', 'button_text', 'url', 'image', 'orientation', 'font_color'
     ];
 
     protected $appends = ['image'];

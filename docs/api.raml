@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.7.0
+version: 0.7.1
 baseUri: https://prilov.aguayo.co/api
 documentation:
 - title: Introducción
@@ -231,9 +231,10 @@ types:
   Slider:
     type: Property
     properties:
-      large_text: string
-      small_text: string
-      button_text: string
+      priority: integer
+      main_text: string
+      small_text?: string
+      button_text?: string
       orientation: string
       font_color: string
       image: string
@@ -283,6 +284,7 @@ types:
       brand_id: integer
       category_id: integer
       color_ids: integer[]
+      campaign_ids: integer[]
       condition_id: integer
       status_id: integer
   ProductExpanded:
@@ -292,6 +294,7 @@ types:
       brand?: Brand
       category?: Category
       colors?: Property[]
+      campaign?: Property[]
       condition?: Property
       size?: Property
       status?: Property

@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 $factory->define(App\Slider::class, function (Faker $faker) {
     return [
         'name' => $faker->sentence(2),
-        'large_text' => $faker->sentence(5),
+        'main_text' => $faker->sentence(5),
         'small_text' => $faker->optional()->sentence(4),
         'button_text' => $faker->optional()->sentence(2),
         'url' => $faker->url,
