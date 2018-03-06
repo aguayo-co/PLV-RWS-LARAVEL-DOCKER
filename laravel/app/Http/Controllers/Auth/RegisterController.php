@@ -28,10 +28,10 @@ class RegisterController extends Controller
         return [
             # Por requerimiento de front, el error de correo existente debe ser enviado por aparte.
             'exists' => 'unique:users,email',
-            'email' => 'required|string|email|max:255',
+            'email' => 'required|string|email',
             'password' => 'required|string|min:6',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
             'phone' => 'string',
             'about' => 'string',
             'picture' => 'image',
@@ -53,7 +53,7 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return array
      */
-    public function alterValidateData($data, Model $user = null)
+    protected function alterValidateData($data, Model $user = null)
     {
         if (array_key_exists('email', $data)) {
             $data['exists'] = $data['email'];
@@ -64,6 +64,8 @@ class RegisterController extends Controller
     public function postStore(Request $request, Model $user)
     {
         event(new Registered($user));
-        return parent::postStore($request, $user)->makeVisible('api_token');
+        $user = parent::postStore($request, $user);
+        $user->api_token = $user->createToken('PrilovRegister')->accessToken;
+        return $user;
     }
 }

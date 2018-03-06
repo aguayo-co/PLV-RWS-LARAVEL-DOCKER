@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -22,7 +23,7 @@ class ProductController extends Controller
         $this->middleware('role:seller|admin', ['only' => ['store', 'update']]);
     }
 
-    public function alterValidateData($data, Model $product = null)
+    protected function alterValidateData($data, Model $product = null)
     {
         $data['slug'] = str_slug(array_get($data, 'title'));
         return $data;
@@ -32,7 +33,7 @@ class ProductController extends Controller
     {
         $required = !$product ? 'required|' : '';
         return [
-            'user_id' => $required . 'exists:users,id',
+            'user_id' => 'exists:users,id',
             'title' => $required . 'string',
             'slug' => 'string',
             'description' => $required . 'string',
@@ -62,6 +63,15 @@ class ProductController extends Controller
     protected function validationMessages()
     {
         return ['category_id.exists' => trans('validation.not_in')];
+    }
+
+    protected function alterFillData($data, Model $product = null)
+    {
+        if (!$product && !array_get($data, 'user_id')) {
+            $user = Auth::user();
+            $data['user_id'] = $user->id;
+        }
+        return $data;
     }
 
     public function postUpdate(Request $request, Model $product)

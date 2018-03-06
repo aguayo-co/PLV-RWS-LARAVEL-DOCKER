@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
+use Laravel\Passport\Token;
 
 class ResetPasswordController extends Controller
 {
@@ -43,9 +44,9 @@ class ResetPasswordController extends Controller
     {
         $user = $this->getUser($request, $email);
 
-        $this->setPassword($user, $request->password);
+        $this->resetPassword($user, $request->password);
 
-        return $user->makeVisible('api_token');
+        return $user;
     }
 
     protected function getUser(Request $request, $email)
@@ -65,11 +66,13 @@ class ResetPasswordController extends Controller
         return $user;
     }
 
-    protected function setPassword($user, $password)
+    protected function resetPassword($user, $password)
     {
         $user->password = $password;
         $user->save();
         $this->broker()->deleteToken($user);
+        $user->api_token = $user->createToken('PrilovResetPassword')->accessToken;
+        Token::destroy($user->tokens->pluck('id')->all());
         event(new PasswordReset($user));
     }
 

@@ -31,7 +31,7 @@ class AddressController extends Controller
      * @param  array  $data
      * @return array
      */
-    public function alterFillData($data)
+    protected function alterFillData($data, Model $address = null)
     {
         $user = request()->route('user');
         $data['user_id'] = $user->id;

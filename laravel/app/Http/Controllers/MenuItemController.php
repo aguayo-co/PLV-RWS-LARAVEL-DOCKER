@@ -11,7 +11,7 @@ class MenuItemController extends Controller
 {
     public $modelClass = MenuItem::class;
 
-    public function alterValidateData($data, Model $menuItem = null)
+    protected function alterValidateData($data, Model $menuItem = null)
     {
         $data['id'] = $menuItem ? $menuItem->id : false;
         return $data;

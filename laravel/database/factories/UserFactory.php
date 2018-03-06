@@ -18,7 +18,6 @@ $factory->define(App\User::class, function (Faker $faker) {
     return [
         'email' => $faker->unique()->safeEmail,
         'password' => 'secret',
-        'api_token' => str_random(60),
         'first_name' => $faker->firstName,
         'last_name' => $faker->lastName,
     ];

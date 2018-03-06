@@ -109,21 +109,9 @@ class LoginController extends Controller
 
         $user = $this->guard()->user();
 
-        $this->ensureApiToken($user);
+        $user->api_token = $user->createToken('PrilovLogin')->accessToken;
 
-        return $this->authenticated($request, $user);
-    }
-
-    /**
-     * The user has been authenticated.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $user
-     * @return mixed
-     */
-    protected function authenticated(Request $request, $user)
-    {
-        return $user->makeVisible('api_token');
+        return $user;
     }
 
     /**
@@ -159,18 +147,5 @@ class LoginController extends Controller
     protected function guard()
     {
         return Auth::guard('web');
-    }
-
-    /**
-     * Ensure the user has a api_token.
-     *
-     * @return \Illuminate\Contracts\Auth\StatefulGuard
-     * @return void
-     */
-    protected function ensureApiToken($user)
-    {
-        if (strlen($user->api_token) != 60) {
-            $user->update(['api_token' => User::generateApiToken()]);
-        }
     }
 }

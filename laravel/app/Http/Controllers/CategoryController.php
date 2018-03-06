@@ -10,7 +10,7 @@ class CategoryController extends Controller
 {
     public $modelClass = Category::class;
 
-    public function alterValidateData($data, Model $category = null)
+    protected function alterValidateData($data, Model $category = null)
     {
         $data['id'] = $category ? $category->id : false;
         $data['slug'] = str_slug(array_get($data, 'name'));

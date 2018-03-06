@@ -39,6 +39,7 @@ class Product extends Model
      * Store files temporarily while creating a product.
      */
     protected $temp_images;
+    protected $temp_color_ids;
 
     public static function boot()
     {
@@ -46,7 +47,13 @@ class Product extends Model
         self::created(function ($product) {
             if ($product->temp_images) {
                 $product->images = $product->temp_images;
+                $product->temp_images = null;
             }
+            if ($product->temp_color_ids) {
+                $product->color_ids = $product->temp_color_ids;
+                $product->temp_color_ids = null;
+            }
+
         });
     }
 
@@ -65,6 +72,10 @@ class Product extends Model
 
     protected function setColorIdsAttribute(array $colorIds)
     {
+        if (!$this->id) {
+            $this->temp_color_ids = $colorIds;
+            return;
+        }
         $this->colors()->sync($colorIds);
     }
 

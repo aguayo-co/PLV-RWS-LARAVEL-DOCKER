@@ -135,7 +135,7 @@ class Controller extends BaseController
      * @param  array  $data
      * @return array
      */
-    public function alterValidateData($data, Model $model = null)
+    protected function alterValidateData($data, Model $model = null)
     {
         return $data;
     }
@@ -146,7 +146,7 @@ class Controller extends BaseController
      * @param  array  $data
      * @return array
      */
-    public function alterFillData($data)
+    protected function alterFillData($data, Model $model = null)
     {
         return $data;
     }

@@ -10,7 +10,7 @@ class BannerController extends Controller
 {
     public $modelClass = Banner::class;
 
-    public function alterValidateData($data, Model $banner = null)
+    protected function alterValidateData($data, Model $banner = null)
     {
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;

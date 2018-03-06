@@ -10,7 +10,7 @@ class ShippingMethodController extends Controller
 {
     public $modelClass = ShippingMethod::class;
 
-    public function alterValidateData($data, Model $shippingMethod = null)
+    protected function alterValidateData($data, Model $shippingMethod = null)
     {
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;

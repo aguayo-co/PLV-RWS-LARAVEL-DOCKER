@@ -10,7 +10,7 @@ class MenuController extends Controller
 {
     public $modelClass = Menu::class;
 
-    public function alterValidateData($data, Model $menu = null)
+    protected function alterValidateData($data, Model $menu = null)
     {
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;

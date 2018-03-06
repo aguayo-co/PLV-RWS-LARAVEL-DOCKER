@@ -38,6 +38,7 @@ class Banner extends Model
         self::created(function ($banner) {
             if ($banner->temp_image) {
                 $banner->image = $banner->temp_image;
+                $banner->temp_image = null;
             }
         });
     }

@@ -50,4 +50,16 @@ class Handler extends ExceptionHandler
     {
         return parent::render($request, $exception);
     }
+
+    /**
+     * Get the default context variables for logging.
+     * Modified form original due to:
+     *  - https://github.com/laravel/passport/issues/440
+     *
+     * @return array
+     */
+    protected function context()
+    {
+        return [];
+    }
 }

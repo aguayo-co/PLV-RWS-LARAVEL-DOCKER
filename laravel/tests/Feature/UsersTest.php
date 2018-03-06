@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\User;
+use Laravel\Passport\Passport;
 use Tests\TestCase;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Password;
 
 class UsersTest extends TestCase
 {
@@ -53,6 +56,8 @@ class UsersTest extends TestCase
 
     public function testTokenIsSentOnCreate()
     {
+        $this->artisan('passport:client', ['--personal' => true, '-n' => true]);
+
         $url = route('api.register');
         $response = $this->json('POST', $url, [
             'email' => 'test@domain.com',
@@ -65,6 +70,7 @@ class UsersTest extends TestCase
 
     public function testTokenIsSentOnLogin()
     {
+        $this->artisan('passport:client', ['--personal' => true, '-n' => true]);
         $user = factory(User::class)->create();
 
         $url = route('api.login');
@@ -75,14 +81,48 @@ class UsersTest extends TestCase
         $response->assertJsonStructure(['api_token']);
     }
 
+    public function testTokenIsSentOnPasswordChange()
+    {
+        $this->artisan('passport:client', ['--personal' => true, '-n' => true]);
+
+        $user = factory(User::class)->create();
+        $headers = [
+            'Authorization' => 'Bearer ' . $user->createToken('PrilovRegister')->accessToken
+        ];
+
+        $url = route('api.user.update', $user->id);
+        $response = $this->json('PATCH', $url, [
+            'password' => '123$%ˆ456!@#',
+        ], $headers);
+
+        $response->assertJsonStructure(['api_token']);
+    }
+
+    public function testTokenIsSentOnPasswordReset()
+    {
+        $this->artisan('passport:client', ['--personal' => true, '-n' => true]);
+
+        $user = factory(User::class)->create();
+
+        $url = route('api.password.reset', $user->email);
+        $response = $this->json('POST', $url, [
+            'password' => '123$%ˆ456!@#',
+            'token' => Password::broker()->getRepository()->create($user)
+        ]);
+
+        $response->assertJsonStructure(['api_token']);
+    }
+
     public function testTokenIsNotSentOnUpdate()
     {
         $user = factory(User::class)->create();
 
+        Passport::actingAs(
+            $user
+        );
+
         $url = route('api.user.update', $user->id);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $user->api_token
-        ])->json('PATCH', $url, [
+        $response = $this->json('PATCH', $url, [
             'first_name' => 'First Name',
         ]);
 
@@ -93,11 +133,32 @@ class UsersTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $url = route('api.user.update', $user->id);
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $user->api_token
-        ])->json('GET', $url);
+        $url = route('api.user.get', $user->id);
+        $response = $this->json('GET', $url);
 
         $response->assertStatus(200)->assertJsonMissing(['api_token']);
+    }
+
+    public function testDoesNotHaveSellerRole()
+    {
+        Role::create(['name' => 'seller']);
+        $user = factory(User::class)->create();
+        $this->assertFalse($user->hasRole('seller'));
+    }
+
+    public function testSellerRoleIsAdded()
+    {
+        Role::create(['name' => 'seller']);
+        $user = factory(User::class)->states('profile')->create();
+        $this->assertTrue($user->hasRole('seller'));
+    }
+
+    public function testSellerRoleIsRemoved()
+    {
+        Role::create(['name' => 'seller']);
+        $user = factory(User::class)->states('profile')->create();
+        $user->cover = null;
+        $user->save();
+        $this->assertFalse($user->hasRole('seller'));
     }
 }
