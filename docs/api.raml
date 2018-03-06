@@ -454,7 +454,7 @@ resourceTypes:
   /users/password/reset/{email}:
     post:
       is: [ responseError ]
-      description: "Validates a password reset token"
+      description: "Resets the password for the given user."
       body:
         application/json:
           type: object
@@ -463,7 +463,7 @@ resourceTypes:
             token: string
       responses:
         200:
-          description: "The provided password token is valid"
+          description: "Password changed succesfully."
 
 /menus:
   type: collection
