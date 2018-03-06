@@ -179,6 +179,9 @@ class User extends Authenticatable
     protected function setImage(UploadedFile $image, $path)
     {
         $image->storeAs($path, uniqid());
+        # Timestamps might not get updated if this was the only attribute that
+        # changed in the model. Force timestamp update.
+        $this->updateTimestamps();
     }
 
     protected function getImage($path)

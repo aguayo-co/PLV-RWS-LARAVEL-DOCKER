@@ -42,6 +42,7 @@ Route::name('api.')->group(function () {
     create_admin_routes('Category', SLUG_REGEX);
     create_admin_routes('Color', SLUG_REGEX);
     create_admin_routes('Condition', SLUG_REGEX);
+    create_admin_routes('Slider', SLUG_REGEX);
     create_admin_routes('Status', SLUG_REGEX);
 
     Route::get('products', 'ProductController@index')->name('products');

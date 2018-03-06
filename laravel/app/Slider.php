@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-class Banner extends Model
+class Slider extends Model
 {
-    public const IMAGES_BASE_PATH = 'public/banners/images/';
+    public const IMAGES_BASE_PATH = 'public/sliders/images/';
 
     /**
      * The attributes that are mass assignable.
@@ -16,13 +16,13 @@ class Banner extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'title', 'subtitle', 'button_text', 'url', 'image',
+        'name', 'large_text', 'small_text', 'button_text', 'url', 'image', 'orientation', 'font_color'
     ];
 
     protected $appends = ['image'];
 
     /**
-     * Store file temporarily while creating a banner.
+     * Store file temporarily while creating a slider.
      */
     protected $temp_image;
 
@@ -35,10 +35,10 @@ class Banner extends Model
     public static function boot()
     {
         parent::boot();
-        self::created(function ($banner) {
-            if ($banner->temp_image) {
-                $banner->image = $banner->temp_image;
-                $banner->temp_image = null;
+        self::created(function ($slider) {
+            if ($slider->temp_image) {
+                $slider->image = $slider->temp_image;
+                $slider->temp_image = null;
             }
         });
     }

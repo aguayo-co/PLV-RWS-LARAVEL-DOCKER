@@ -228,6 +228,16 @@ types:
     type: Property
   Status:
     type: Property
+  Slider:
+    type: Property
+    properties:
+      large_text: string
+      small_text: string
+      button_text: string
+      orientation: string
+      font_color: string
+      image: string
+      url: string
 
   Address:
     type: BaseObject
@@ -261,6 +271,7 @@ types:
     type: BaseObject
     properties:
       title: string
+      slug?: string
       images: file[]
       delete_images?: string[]
       description: string
@@ -290,9 +301,8 @@ types:
       email: string
       password: string
   ShippingMethod:
-    type: BaseObject
+    type: Property
     properties:
-      name: string
       descriptionSeller: string
       descriptionBuyer: string
   DetailedAnswer:
@@ -530,6 +540,10 @@ resourceTypes:
 /conditions:
   type: collection
   /{condition-slug}:
+    type: singleItem
+/sliders:
+  type: collection
+  /{sliders-slug}:
     type: singleItem
 /statuses:
   type: collection
