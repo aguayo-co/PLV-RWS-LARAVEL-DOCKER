@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Campaign;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 
 class CampaignController extends Controller
@@ -23,5 +24,12 @@ class CampaignController extends Controller
             'name' => $required . 'string|unique:campaigns,name' . $ignore,
             'slug' => 'string|unique:campaigns,slug' . $ignore,
         ];
+    }
+
+    public function show(Request $request, Model $campaign)
+    {
+        $campaign = parent::show($request, $campaign);
+        $campaign->products = $campaign->products()->simplePaginate($request->items);
+        return $campaign;
     }
 }

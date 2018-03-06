@@ -24,11 +24,11 @@ class SliderController extends Controller
             'name' => $required . 'string|unique:sliders,name' . $ignore,
             'slug' => 'string|unique:sliders,slug' . $ignore,
             'large_text' => $required . 'string',
-            'small_text' => $required . 'string',
+            'small_text' => 'nullable|string',
             'orientation' => $required . 'string',
             'font_color' => $required . 'string',
             'image' => $required . 'image',
-            'button_text' => $required . 'string',
+            'button_text' => 'nullable|string',
             'url' => $required . 'string',
         ];
     }

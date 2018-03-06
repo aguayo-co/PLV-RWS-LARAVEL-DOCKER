@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Campaign extends Model
+class Group extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -20,9 +20,9 @@ class Campaign extends Model
         return 'slug';
     }
 
-    public function products()
+    public function users()
     {
-        return $this->belongsToMany('App\Product');
+        return $this->belongsToMany('App\User');
     }
 
     public function setNameAttribute($name)

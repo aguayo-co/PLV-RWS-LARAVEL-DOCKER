@@ -33,7 +33,7 @@ class ProductController extends Controller
     {
         $required = !$product ? 'required|' : '';
         return [
-            'user_id' => 'exists:users,id',
+            'user_id' => 'integer|exists:users,id',
             'title' => $required . 'string',
             'slug' => 'string',
             'description' => $required . 'string',
@@ -41,18 +41,21 @@ class ProductController extends Controller
             'original_price' => $required . 'numeric|between:0,999999999.99',
             'price' => $required . 'numeric|between:0,999999999.99',
             'commission' => $required . 'numeric|between:0,100',
-            'brand_id' => $required . 'exists:brands,id',
+            'brand_id' => $required . 'integer|exists:brands,id',
             # Sólo permite una categoría que tenga padre.
             'category_id' => [
                 trim($required, '|'),
+                'integer',
                 Rule::exists('categories', 'id')->where(function ($query) {
                     $query->whereNotNull('parent_id');
                 }),
             ],
             'color_ids' => $required . 'array|max:2',
-            'color_ids.*' => 'exists:colors,id',
-            'condition_id' => $required . 'exists:conditions,id',
-            'status_id' => $required . 'exists:statuses,id',
+            'color_ids.*' => 'integer|exists:colors,id',
+            'campaign_ids' => 'array',
+            'campaign_ids.*' => 'integer|exists:campaigns,id',
+            'condition_id' => $required . 'integer|exists:conditions,id',
+            'status_id' => $required . 'integer|exists:statuses,id',
             'images' => $required . 'array',
             'images.*' => 'image',
             'delete_images' => 'array',
@@ -72,31 +75,5 @@ class ProductController extends Controller
             $data['user_id'] = $user->id;
         }
         return $data;
-    }
-
-    public function postUpdate(Request $request, Model $product)
-    {
-        $product->campaigns()->sync($request->campaign_ids);
-        return parent::postUpdate($request, $product);
-    }
-
-    public function postStore(Request $request, Model $product)
-    {
-        $product->campaigns()->attach($request->campaign_ids);
-        return parent::postStore($request, $product);
-    }
-
-    protected function withCategory(Request $request, Model $category)
-    {
-        return Product::where('category_id', $category->id)
-            ->orWhereHas('category', function ($query) use ($category) {
-                $query->where('parent_id', $category->id);
-            })
-            ->simplePaginate($request->items);
-    }
-
-    protected function withCampaign(Request $request, Model $campaign)
-    {
-        return $campaign->products()->simplePaginate($request->items);
     }
 }

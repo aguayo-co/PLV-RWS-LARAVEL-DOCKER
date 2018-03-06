@@ -37,6 +37,8 @@ class RegisterController extends Controller
             'picture' => 'image',
             'cover' => 'image',
             'vacation_mode' => 'boolean',
+            'group_ids' => 'array',
+            'group_ids.*' => 'integer|exists:groups,id',
         ];
     }
 

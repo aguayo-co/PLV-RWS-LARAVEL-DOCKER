@@ -31,26 +31,29 @@ Route::name('api.')->group(function () {
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
 
-    create_admin_routes('Menu', SLUG_REGEX);
-    create_admin_routes('MenuItem', ID_REGEX);
+    Route::get('users/group/{group}', 'GroupController@show')->name('users.group.get')->where('group', SLUG_REGEX);
 
-    create_admin_routes('ShippingMethod', SLUG_REGEX);
+    create_crud_routes('Menu', SLUG_REGEX);
+    create_crud_routes('MenuItem', ID_REGEX);
 
-    create_admin_routes('Banner', SLUG_REGEX);
-    create_admin_routes('Brand', SLUG_REGEX);
-    create_admin_routes('Campaign', SLUG_REGEX);
-    create_admin_routes('Category', SLUG_REGEX);
-    create_admin_routes('Color', SLUG_REGEX);
-    create_admin_routes('Condition', SLUG_REGEX);
-    create_admin_routes('Slider', SLUG_REGEX);
-    create_admin_routes('Status', SLUG_REGEX);
+    create_crud_routes('ShippingMethod', SLUG_REGEX);
+
+    create_crud_routes('Banner', SLUG_REGEX);
+    create_crud_routes('Brand', SLUG_REGEX);
+    create_crud_routes('Campaign', SLUG_REGEX);
+    create_crud_routes('Category', SLUG_REGEX);
+    create_crud_routes('Color', SLUG_REGEX);
+    create_crud_routes('Condition', SLUG_REGEX);
+    create_crud_routes('Group', SLUG_REGEX);
+    create_crud_routes('Slider', SLUG_REGEX);
+    create_crud_routes('Status', SLUG_REGEX);
 
     Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}/{slug?}', 'ProductController@show')
         ->name('product.get')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
-    Route::get('products/category/{category}', 'ProductController@withCategory')
+    Route::get('products/category/{category}', 'CategoryController@show')
         ->name('products.category.get')->where('category', SLUG_REGEX);
-    Route::get('products/campaign/{campaign}', 'ProductController@withCampaign')
+    Route::get('products/campaign/{campaign}', 'CampaignController@show')
         ->name('products.campaign.get')->where('campaign', SLUG_REGEX);
 
     Route::middleware('auth:api')->group(function () {
@@ -68,6 +71,7 @@ Route::name('api.')->group(function () {
         Route::middleware('role:admin')->group(function () {
             Route::delete('products/{product}/{slug?}', 'ProductController@delete')
                 ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
+
         });
     });
 });

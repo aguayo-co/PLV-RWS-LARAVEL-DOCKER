@@ -10,15 +10,17 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
+use App\Traits\SaveLater;
 
 class User extends Authenticatable
 {
     use Notifiable;
     use HasRoles;
     use HasApiTokens;
+    use SaveLater;
 
-    public const COVERS_BASE_PATH = 'public/users/covers/';
-    public const PICTURES_BASE_PATH = 'public/users/pictures/';
+    protected const COVERS_BASE_PATH = 'public/users/covers/';
+    protected const PICTURES_BASE_PATH = 'public/users/pictures/';
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +37,7 @@ class User extends Authenticatable
         'phone',
         'picture',
         'vacation_mode',
+        'group_ids',
     ];
 
     /**
@@ -47,27 +50,12 @@ class User extends Authenticatable
     ];
 
     protected $appends = ['cover', 'picture'];
-    protected $with = ['roles:id,name'];
-
-    /**
-     * Store files temporarily while creating a user.
-     */
-    protected $temp_cover;
-    protected $temp_picture;
+    protected $with = ['roles:id,name', 'groups'];
 
     public static function boot()
     {
         parent::boot();
-        self::created(function ($user) {
-            if ($user->temp_cover) {
-                $user->cover = $user->temp_cover;
-                $user->temp_cover = null;
-            }
-            if ($user->temp_picture) {
-                $user->picture = $user->temp_picture;
-                $user->temp_picture = null;
-            }
-        });
+        self::registerSavesNow();
         self::saved(function ($user) {
             $user->validateSeller();
         });
@@ -126,6 +114,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Address');
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany('App\Group');
+    }
+
     protected function getCoverPathAttribute()
     {
         if (!$this->id) {
@@ -154,8 +147,7 @@ class User extends Authenticatable
 
     protected function setCoverAttribute(?UploadedFile $cover)
     {
-        if (!$this->id) {
-            $this->temp_cover = $cover;
+        if ($this->saveLater('cover', $cover)) {
             return;
         }
         $this->clearImages($this->cover_path);
@@ -166,8 +158,7 @@ class User extends Authenticatable
 
     protected function setPictureAttribute(?UploadedFile $picture)
     {
-        if (!$this->id) {
-            $this->temp_picture = $picture;
+        if ($this->saveLater('picture', $picture)) {
             return;
         }
         $this->clearImages($this->picture_path);

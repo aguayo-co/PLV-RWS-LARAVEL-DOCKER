@@ -4,10 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\SaveLater;
 
 class Product extends Model
 {
-    public const IMAGES_BASE_PATH = 'public/products/images/';
+    use SaveLater;
+
+    protected const IMAGES_BASE_PATH = 'public/products/images/';
 
     /**
      * The attributes that are mass assignable.
@@ -29,33 +32,12 @@ class Product extends Model
         'images',
         'delete_images',
         'color_ids',
+        'campaign_ids',
     ];
 
     protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status'];
 
-    protected $appends = ['images', 'color_ids'];
-
-    /**
-     * Store files temporarily while creating a product.
-     */
-    protected $temp_images;
-    protected $temp_color_ids;
-
-    public static function boot()
-    {
-        parent::boot();
-        self::created(function ($product) {
-            if ($product->temp_images) {
-                $product->images = $product->temp_images;
-                $product->temp_images = null;
-            }
-            if ($product->temp_color_ids) {
-                $product->color_ids = $product->temp_color_ids;
-                $product->temp_color_ids = null;
-            }
-
-        });
-    }
+    protected $appends = ['images', 'color_ids', 'campaign_ids'];
 
     /**
      * Get the user that owns the address.
@@ -72,11 +54,23 @@ class Product extends Model
 
     protected function setColorIdsAttribute(array $colorIds)
     {
-        if (!$this->id) {
-            $this->temp_color_ids = $colorIds;
+        if ($this->saveLater('color_ids', $colorIds)) {
             return;
         }
         $this->colors()->sync($colorIds);
+    }
+
+    protected function getCampaignIdsAttribute()
+    {
+        return $this->campaigns->pluck('id')->all();
+    }
+
+    protected function setCampaignIdsAttribute(array $campaignIds)
+    {
+        if ($this->saveLater('campaign_ids', $campaignIds)) {
+            return;
+        }
+        $this->campaigns()->sync($campaignIds);
     }
 
     protected function getImagePathAttribute()
@@ -95,10 +89,10 @@ class Product extends Model
 
     protected function setImagesAttribute(array $images)
     {
-        if (!$this->id) {
-            $this->temp_images = $images;
+        if ($this->saveLater('images', $images)) {
             return;
         }
+
         foreach ($images as $image) {
             $image->storeAs($this->image_path, uniqid());
         }

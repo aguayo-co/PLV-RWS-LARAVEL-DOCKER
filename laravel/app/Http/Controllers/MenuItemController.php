@@ -13,6 +13,7 @@ class MenuItemController extends Controller
 
     protected function alterValidateData($data, Model $menuItem = null)
     {
+        # ID needed to validate it is not self-referenced.
         $data['id'] = $menuItem ? $menuItem->id : false;
         return $data;
     }
@@ -26,8 +27,8 @@ class MenuItemController extends Controller
             'name' => $required . 'string',
             'url' => 'nullable|string',
             'icon' => 'nullable|string',
-            'parent_id' => $requiredParentId . 'empty_with:menu_id|exists:menu_items,id|different:id',
-            'menu_id' => $requiredMenuId . 'empty_with:parent_id|exists:menus,id',
+            'parent_id' => $requiredParentId . 'integer|empty_with:menu_id|exists:menu_items,id|different:id',
+            'menu_id' => $requiredMenuId . 'integer|empty_with:parent_id|exists:menus,id',
         ];
     }
 }

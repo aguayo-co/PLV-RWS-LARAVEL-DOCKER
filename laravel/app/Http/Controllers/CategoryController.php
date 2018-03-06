@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Product;
 use App\Category;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 
@@ -12,6 +14,7 @@ class CategoryController extends Controller
 
     protected function alterValidateData($data, Model $category = null)
     {
+        # ID needed to validate it is not self-referenced.
         $data['id'] = $category ? $category->id : false;
         $data['slug'] = str_slug(array_get($data, 'name'));
         return $data;
@@ -26,6 +29,7 @@ class CategoryController extends Controller
             'slug' => 'string|unique:categories,slug' . $ignore,
             'parent_id' => [
                 'nullable',
+                'integer',
                 'different:id',
                 Rule::exists('categories', 'id')->where(function ($query) {
                     $query->whereNull('parent_id');
@@ -59,5 +63,22 @@ class CategoryController extends Controller
         return function ($query) {
             return $query->whereNull('parent_id');
         };
+    }
+
+    public function show(Request $request, Model $category)
+    {
+        #Products including those of subcategories.
+        $products = Product::where('category_id', $category->id)
+        ->orWhereHas('category', function ($query) use ($category) {
+            $query->where('parent_id', $category->id);
+        });
+
+        # If subcategory, remove category from product.
+        $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category.parent'));
+        if ($category->parent_id) {
+            $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category'));
+        }
+        $category->products = $products->simplePaginate($request->items);
+        return $category;
     }
 }

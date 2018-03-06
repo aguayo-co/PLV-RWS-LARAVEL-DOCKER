@@ -5,10 +5,13 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use App\Traits\SaveLater;
 
 class Banner extends Model
 {
-    public const IMAGES_BASE_PATH = 'public/banners/images/';
+    use SaveLater;
+
+    protected const IMAGES_BASE_PATH = 'public/banners/images/';
 
     /**
      * The attributes that are mass assignable.
@@ -21,26 +24,9 @@ class Banner extends Model
 
     protected $appends = ['image'];
 
-    /**
-     * Store file temporarily while creating a banner.
-     */
-    protected $temp_image;
-
-
     public function getRouteKeyName()
     {
         return 'slug';
-    }
-
-    public static function boot()
-    {
-        parent::boot();
-        self::created(function ($banner) {
-            if ($banner->temp_image) {
-                $banner->image = $banner->temp_image;
-                $banner->temp_image = null;
-            }
-        });
     }
 
     protected function getImageAttribute()
@@ -59,8 +45,7 @@ class Banner extends Model
 
     protected function setImageAttribute(UploadedFile $image)
     {
-        if (!$this->id) {
-            $this->temp_image = $image;
+        if ($this->saveLater('image', $image)) {
             return;
         }
         $path = $this->image_path;

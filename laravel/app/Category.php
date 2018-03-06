@@ -15,8 +15,6 @@ class Category extends Model
         'name', 'parent_id',
     ];
 
-    protected $with = ['children'];
-
     public function getRouteKeyName()
     {
         return 'slug';

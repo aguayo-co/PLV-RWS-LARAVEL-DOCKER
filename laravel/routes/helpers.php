@@ -6,7 +6,7 @@
 const SLUG_REGEX = '[-\pL\pN\s]+';
 const ID_REGEX = '[0-9]+';
 
-function create_admin_routes($model, $regex)
+function create_crud_routes($model, $regex)
 {
     $plural = str_plural($model);
     $snakes = snake_case($plural);
