@@ -67,18 +67,16 @@ class CategoryController extends Controller
 
     public function show(Request $request, Model $category)
     {
+        $category = parent::show($request, $category);
+
         #Products including those of subcategories.
         $products = Product::where('category_id', $category->id)
         ->orWhereHas('category', function ($query) use ($category) {
             $query->where('parent_id', $category->id);
         });
 
-        # If subcategory, remove category from product.
-        $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category.parent'));
-        if ($category->parent_id) {
-            $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category'));
-        }
+        $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category'));
         $category->products = $products->simplePaginate($request->items);
-        return $category;
+        return $category->load(['children', 'parent']);
     }
 }

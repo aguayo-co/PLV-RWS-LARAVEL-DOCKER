@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.7.1
+version: 0.7.2
 baseUri: https://prilov.aguayo.co/api
 documentation:
 - title: Introducción
@@ -203,7 +203,6 @@ types:
     properties:
       name: string
       slug?: string
-
   Banner:
     type: Property
     properties:
@@ -218,10 +217,35 @@ types:
       url: string
   Campaign:
     type: Property
+  CampaignExpanded:
+    type: Campaign
+    properties:
+      products:
+        type: object
+        properties:
+          data: ProductExpanded[]
   Category:
     type: Property
     properties:
-      parent?: number
+      parent_id: number
+  CategoryExpanded:
+    type: Category
+    properties:
+      parent?: Category
+      children?: Category[]
+      products:
+        type: object
+        properties:
+          data: ProductExpanded[]
+  Group:
+    type: Property
+  GroupExpanded:
+    type: Group
+    properties:
+      users:
+        type: object
+        properties:
+          data: UserExpanded[]
   Color:
     type: Property
   Condition:
@@ -259,10 +283,12 @@ types:
       cover?: file
       picture?: file
       favorite_address_id?: integer
+      group_ids?: integer[]
   UserExpanded:
     type: [User]
     properties:
       addresses?: Address[]
+      groups?: Group[]
       roles?: string[]
   UserLogged:
     type: UserExpanded
@@ -345,7 +371,6 @@ resourceTypes:
   singleItem:
     get:
       is: [ singleItemResponse ]
-      description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
     patch:
       is: [ singleItemResponse, responseError ]
       securedBy: [token: { scopes: [ admin ] }]
@@ -502,18 +527,10 @@ resourceTypes:
       is: [ expanded ]
   /category/{category-slug}:
     get:
-      description: "Gets a paginated result of products with the specified category"
-      is: [ paginated ]
-      responses:
-        404:
-          description: "Category not found."
+      is: [ expanded, singleItemResponse ]
   /campaign/{campaign-slug}:
     get:
-      description: "Gets a paginated result of products with the specified campaign"
-      is: [ paginated ]
-      responses:
-        404:
-          description: "Campaign not found."
+      is: [ expanded, singleItemResponse ]
 
 /shipping_methods:
   type: collection
@@ -532,10 +549,14 @@ resourceTypes:
   type: collection
   /{campaign-slug}:
     type: singleItem
+    get:
+      is: [ expanded ]
 /categories:
   type: collection
   /{category-slug}:
     type: singleItem
+    get:
+      is: [ expanded ]
 /colors:
   type: collection
   /{color-slug}:
@@ -544,6 +565,12 @@ resourceTypes:
   type: collection
   /{condition-slug}:
     type: singleItem
+/groups:
+  type: collection
+  /{group-slug}:
+    type: singleItem
+    get:
+      is: [ expanded ]
 /sliders:
   type: collection
   /{sliders-slug}:
@@ -558,10 +585,10 @@ traits:
     queryParameters:
       items:
         type: number
-        description: "Number of items to retrieve"
+        description: "Número de items por página."
       page:
         type: number
-        description: "The page number that should be retrieved accordingly to the number of items requested"
+        description: "Número de página."
     responses:
       200:
         body:
@@ -589,6 +616,7 @@ traits:
               }
 
   singleItemResponse:
+    description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
     responses:
       200:
         body:

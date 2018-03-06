@@ -50,7 +50,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = ['cover', 'picture'];
-    protected $with = ['roles:id,name', 'groups'];
+    protected $with = ['roles', 'groups'];
 
     public static function boot()
     {
