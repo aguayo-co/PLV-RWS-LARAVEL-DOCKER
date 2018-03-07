@@ -45,6 +45,7 @@ class UserController extends Controller
             'following_ids.*' => 'integer|exists:users,id|different:id',
         ];
     }
+
     protected function validationMessages()
     {
         return [

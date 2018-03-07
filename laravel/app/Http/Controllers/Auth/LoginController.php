@@ -111,7 +111,7 @@ class LoginController extends Controller
 
         $user->api_token = $user->createToken('PrilovLogin')->accessToken;
 
-        return $user;
+        return setVisibility($user);
     }
 
     /**
@@ -147,5 +147,11 @@ class LoginController extends Controller
     protected function guard()
     {
         return Auth::guard('web');
+    }
+
+    protected function setVisibility(User $user)
+    {
+        return $user->load(['followers:id', 'following:id'])
+            ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
     }
 }
