@@ -318,12 +318,18 @@ types:
       picture?: file
       favorite_address_id?: integer
       group_ids?: integer[]
+      following_ids?: integer[]
   UserExpanded:
     type: [User]
     properties:
       addresses?: Address[]
       groups?: Group[]
       roles?: string[]
+      following_ids?: integer[]
+      followers_ids?: integer[]
+      following_count?: integer
+      followers_count?: integer
+
   UserLogged:
     type: UserExpanded
     properties:
