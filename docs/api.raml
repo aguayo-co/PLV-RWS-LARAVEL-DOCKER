@@ -20,9 +20,8 @@ documentation:
 
 - title: Asociación de datos
   content: |
-    Cuando un modelo tenga un campo que referencia a otro o a si mismo, estos campos tendrán terminación *_id*.
-    En algunos de los casos, las repsuestas incluirán un campo adicional no especificado con el modelo relacionado
-    expandido, así:
+    Cuando un modelo tenga un campo que referencia a otro o a si mismo, este campo tendrá terminación *_id*.
+    En algunos de los casos, las respuestas incluirán un campo adicional expandido, así:
     ```json
     {
       "id": 1,
@@ -34,6 +33,28 @@ documentation:
       }
     }
     ```
+
+    Cuando un modelo tenga un campo que referencia a otros modelos, este campo tendrá terminació *_ids*.
+    En algunos de los casos, las respuestas incluirán un campo adicional expandido, así:
+    ```json
+    {
+      "id": 1,
+      "name": "I have an associated products",
+      "product_ids": [2, 4],
+      "products": [
+        {
+          "id": 2,
+          "name": "I am a product."
+        },
+        {
+          "id": 4,
+          "name": "I also am a product."
+        }
+      ]
+    }
+    ```
+    Los campos múltiples pueden venir paginados, en cuyo caso la expansión tendrá los campos de paginación, y los
+    modelos asociados vendrán dentro de la propiedad `data`, tal cómo una colección paginada.
 
 - title: Peticiones
   content: |
@@ -198,6 +219,17 @@ types:
       id?: datetime
       created_at?: datetime
       updated_at?: datetime
+  PaginatedResponse:
+    type: object
+    properties:
+      current_page: integer
+      first_page_url: string
+      from: integer
+      next_page_url: string
+      path: string
+      per_page: integer
+      prev_page_url: string
+      to: integer
   Property:
     type: BaseObject
     properties:
@@ -208,7 +240,7 @@ types:
     properties:
       title: string
       subtitle: string
-      image: string
+      image: file
       button_text: string
       url: string
   Brand:
@@ -221,7 +253,7 @@ types:
     type: Campaign
     properties:
       products:
-        type: object
+        type: PaginatedResponse
         properties:
           data: ProductExpanded[]
   Category:
@@ -234,7 +266,7 @@ types:
       parent?: Category
       children?: Category[]
       products:
-        type: object
+        type: PaginatedResponse
         properties:
           data: ProductExpanded[]
   Group:
@@ -243,7 +275,7 @@ types:
     type: Group
     properties:
       users:
-        type: object
+        type: PaginatedResponse
         properties:
           data: UserExpanded[]
   Color:
@@ -261,7 +293,7 @@ types:
       button_text?: string
       orientation: string
       font_color: string
-      image: string
+      image: file
       url: string
 
   Address:
@@ -392,8 +424,6 @@ resourceTypes:
                   "message": "Object deleted"
                 }
 
-
-
 /users:
   post:
     is: [ logged, createItemPost ]
@@ -406,6 +436,8 @@ resourceTypes:
       is: [ expanded ]
     /addresses:
       type: collection
+      post:
+        securedBy: [token: { scopes: [ owner ] }]
 
   /login:
     post:
@@ -487,6 +519,7 @@ resourceTypes:
   get:
     is: [ expanded ]
   post:
+    securedBy: [token: { scopes: [ owner ] }]
     is: [ expanded ]
   /{product-id}/{product-slug}:
     type: singleItem
@@ -583,11 +616,11 @@ resourceTypes:
 traits:
   paginated:
     queryParameters:
-      items:
-        type: number
+      items?:
+        type: integer
         description: "Número de items por página."
-      page:
-        type: number
+      page?:
+        type: integer
         description: "Número de página."
     responses:
       200:
