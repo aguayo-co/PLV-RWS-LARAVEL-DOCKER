@@ -30,7 +30,6 @@ Route::name('api.')->group(function () {
     });
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
-
     Route::get('users/group/{group}', 'GroupController@show')->name('users.group.get')->where('group', SLUG_REGEX);
 
     create_crud_routes('Menu', SLUG_REGEX);

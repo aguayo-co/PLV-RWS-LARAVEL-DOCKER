@@ -43,6 +43,10 @@ class UserController extends Controller
             'group_ids.*' => 'integer|exists:groups,id',
             'following_ids' => 'array',
             'following_ids.*' => 'integer|exists:users,id|different:id',
+            'following_add' => 'array',
+            'following_add.*' => 'integer|exists:users,id|different:id',
+            'following_remove' => 'array',
+            'following_remove.*' => 'integer|exists:users,id',
         ];
     }
 
@@ -51,6 +55,7 @@ class UserController extends Controller
         return [
             'exists.unique' => trans('validation.email.exists'),
             'following_ids.*.different' => trans('validation.different.self'),
+            'following_add.*.different' => trans('validation.different.self'),
         ];
     }
 
@@ -63,6 +68,13 @@ class UserController extends Controller
         if ($request->password) {
             Token::destroy($user->tokens->pluck('id')->all());
             $user->api_token = $user->createToken('PrilovChangePassword')->accessToken;
+        }
+
+        if ($request->following_add) {
+            $user->following()->syncWithoutDetaching($request->following_add);
+        }
+        if ($request->following_remove) {
+            $user->following()->detach($request->following_remove);
         }
 
         return $this->setVisibility($user);
