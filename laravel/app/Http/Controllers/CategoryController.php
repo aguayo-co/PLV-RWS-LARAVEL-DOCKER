@@ -53,30 +53,23 @@ class CategoryController extends Controller
         return ['parent_id.exists' => trans('validation.not_in')];
     }
 
-    /**
-     * Return a Closure to be applied to the index query.
-     *
-     * @return Closure
-     */
     protected function alterIndexQuery()
     {
         return function ($query) {
-            return $query->whereNull('parent_id');
+            return $query->whereNull('parent_id')->with(['children']);
         };
     }
 
     public function show(Request $request, Model $category)
     {
-        $category = parent::show($request, $category);
+        $category = parent::show($request, $category)->load(['children', 'parent']);
 
-        #Products including those of subcategories.
-        $products = Product::where('category_id', $category->id)
+        # Products including those of subcategories.
+        $category->products = Product::where('category_id', $category->id)
         ->orWhereHas('category', function ($query) use ($category) {
             $query->where('parent_id', $category->id);
-        });
+        })->simplePaginate($request->items);
 
-        $products = $products->setEagerLoads(array_except($products->getEagerLoads(), 'category'));
-        $category->products = $products->simplePaginate($request->items);
-        return $category->load(['children', 'parent']);
+        return $category;
     }
 }

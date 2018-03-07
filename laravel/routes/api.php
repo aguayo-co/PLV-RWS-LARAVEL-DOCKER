@@ -18,7 +18,7 @@ include_once 'helpers.php';
 Route::name('api.')->group(function () {
 
     Route::middleware('guest')->group(function () {
-        Route::post('users', 'Auth\RegisterController@store')->name('register');
+        Route::post('users', 'Auth\UserController@store')->name('register');
         Route::post('users/login', 'Auth\LoginController@login')->name('login');
 
         Route::get('users/password/recovery/{email}', 'Auth\ForgotPasswordController@sendResetLinkEmail')

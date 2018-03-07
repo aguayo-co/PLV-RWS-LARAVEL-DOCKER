@@ -38,6 +38,7 @@ class User extends Authenticatable
         'picture',
         'vacation_mode',
         'group_ids',
+        'following_ids',
     ];
 
     /**
@@ -46,10 +47,22 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'email', 'password', 'remember_token',
+        'email',
+        'password',
+        'remember_token',
+        # By default, hide everything that is sel referenced.
+        # If not, this might lead to recursion.
+        # Important to ->load(['followers', 'following']) on collections
+        # if need to show its _ids or _count attributes.
+        'following',
+        'followers',
+        'following_ids',
+        'followers_ids',
+        'following_count',
+        'followers_count',
     ];
 
-    protected $appends = ['cover', 'picture'];
+    protected $appends = ['cover', 'picture', 'following_ids', 'followers_ids', 'following_count', 'followers_count'];
     protected $with = ['roles', 'groups'];
 
     public static function boot()
@@ -117,6 +130,53 @@ class User extends Authenticatable
     public function groups()
     {
         return $this->belongsToMany('App\Group');
+    }
+
+    protected function getFollowersCountAttribute()
+    {
+        return $this->followers->count();
+    }
+
+    protected function getFollowingCountAttribute()
+    {
+        return $this->following->count();
+    }
+
+
+    protected function getFollowersIdsAttribute()
+    {
+        return $this->followers->pluck('id')->all();
+    }
+
+    protected function getFollowingIdsAttribute()
+    {
+        return $this->following->pluck('id')->all();
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follower_followee', 'followee_id', 'follower_id');
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follower_followee', 'follower_id', 'followee_id');
+    }
+
+    protected function setFollowingIdsAttribute(array $followingIds)
+    {
+        if ($this->saveLater('following_ids', $followingIds)) {
+            return;
+        }
+        $this->following()->sync($followingIds);
+    }
+
+    protected function setGroupIdsAttribute(array $groupIds)
+    {
+        if ($this->saveLater('group_ids', $groupIds)) {
+            return;
+        }
+        $this->groups()->sync($groupIds);
     }
 
     protected function getCoverPathAttribute()

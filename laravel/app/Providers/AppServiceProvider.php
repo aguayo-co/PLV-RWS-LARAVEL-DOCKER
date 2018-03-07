@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('empty_with', 'App\Validators\EmptyWithValidator@validateEmptyWith');
         Validator::replacer('empty_with', 'App\Validators\EmptyWithValidator@replaceEmptyWith');
+
+        DB::listen(function ($query) {
+            Log::notice($query->sql);
+        });
     }
 
     /**
