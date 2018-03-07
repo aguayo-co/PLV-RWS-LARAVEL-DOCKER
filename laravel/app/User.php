@@ -38,7 +38,6 @@ class User extends Authenticatable
         'picture',
         'vacation_mode',
         'group_ids',
-        'following_ids',
     ];
 
     /**
@@ -161,14 +160,6 @@ class User extends Authenticatable
     public function following()
     {
         return $this->belongsToMany(User::class, 'follower_followee', 'follower_id', 'followee_id');
-    }
-
-    protected function setFollowingIdsAttribute(array $followingIds)
-    {
-        if ($this->saveLater('following_ids', $followingIds)) {
-            return;
-        }
-        $this->following()->sync($followingIds);
     }
 
     protected function setGroupIdsAttribute(array $groupIds)

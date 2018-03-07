@@ -41,8 +41,6 @@ class UserController extends Controller
             'vacation_mode' => 'boolean',
             'group_ids' => 'array',
             'group_ids.*' => 'integer|exists:groups,id',
-            'following_ids' => 'array',
-            'following_ids.*' => 'integer|exists:users,id|different:id',
             'following_add' => 'array',
             'following_add.*' => 'integer|exists:users,id|different:id',
             'following_remove' => 'array',
