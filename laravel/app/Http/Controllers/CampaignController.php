@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CampaignController extends Controller
 {
-    public $modelClass = Campaign::class;
+    protected $modelClass = Campaign::class;
 
     protected function alterValidateData($data, Model $campaign = null)
     {
@@ -29,7 +29,10 @@ class CampaignController extends Controller
     public function show(Request $request, Model $campaign)
     {
         $campaign = parent::show($request, $campaign);
-        $campaign->products = $campaign->products()->simplePaginate($request->items);
+
+        $products = $this->applyParamsToQuery($request, $campaign->products(), ProductController::class);
+        $campaign->products = $products->simplePaginate($request->items);
+
         return $campaign;
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class BannerController extends Controller
 {
-    public $modelClass = Banner::class;
+    protected $modelClass = Banner::class;
 
     protected function alterValidateData($data, Model $banner = null)
     {

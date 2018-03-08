@@ -11,7 +11,7 @@ use App\User;
 
 class UserController extends Controller
 {
-    public $modelClass = User::class;
+    protected $modelClass = User::class;
 
     protected function alterValidateData($data, Model $user = null)
     {
@@ -93,7 +93,7 @@ class UserController extends Controller
 
     protected function setVisibility(User $user)
     {
-        return $user->load(['followers', 'following'])
+        return $user->load(['followers:id', 'following:id'])
             ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
     }
 }

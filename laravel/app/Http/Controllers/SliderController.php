@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 
 class SliderController extends Controller
 {
-    public $modelClass = Slider::class;
+    protected $modelClass = Slider::class;
+
+    public static $allowedOrderBy = ['id', 'created_at', 'updated_at', 'priority'];
 
     protected function alterValidateData($data, Model $slider = null)
     {

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BrandController extends Controller
 {
-    public $modelClass = Brand::class;
+    protected $modelClass = Brand::class;
 
     protected function alterValidateData($data, Model $brand = null)
     {

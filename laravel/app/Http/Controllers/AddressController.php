@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
-    public $modelClass = Address::class;
+    protected $modelClass = Address::class;
 
     public function __construct()
     {

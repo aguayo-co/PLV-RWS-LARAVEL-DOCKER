@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ColorController extends Controller
 {
-    public $modelClass = Color::class;
+    protected $modelClass = Color::class;
 
     protected function alterValidateData($data, Model $color = null)
     {

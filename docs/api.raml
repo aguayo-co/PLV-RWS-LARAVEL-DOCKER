@@ -127,7 +127,78 @@ documentation:
     - page
     - items
 
-    Ejemplo: *https://prilov.aguayo.co/api/colors?page=5&items25*
+    Ejemplo:
+
+    ```
+    ?page=5&items25 # Trae la página 5, con 25 elementos en cada página.
+    ```
+
+- title: Ordenamiento
+  content: |
+    Algunas de las peticiones permiten ordenar los resultados por criterios enviados por URL.
+    Cuando una petición es ordenable, se debe pasar un parámetro `orderby` en la url con los valores
+    por los que se quiere ordenar separados por coma. Cuando un valor se quiere ordenar de forma descendente,
+    se debe anteponer el signo `-` al mismo.
+
+    Cualquier petición que sea ordenable tiene los siguientes parámetros disponibles:
+    - updated_at
+    - created_id
+    - id
+
+    Ejemplo:
+    ```
+    ?orderby=id # Ordena por ID de forma ascendente
+    ?orderby=-id # Ordena por ID de forma descendente
+    ?orderby=updated_at,id #Ordena primero por fecha de actualización, y después por ID.
+    ```
+
+    Algunas coleciones tendrán otras opciones de ordenamiento.
+
+- title: Filtrado
+  content: |
+    En general, cualquier petición que sea ordenable, es filtrable.
+    Existen 2 tipos de filtros:
+    - ContenidoEn
+    Este filtro recibe una lista de valores separados por comas, y se devuelven los resultados que tengan
+    cualquiera de estos. Por ejemplo productos que pertenecen a ciertas categorías.
+    - Entre
+    Este filtro recibe dos valores separados por comas y se devuelven los resultados que tengan valores contenidos
+    entre estos dos, incluyendo los dos valores. Por ejemplo productos que están entre dos precios.
+
+    Los filtros se pasan por parametros de URL como arreglos de la siguiente forma:
+    ```
+    # genérico:
+    ?filter[{{ filtro }}]={{ valore1,valor2 }}
+
+    # productos entre dos precios, tipo Entre.
+    ?filter[precio]=1000,2500
+
+    # productos con colores, tipo ContenidoEn.
+    ?filter[color_ids]=1,3,5
+
+    # los dos filtroa al tiempo:
+    ?filter[color_ids]=1,3,5&filter[precio]=1000,2500
+    ```
+
+    Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:
+
+    |filtro|tipo|
+    |------|----|
+    |id|ContenidoEn|
+    |updated_at|Entre|
+    |created_at|Entre|
+
+- title: B;usquedas
+  content: |
+    Cuando una colección permita realizar búsquedas de texto, el criterio de búsqueda se debe pasar por URL con el
+    el parámetro `q`
+
+    Ejemplo:
+    ```
+    ?q=pantalon negro
+    ```
+
+    Las búsquedas de texto no son eficientes en MySQL, sobre todo cuando se combina con ordenado o filtrado.
 
 - title: Autenticación
   content: |
@@ -242,8 +313,8 @@ types:
     properties:
       title: string
       subtitle: string
-      image: file
-      button_text: string
+      image?: file
+      button_text?: string
       url: string
   Brand:
     type: Property
@@ -406,7 +477,7 @@ resourceTypes:
   collection:
     get:
       description: Get all the <<resourcePathName|!pluralize|!uppercamelcase>>
-      is: [ paginated ]
+      is: [ paginated, sortable, filterable ]
     post:
       is: [ createItemPost ]
       securedBy: [token: { scopes: [ admin ] }]
@@ -558,6 +629,29 @@ resourceTypes:
 
 /products:
   description: |
+    ##### Ordenamiento
+
+    Aparte de los criterios globales, los productos se pueden ordenar por los siguientes criterios:
+
+    |valor|parametro de url|ejemplo|
+    |-----|----------------|-------|
+    |precio|price|`?orderby=-price`|
+    |comisión|prilov|`?orderby=prilov`|
+
+    ##### Filtrado
+
+    Aparte de los criterios filtrado, los productos se pueden filtrar por los siguientes criterios:
+
+    |filtro|tipo|
+    |------|----|
+    |price|Entre|
+    |color_ids|ContenidoEn|
+    |campaign_ids|ContenidoEn|
+    |brand_id|ContenidoEn|
+    |category_id|ContenidoEn|
+    |condition_id|ContenidoEn|
+    |status_id|ContenidoEn|
+
     ##### Agregar imágenes
 
     Las imágenes que se envíen en el campo `images`, serán aregadas al listado de imágenes que ya tenga
@@ -587,7 +681,7 @@ resourceTypes:
     ```
   type: collection
   get:
-    is: [ expanded ]
+    is: [ expanded, searchable ]
   post:
     securedBy: [token: { scopes: [ owner ] }]
     is: [ expanded ]
@@ -600,10 +694,10 @@ resourceTypes:
       is: [ expanded ]
   /category/{category-slug}:
     get:
-      is: [ expanded, singleItemResponse ]
+      is: [ expanded, singleItemResponse, sortable, filterable, searchable ]
   /campaign/{campaign-slug}:
     get:
-      is: [ expanded, singleItemResponse ]
+      is: [ expanded, singleItemResponse, sortable, filterable, searchable ]
 
 /shipping_methods:
   type: collection
@@ -623,13 +717,13 @@ resourceTypes:
   /{campaign-slug}:
     type: singleItem
     get:
-      is: [ expanded ]
+      is: [ expanded, sortable, filterable, searchable ]
 /categories:
   type: collection
   /{category-slug}:
     type: singleItem
     get:
-      is: [ expanded ]
+      is: [ expanded, sortable, filterable, searchable ]
 /colors:
   type: collection
   /{color-slug}:
@@ -645,6 +739,15 @@ resourceTypes:
     get:
       is: [ expanded ]
 /sliders:
+  description: |
+    ##### Ordenamiento
+
+    Aparte de los criterios globales, los sliders se pueden ordenar por los siguientes criterios:
+
+    |valor|parametro de url|ejemplo|
+    |-----|----------------|-------|
+    |prioridad|priority|`?orderby=-priority`|
+
   type: collection
   /{sliders-slug}:
     type: singleItem
@@ -667,6 +770,22 @@ traits:
         body:
           application/json:
             type: <<resourcePathName|!singularize|!uppercamelcase>>[]
+
+  sortable:
+    queryParameters:
+      orderby?:
+        type: string
+        description: "Criteros de ordenamiento de los resultados."
+  filterable:
+    queryParameters:
+      filter?:
+        type: string[]
+        description: "Criteros de filtrado de los resultados."
+  searchable:
+    queryParameters:
+      q?:
+        type: string
+        description: "Criteros de búsqueda de los resultados."
 
   responseError:
     responses:

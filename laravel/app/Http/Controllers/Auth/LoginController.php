@@ -111,7 +111,7 @@ class LoginController extends Controller
 
         $user->api_token = $user->createToken('PrilovLogin')->accessToken;
 
-        return setVisibility($user);
+        return $this->setVisibility($user);
     }
 
     /**

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StatusController extends Controller
 {
-    public $modelClass = Status::class;
+    protected $modelClass = Status::class;
 
     protected function alterValidateData($data, Model $status = null)
     {

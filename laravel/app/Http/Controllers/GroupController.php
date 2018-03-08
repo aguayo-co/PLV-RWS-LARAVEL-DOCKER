@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class GroupController extends Controller
 {
-    public $modelClass = Group::class;
+    protected $modelClass = Group::class;
 
     protected function alterValidateData($data, Model $group = null)
     {
@@ -29,7 +29,16 @@ class GroupController extends Controller
     public function show(Request $request, Model $group)
     {
         $group = parent::show($request, $group);
-        $group->users = $group->users()->simplePaginate($request->items);
+
+        $users = $this->applyOrderBy(
+            $request,
+            $group->users(),
+            UserController::$allowedOrderBy,
+            UserController::$defaultOrderBy,
+            UserController::$orderByAliases
+        );
+        $group->users = $users->simplePaginate($request->items);
+
         return $group;
     }
 }

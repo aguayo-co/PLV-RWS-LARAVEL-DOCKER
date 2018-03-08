@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
-    public $modelClass = Menu::class;
+    protected $modelClass = Menu::class;
 
     protected function alterValidateData($data, Model $menu = null)
     {

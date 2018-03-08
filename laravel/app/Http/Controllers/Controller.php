@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,10 +13,16 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
+use App\Http\Traits\CanOrderBy;
+use App\Http\Traits\CanFilter;
+use App\Http\Traits\CanSearch;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs;
+    use CanOrderBy;
+    use CanFilter;
+    use CanSearch;
 
     /**
      * Create a new controller instance.
@@ -35,11 +42,22 @@ class Controller extends BaseController
         $this->middleware('self_or_admin', ['only' => ['update', 'store']]);
     }
 
+    /**
+     * Return an array of validations rules to apply to the request data.
+     *
+     * @return array
+     */
     protected function validationRules(?Model $model)
     {
         throw new Exception('Not implemented');
     }
 
+    /**
+     * Return an array of validation messages to use
+     * with the controller validation rules.
+     *
+     * @return array
+     */
     protected function validationMessages()
     {
         return [];
@@ -72,13 +90,35 @@ class Controller extends BaseController
 
 
     /**
-     * Return a Closure to be applied to the index query.
+     * Return a Closure that modifies the index query.
+     * The closure receives the $query as a parameter.
+     * Example:
+     *  return function ($query) {
+     *      return $query->where('column', 'value')->with(['association']);
+     *  };
      *
      * @return Closure
      */
     protected function alterIndexQuery()
     {
         return;
+    }
+
+    /**
+     * Process url query parameters and apply the to the query.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  $controllerClass
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function applyParamsToQuery($request, $query, $controllerClass = null)
+    {
+        $controllerClass = $controllerClass ?: $this;
+        $query = $this->applyFilters($request, $query, $controllerClass);
+        $query = $this->applyOrderBy($request, $query, $controllerClass);
+        $query = $this->doSearch($request, $query, $controllerClass);
+        return $query;
     }
 
     /**
@@ -90,7 +130,9 @@ class Controller extends BaseController
     public function index(Request $request)
     {
         $alter = $this->alterIndexQuery();
-        return call_user_func($this->modelClass . '::when', $alter, $alter)->simplePaginate($request->items);
+        $query = call_user_func($this->modelClass . '::when', $alter, $alter);
+        $query = $this->applyParamsToQuery($request, $query);
+        return $query->simplePaginate($request->items);
     }
 
     /**

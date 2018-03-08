@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ShippingMethodController extends Controller
 {
-    public $modelClass = ShippingMethod::class;
+    protected $modelClass = ShippingMethod::class;
 
     protected function alterValidateData($data, Model $shippingMethod = null)
     {

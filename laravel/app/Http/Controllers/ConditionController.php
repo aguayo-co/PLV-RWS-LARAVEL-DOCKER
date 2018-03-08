@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConditionController extends Controller
 {
-    public $modelClass = Condition::class;
+    protected $modelClass = Condition::class;
 
     protected function alterValidateData($data, Model $condition = null)
     {

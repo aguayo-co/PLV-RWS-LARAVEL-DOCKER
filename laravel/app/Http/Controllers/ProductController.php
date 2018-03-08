@@ -10,7 +10,22 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
-    public $modelClass = Product::class;
+    protected $modelClass = Product::class;
+
+    public static $allowedOrderBy = ['id', 'created_at', 'updated_at', 'price', 'commission'];
+    public static $orderByAliases = ['prilov' => 'commission'];
+
+    public static $allowedWhereIn = [
+        'id',
+        'brand_id',
+        'category_id',
+        'condition_id',
+        'status_id',
+    ];
+    public static $allowedWhereHas = ['color_ids' => 'colors', 'campaign_ids' => 'campaigns'];
+    public static $allowedWhereBetween = ['price'];
+
+    public static $searchIn = ['title', 'description'];
 
     /**
      * Create a new controller instance.

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreateProductsTable extends Migration
 {
@@ -34,6 +35,7 @@ class CreateProductsTable extends Migration
             $table->foreign('status_id')->references('id')->on('statuses');
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE products ADD FULLTEXT search(title, description)');
     }
 
     /**
