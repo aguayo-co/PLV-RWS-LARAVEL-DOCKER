@@ -220,13 +220,13 @@ PATCH
 ?filter[{{ filtro }}]={{ valore1,valor2 }}
 
 # productos entre dos precios, tipo Entre.
-?filter[precio]=1000,2500
+?filter[price]=1000,2500
 
 # productos con colores, tipo ContenidoEn.
 ?filter[color_ids]=1,3,5
 
 # los dos filtroa al tiempo:
-?filter[color_ids]=1,3,5&amp;filter[precio]=1000,2500
+?filter[color_ids]=1,3,5&amp;filter[price]=1000,2500
 </code></pre><p>Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:</p><table class="table"><thead><tr><th>filtro</th><th>tipo</th></tr></thead><tbody><tr><td>id</td><td>ContenidoEn</td></tr><tr><td>updated_at</td><td>Entre</td></tr><tr><td>created_at</td><td>Entre</td></tr></tbody></table><h3 id="b_squedas"><a href="#b_squedas">Búsquedas</a></h3><p>Cuando una colección permita realizar búsquedas de texto, el criterio de búsqueda se debe pasar por URL con el el parámetro <code>q</code></p><p>Ejemplo:</p><pre><code>?q=pantalon negro
 </code></pre><p>Las búsquedas de texto no son eficientes en MySQL, sobre todo cuando se combina con ordenado o filtrado.</p><h3 id="autenticaci_n"><a href="#autenticaci_n">Autenticación</a></h3><p>Existen 2 tipos de usuarios en el portal:</p><ul><li>Autenticado</li><li>No Autenticado</li></ul><p>Un usuario se considera autenticado cuando envía una petición con un token Bearer como encabezado:</p><pre><code>Authorization: Bearer TOKEN
 </code></pre><p>Cada sesión de usuario tendrá un tóken diferente, de esta forma el usuario puede estar autenticado en multiples dispositivos a la vez.</p><p>Cuando un usuario cambia de contraseña, todos los tokens serán invalidados.</p><p>Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario. Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:</p><pre><code>{
