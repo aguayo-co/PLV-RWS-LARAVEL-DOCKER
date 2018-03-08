@@ -19,7 +19,7 @@ class CreateBannersTable extends Migration
             $table->string('slug')->unique();
             $table->string('title');
             $table->string('subtitle');
-            $table->string('button_text');
+            $table->string('button_text')->nullable();
             $table->string('url');
             $table->timestamps();
         });

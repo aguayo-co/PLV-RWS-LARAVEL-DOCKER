@@ -43,14 +43,16 @@ class Banner extends Model
         return $this::IMAGES_BASE_PATH . $this->id . '/';
     }
 
-    protected function setImageAttribute(UploadedFile $image)
+    protected function setImageAttribute(?UploadedFile $image)
     {
         if ($this->saveLater('image', $image)) {
             return;
         }
         $path = $this->image_path;
         Storage::deleteDirectory($path);
-        $image->storeAs($path, uniqid());
+        if ($image) {
+            $image->storeAs($path, uniqid());
+        }
         # Timestamps might not get updated if this was the only attribute that
         # changed in the model. Force timestamp update.
         $this->updateTimestamps();

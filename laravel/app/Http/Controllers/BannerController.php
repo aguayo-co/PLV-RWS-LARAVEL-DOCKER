@@ -25,8 +25,8 @@ class BannerController extends Controller
             'slug' => 'string|unique:banners,slug' . $ignore,
             'title' => $required . 'string',
             'subtitle' => $required . 'string',
-            'image' => $required . 'image',
-            'button_text' => $required . 'string',
+            'image' => 'nullable|image',
+            'button_text' => 'nullable|string',
             'url' => $required . 'string',
         ];
     }
