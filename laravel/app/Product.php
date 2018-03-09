@@ -35,7 +35,7 @@ class Product extends Model
         'campaign_ids',
     ];
 
-    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status'];
+    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status', 'user'];
 
     protected $appends = ['images', 'color_ids', 'campaign_ids'];
 
