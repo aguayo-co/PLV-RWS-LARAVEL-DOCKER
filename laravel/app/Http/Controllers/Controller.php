@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Exception;
 use Illuminate\Http\Response;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

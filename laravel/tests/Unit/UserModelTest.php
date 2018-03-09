@@ -17,14 +17,6 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('password', $user->toArray());
     }
 
-    public function testRememberTokenIsHidden()
-    {
-        $user = factory(User::class)->create(['remember_token'=> 'abc']);
-
-        $this->assertNotNull($user->remember_token);
-        $this->assertArrayNotHasKey('remember_token', $user->toArray());
-    }
-
     public function testEmailIsHidden()
     {
         $user = factory(User::class)->create();

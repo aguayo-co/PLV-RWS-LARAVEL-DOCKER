@@ -140,6 +140,11 @@ class Product extends Model
         return $this->belongsTo('App\Status');
     }
 
+    public function purchases()
+    {
+        return $this->belongsToMany('App\Purchase');
+    }
+
     public function setTitleAttribute($title)
     {
         $this->attributes['title'] = $title;

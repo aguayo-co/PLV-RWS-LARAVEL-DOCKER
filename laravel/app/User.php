@@ -47,7 +47,6 @@ class User extends Authenticatable
     protected $hidden = [
         'email',
         'password',
-        'remember_token',
         # By default, hide everything that is sel referenced.
         # If not, this might lead to recursion.
         # Important to ->load(['followers:id', 'following:id']) on collections
