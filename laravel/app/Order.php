@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    const SHOPPING_CART = 1;
+    const SHOPPING_CART = 10;
+    const PAYMENT = 20;
+    const PAYED = 30;
+    const CANCELED = 99;
 
     protected $fillable = ['buyer_id', 'status'];
     protected $with = ['purchases.products'];
@@ -41,7 +44,7 @@ class Order extends Model
      */
     public function getProductsAttribute()
     {
-        return $this->purchases->load('products')->pluck('products')->flatten();
+        return $this->purchases->pluck('products')->flatten();
     }
 
     /**

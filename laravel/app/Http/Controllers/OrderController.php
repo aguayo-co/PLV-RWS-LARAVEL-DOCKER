@@ -42,7 +42,7 @@ class OrderController extends Controller
     protected function getProductsByUser($productIds)
     {
         $this->validateProductIds($productIds);
-        return Product::whereIn('id', $productIds)->get(['user_id', 'id'])->groupBy('user_id');
+        return Product::whereIn('id', $productIds)->groupBy('user_id');
     }
 
     public function addProducts(Request $request)
@@ -86,6 +86,6 @@ class OrderController extends Controller
 
     public function getCart(Request $request)
     {
-        return $this->show($request, $this->currentUserOrder()->fresh()->makeVisible('purchases'));
+        return $this->show($request, $this->currentUserOrder());
     }
 }
