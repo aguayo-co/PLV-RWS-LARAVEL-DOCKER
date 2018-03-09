@@ -10,7 +10,7 @@ class Product extends Model
 {
     use SaveLater;
 
-    protected const IMAGES_BASE_PATH = 'public/products/images/';
+    protected const IMAGES_BASE_PATH = 'public/product/images/';
 
     /**
      * The attributes that are mass assignable.

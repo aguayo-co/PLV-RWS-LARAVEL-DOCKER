@@ -31,6 +31,7 @@ class SliderController extends Controller
             'orientation' => $required . 'string',
             'font_color' => $required . 'string',
             'image' => $required . 'image',
+            'image_mobile' => $required . 'image',
             'button_text' => 'nullable|string',
             'url' => $required . 'string',
         ];

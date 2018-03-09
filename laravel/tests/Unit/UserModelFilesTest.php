@@ -14,7 +14,7 @@ class UserModelFilesTest extends TestCase
         $user = factory(User::class)->create();
 
         $user->cover = UploadedFile::fake()->image('cover');
-        $this->assertTrue(Storage::exists(Storage::files($user->cover_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('cover'))[0]));
     }
 
     public function testPictureImagePersistedOnExisting()
@@ -22,7 +22,7 @@ class UserModelFilesTest extends TestCase
         $user = factory(User::class)->create();
 
         $user->picture = UploadedFile::fake()->image('picture');
-        $this->assertTrue(Storage::exists(Storage::files($user->picture_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('picture'))[0]));
     }
 
     public function testCoverImagePersistedOnNew()
@@ -31,7 +31,7 @@ class UserModelFilesTest extends TestCase
 
         $user->cover = UploadedFile::fake()->image('cover');
         $user->save();
-        $this->assertTrue(Storage::exists(Storage::files($user->cover_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('cover'))[0]));
     }
 
     public function testPictureImagePersistedOnNew()
@@ -40,7 +40,7 @@ class UserModelFilesTest extends TestCase
 
         $user->picture = UploadedFile::fake()->image('picture');
         $user->save();
-        $this->assertTrue(Storage::exists(Storage::files($user->picture_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('picture'))[0]));
     }
 
     public function testPictureDeleted()
@@ -49,7 +49,7 @@ class UserModelFilesTest extends TestCase
 
         $user->picture = UploadedFile::fake()->image('picture');
         $user->picture = null;
-        $this->assertFalse(Storage::exists($user->picture_path));
+        $this->assertFalse(Storage::exists($user->getBasePathFor('picture')));
     }
 
     public function testCoverDeleted()
@@ -58,7 +58,7 @@ class UserModelFilesTest extends TestCase
 
         $user->cover = UploadedFile::fake()->image('cover');
         $user->cover = null;
-        $this->assertFalse(Storage::exists($user->cover_path));
+        $this->assertFalse(Storage::exists($user->getBasePathFor('cover')));
     }
 
     public function testCoverPathRequiresId()
@@ -67,7 +67,7 @@ class UserModelFilesTest extends TestCase
 
         $user->cover = UploadedFile::fake()->image('cover');
         $user->save();
-        $this->assertTrue(Storage::exists(Storage::files($user->cover_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('cover'))[0]));
     }
 
     public function testPicturePathRequiresId()
@@ -76,6 +76,6 @@ class UserModelFilesTest extends TestCase
 
         $user->picture = UploadedFile::fake()->image('picture');
         $user->save();
-        $this->assertTrue(Storage::exists(Storage::files($user->picture_path)[0]));
+        $this->assertTrue(Storage::exists(Storage::files($user->getBasePathFor('picture'))[0]));
     }
 }

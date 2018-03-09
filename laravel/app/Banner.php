@@ -5,13 +5,11 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Traits\SaveLater;
+use App\Traits\HasSingleFile;
 
 class Banner extends Model
 {
-    use SaveLater;
-
-    protected const IMAGES_BASE_PATH = 'public/banners/images/';
+    use HasSingleFile;
 
     /**
      * The attributes that are mass assignable.
@@ -31,31 +29,12 @@ class Banner extends Model
 
     protected function getImageAttribute()
     {
-        $path = $this->image_path;
-        if ($files = Storage::files($path)) {
-            return asset(Storage::url($files[0]));
-        }
-        return;
-    }
-
-    protected function getImagePathAttribute()
-    {
-        return $this::IMAGES_BASE_PATH . $this->id . '/';
+        return $this->getFileUrl('image');
     }
 
     protected function setImageAttribute(?UploadedFile $image)
     {
-        if ($this->saveLater('image', $image)) {
-            return;
-        }
-        $path = $this->image_path;
-        Storage::deleteDirectory($path);
-        if ($image) {
-            $image->storeAs($path, uniqid());
-        }
-        # Timestamps might not get updated if this was the only attribute that
-        # changed in the model. Force timestamp update.
-        $this->updateTimestamps();
+        $this->setFile('image', $image);
     }
 
     public function setNameAttribute($name)

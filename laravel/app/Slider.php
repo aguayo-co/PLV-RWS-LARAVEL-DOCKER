@@ -5,13 +5,11 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Traits\SaveLater;
+use App\Traits\HasSingleFile;
 
 class Slider extends Model
 {
-    use SaveLater;
-
-    protected const IMAGES_BASE_PATH = 'public/sliders/images/';
+    use HasSingleFile;
 
     /**
      * The attributes that are mass assignable.
@@ -19,7 +17,16 @@ class Slider extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'main_text', 'small_text', 'button_text', 'url', 'image', 'orientation', 'font_color'
+        'name',
+        'main_text',
+         'small_text',
+         'button_text',
+         'url',
+         'image',
+         'image_mobile',
+         'orientation',
+         'font_color',
+         'priority'
     ];
 
     protected $appends = ['image'];
@@ -31,29 +38,23 @@ class Slider extends Model
 
     protected function getImageAttribute()
     {
-        $path = $this->image_path;
-        if ($files = Storage::files($path)) {
-            return asset(Storage::url($files[0]));
-        }
-        return;
-    }
-
-    protected function getImagePathAttribute()
-    {
-        return $this::IMAGES_BASE_PATH . $this->id . '/';
+        return $this->getFileUrl('image');
     }
 
     protected function setImageAttribute(UploadedFile $image)
     {
-        if ($this->saveLater('image', $image)) {
-            return;
-        }
-        $path = $this->image_path;
-        Storage::deleteDirectory($path);
-        $image->storeAs($path, uniqid());
-        # Timestamps might not get updated if this was the only attribute that
-        # changed in the model. Force timestamp update.
-        $this->updateTimestamps();
+        $this->setFile('image', $image);
+    }
+
+
+    protected function getImageMobileAttribute()
+    {
+        return $this->getFileUrl('image_mobile');
+    }
+
+    protected function setImageMobileAttribute(UploadedFile $image)
+    {
+        $this->setFile('image_mobile', $image);
     }
 
     public function setNameAttribute($name)
