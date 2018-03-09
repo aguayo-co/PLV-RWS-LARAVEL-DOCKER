@@ -9,7 +9,7 @@ services:
       - ./laravel:/srv/caddy/html
 
   mysql:
-    image: mysql:5.6
+    image: mysql:5.7
     restart: always
     env_file:
       - mysql/.env
