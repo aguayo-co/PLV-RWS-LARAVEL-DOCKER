@@ -1,4 +1,4 @@
-FROM php:7.1-fpm-alpine
+FROM php:7.2-fpm-alpine
 RUN apk add --no-cache $PHPIZE_DEPS \
     && pecl install xdebug \
     && docker-php-ext-install opcache pdo_mysql \
