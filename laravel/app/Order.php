@@ -11,7 +11,7 @@ class Order extends Model
     const PAYED = 30;
     const CANCELED = 99;
 
-    protected $fillable = ['user_id'];
+    protected $fillable = [];
     protected $with = ['purchases'];
     protected $appends = ['total'];
 

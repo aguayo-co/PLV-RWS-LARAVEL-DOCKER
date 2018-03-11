@@ -20,7 +20,7 @@ class Purchase extends Model
     const COMPLETED_PARTIAL = 92;
     const CANCELED = 99;
 
-    protected $fillable = ['user_id', 'order_id'];
+    protected $fillable = [];
     protected $with = ['products'];
 
     /**

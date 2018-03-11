@@ -28,9 +28,10 @@ class OrderController extends Controller
     {
         $purchase = $order->purchases->firstWhere('user_id', $sellerId);
         if (!$purchase) {
-            $purchase = new Purchase(
-                ['user_id' => $sellerId, 'order_id' => $order->id]
-            );
+            $purchase = new Purchase();
+            $purchase->user_id = $sellerId;
+            $purchase->order_id = $order->id;
+
             $purchase->status = Purchase::SHOPPING_CART;
             $purchase->save();
         }
@@ -44,6 +45,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
         $order = Order::firstOrNew(['user_id' => $user->id, 'status' => Order::SHOPPING_CART]);
+        $order->user_id = $user->id;
         $order->status = Order::SHOPPING_CART;
         $order->save();
         return $order;
