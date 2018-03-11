@@ -12,7 +12,7 @@ class Order extends Model
     const CANCELED = 99;
 
     protected $fillable = [];
-    protected $with = ['purchases'];
+    protected $with = ['sales'];
     protected $appends = ['total'];
 
     /**
@@ -34,9 +34,9 @@ class Order extends Model
     /**
      * Get the order payments.
      */
-    public function purchases()
+    public function sales()
     {
-        return $this->hasMany('App\Purchase');
+        return $this->hasMany('App\Sale');
     }
 
     /**
@@ -44,7 +44,7 @@ class Order extends Model
      */
     public function getProductsAttribute()
     {
-        return $this->purchases->pluck('products')->flatten();
+        return $this->sales->pluck('products')->flatten();
     }
 
     /**

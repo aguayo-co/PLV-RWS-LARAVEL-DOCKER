@@ -47,7 +47,7 @@ Route::name('api.')->group(function () {
     create_crud_routes('Status', SLUG_REGEX);
 
     create_private_crud_routes('Order', ID_REGEX);
-    create_private_crud_routes('Purchase', ID_REGEX);
+    create_private_crud_routes('Sale', ID_REGEX);
 
     # Public product routes
     Route::get('products', 'ProductController@index')->name('products');

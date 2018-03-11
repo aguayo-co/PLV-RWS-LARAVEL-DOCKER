@@ -8,7 +8,7 @@ use App\Gateways\Gateway;
 use App\Order;
 use App\Payment;
 use App\Product;
-use App\Purchase;
+use App\Sale;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,25 +21,25 @@ class OrderController extends Controller
     protected $modelClass = Order::class;
 
     /**
-     * Get a Purchase model for the given seller and order.
+     * Get a Sale model for the given seller and order.
      * Create a new one if one does not exist.
      */
-    protected function getPurchase($order, $sellerId)
+    protected function getSale($order, $sellerId)
     {
-        $purchase = $order->purchases->firstWhere('user_id', $sellerId);
-        if (!$purchase) {
-            $purchase = new Purchase();
-            $purchase->user_id = $sellerId;
-            $purchase->order_id = $order->id;
+        $sale = $order->sales->firstWhere('user_id', $sellerId);
+        if (!$sale) {
+            $sale = new Sale();
+            $sale->user_id = $sellerId;
+            $sale->order_id = $order->id;
 
-            $purchase->status = Purchase::SHOPPING_CART;
-            $purchase->save();
+            $sale->status = Sale::SHOPPING_CART;
+            $sale->save();
         }
-        return $purchase;
+        return $sale;
     }
 
     /**
-     * Get a Purchase model for the given seller and order.
+     * Get a Sale model for the given seller and order.
      */
     protected function currentUserOrder()
     {
@@ -86,8 +86,8 @@ class OrderController extends Controller
     {
         $order = $this->currentUserOrder();
         foreach ($this->getProductsByUser($request->ids) as $userId => $products) {
-            $purchase = $this->getPurchase($order, $userId);
-            $purchase->products()->syncWithoutDetaching($products->pluck('id'));
+            $sale = $this->getSale($order, $userId);
+            $sale->products()->syncWithoutDetaching($products->pluck('id'));
         }
 
         return $order->fresh();
@@ -99,10 +99,10 @@ class OrderController extends Controller
     public function removeProducts(Request $request)
     {
         $order = $this->currentUserOrder();
-        foreach ($order->purchases as $purchase) {
-            $purchase->products()->detach($request->ids);
-            if (!count($purchase->products)) {
-                $purchase->delete();
+        foreach ($order->sales as $sale) {
+            $sale->products()->detach($request->ids);
+            if (!count($sale->products)) {
+                $sale->delete();
             }
         }
 
@@ -160,7 +160,7 @@ class OrderController extends Controller
         $order->status = Order::PAYMENT;
         DB::transaction(function () use ($order) {
             $order->save();
-            Purchase::whereIn('id', $order->purchases->pluck('id'))->update(['status' => Purchase::PAYMENT]);
+            Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYMENT]);
             Product::whereIn('id', $order->products->pluck('id'))->update(['status' => Product::UNAVAILABLE]);
         });
 
@@ -172,7 +172,7 @@ class OrderController extends Controller
      */
     public function approveOrder($order)
     {
-        Purchase::whereIn('id', $order->purchases->pluck('id'))->update(['status' => Purchase::PAYED]);
+        Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYED]);
         $order->status = Order::PAYED;
         $order->save();
     }

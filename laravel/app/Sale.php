@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Purchase extends Model
+class Sale extends Model
 {
     const SHOPPING_CART = 10;
     const PAYMENT = 20;
