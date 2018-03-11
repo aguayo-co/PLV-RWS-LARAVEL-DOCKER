@@ -65,7 +65,6 @@ class User extends Authenticatable
     public static function boot()
     {
         parent::boot();
-        self::registerSavesNow();
         self::saved(function ($user) {
             $user->validateSeller();
         });
@@ -186,5 +185,10 @@ class User extends Authenticatable
     protected function setPictureAttribute(?UploadedFile $picture)
     {
         $this->setFile('picture', $picture);
+    }
+
+    protected function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
     }
 }

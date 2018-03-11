@@ -28,10 +28,8 @@ trait SaveLater
         });
     }
 
-
-    public static function boot()
+    public static function bootSaveLater()
     {
-        parent::boot();
         self::registerSavesNow();
     }
 }

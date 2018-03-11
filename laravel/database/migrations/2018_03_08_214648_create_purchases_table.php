@@ -19,7 +19,7 @@ class CreatePurchasesTable extends Migration
             $table->foreign('order_id')->references('id')->on('orders');
             $table->integer('seller_id')->unsigned();
             $table->foreign('seller_id')->references('id')->on('users');
-            $table->smallInteger('status')->unsigned();
+            $table->tinyInteger('status')->unsigned();
             $table->timestamps();
         });
     }

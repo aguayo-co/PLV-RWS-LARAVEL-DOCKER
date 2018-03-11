@@ -30,11 +30,11 @@ Instalar y configurar Laravel.
     $ cd laravel
     $ cp .env.example .env
     $ composer install
+    $ php artisan storage:link
     # php artisan migrate --step
     $ php artisan key:generate
     $ php artisan passport:keys
     $ php artisan passport:client --personal -n
-    $ php artisan storage:link
     $ cd ..
 
 Ejecutar docker

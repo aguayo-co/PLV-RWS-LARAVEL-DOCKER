@@ -15,7 +15,7 @@ trait HasSingleFile
             abort(500);
         }
 
-        $snakeClass = snake_case((new \ReflectionClass($this))->getShortName());
+        $snakeClass = snake_case(class_basename(self::class));
         $snakeAttribute = snake_case($attribute);
         return 'public/' . $snakeClass . '/' . $snakeAttribute . '/' . $this->id . '/';
     }

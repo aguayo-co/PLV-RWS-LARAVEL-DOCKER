@@ -10,6 +10,10 @@ class Product extends Model
 {
     use SaveLater;
 
+    const UNPUBLISHED = 0;
+    const AVAILABLE = 10;
+    const UNAVAILABLE = 20;
+
     protected const IMAGES_BASE_PATH = 'public/product/images/';
 
     /**
@@ -34,9 +38,7 @@ class Product extends Model
         'color_ids',
         'campaign_ids',
     ];
-
     protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status', 'user'];
-
     protected $appends = ['images', 'color_ids', 'campaign_ids'];
 
     /**

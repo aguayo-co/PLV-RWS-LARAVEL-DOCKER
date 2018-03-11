@@ -14,14 +14,15 @@ $factory->define(App\Product::class, function (Faker $faker) {
         'title' => $faker->sentence,
         'description' => $faker->paragraph,
         'dimensions' => $faker->sentence,
-        'original_price' => $faker->randomFloat(2),
-        'price' => $faker->randomFloat(2),
-        'commission' => $faker->randomNumber(2),
+        'original_price' => $faker->numberBetween(0, 999999),
+        'price' => $faker->numberBetween(0, 999999),
+        'commission' => $faker->numberBetween(0, 100),
         'user_id' => User::all()->random()->id,
         'brand_id' => Brand::all()->random()->id,
         'category_id' => Category::whereNotNull('parent_id')->get()->random()->id,
         'condition_id' => Condition::all()->random()->id,
         'status_id' => Status::all()->random()->id,
+        'status' => Product::AVAILABLE,
         'images' => [UploadedFile::fake()->image('image'), UploadedFile::fake()->image('image'),],
     ];
 });

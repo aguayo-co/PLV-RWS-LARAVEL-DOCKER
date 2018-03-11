@@ -42,6 +42,10 @@ class Kernel extends HttpKernel
             'wants_json',
             'bindings',
         ],
+
+        'callback' => [
+            'throttle:30,1',
+        ],
     ];
 
     /**

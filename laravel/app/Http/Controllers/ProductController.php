@@ -91,4 +91,14 @@ class ProductController extends Controller
         }
         return $data;
     }
+
+    /**
+     * Only show available products on collections.
+     */
+    protected function alterIndexQuery()
+    {
+        return function ($query) {
+            return $query->where('status', Product::AVAILABLE);
+        };
+    }
 }

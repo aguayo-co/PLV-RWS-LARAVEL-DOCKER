@@ -11,7 +11,7 @@ class Order extends Model
     const PAYED = 30;
     const CANCELED = 99;
 
-    protected $fillable = ['buyer_id', 'status'];
+    protected $fillable = ['buyer_id'];
     protected $with = ['purchases.products'];
     protected $appends = ['total'];
 
@@ -40,7 +40,7 @@ class Order extends Model
     }
 
     /**
-     * Get the order payments.
+     * Get the order products.
      */
     public function getProductsAttribute()
     {
@@ -52,6 +52,6 @@ class Order extends Model
      */
     public function getTotalAttribute()
     {
-        return $this->products->sum('price');
+        return $this->products->where('status', Product::AVAILABLE)->sum('price');
     }
 }

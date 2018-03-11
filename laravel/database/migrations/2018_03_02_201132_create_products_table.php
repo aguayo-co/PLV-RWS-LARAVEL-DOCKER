@@ -22,9 +22,9 @@ class CreateProductsTable extends Migration
             $table->string('slug');
             $table->text('description');
             $table->text('dimensions');
-            $table->unsignedDecimal('original_price', 12, 2);
-            $table->unsignedDecimal('price', 12, 2);
-            $table->unsignedDecimal('commission', 5, 2);
+            $table->integer('original_price')->unsigned();
+            $table->integer('price')->unsigned();
+            $table->tinyInteger('commission')->unsigned();
             $table->integer('brand_id')->unsigned();
             $table->foreign('brand_id')->references('id')->on('brands');
             $table->integer('category_id')->unsigned();
@@ -33,6 +33,7 @@ class CreateProductsTable extends Migration
             $table->foreign('condition_id')->references('id')->on('conditions');
             $table->integer('status_id')->unsigned();
             $table->foreign('status_id')->references('id')->on('statuses');
+            $table->integer('status')->unsigned();
             $table->timestamps();
         });
         DB::statement('ALTER TABLE products ADD FULLTEXT search(title, description)');
