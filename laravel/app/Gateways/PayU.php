@@ -3,6 +3,7 @@
 namespace App\Gateways;
 
 use Illuminate\Support\Facades\App;
+use Illuminate\Http\Response;
 use App\Payment;
 
 class PayU implements PaymentGateway
@@ -29,12 +30,23 @@ class PayU implements PaymentGateway
         return 'CLP';
     }
 
-    protected function getSignature(Payment $payment, $reference)
+    protected function getRequestSignature(Payment $payment, $reference)
     {
         $apiKey = $this->getApiKey();
         $merchantId = $this->getMerchantId();
         $currency = $this->getCurrency();
         return md5("{$apiKey}~{$merchantId}~{$reference}~{$payment->total}~{$currency}");
+    }
+
+    protected function getCallbackSignature($data)
+    {
+        $apiKey = $this->getApiKey();
+        $merchantId = array_get($data, 'merchant_id');
+        $currency = array_get($data, 'currency');
+        $referenceSale = array_get($data, 'reference_sale');
+        $total = preg_replace('/(\.[0-9])0$/', '$1', array_get($data, 'value'));
+        $statePol = array_get($data, 'state_pol');
+        return md5("{$apiKey}~{$merchantId}~{$referenceSale}~{$total}~{$currency}~{$statePol}");
     }
 
     protected function testMode()
@@ -62,7 +74,7 @@ class PayU implements PaymentGateway
                 'referenceCode' => $data['reference'],
                 'amount' => $payment->total,
                 'currency' => 'CLP',
-                'signature' => $this->getSignature($payment, $data['reference']),
+                'signature' => $this->getRequestSignature($payment, $data['reference']),
                 'description' => "Transacción Prilov",
 
                 'confirmationUrl' => route('callback.gateway', ['gateway' => 'pay-u']),
@@ -86,7 +98,9 @@ class PayU implements PaymentGateway
 
     public function validateCallbackData($data)
     {
-        return;
+        if ($this->getCallbackSignature($data) != array_get($data, 'sign')) {
+            abort(Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function setCallback($data)
