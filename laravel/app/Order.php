@@ -11,14 +11,14 @@ class Order extends Model
     const PAYED = 30;
     const CANCELED = 99;
 
-    protected $fillable = ['buyer_id'];
-    protected $with = ['purchases.products'];
+    protected $fillable = ['user_id'];
+    protected $with = ['purchases'];
     protected $appends = ['total'];
 
     /**
      * Get the user that buys this.
      */
-    public function buyer()
+    public function user()
     {
         return $this->belongsTo('App\User');
     }

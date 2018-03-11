@@ -18,13 +18,7 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    /**
-     * Agregar producto a carro.
-     * Eliminar producto de carro.
-     * Agrega información de despacho.
-     * Selecciona método de pago.
-     * Enviar a pago.
-     */
+    protected $modelClass = Order::class;
 
     /**
      * Get a Purchase model for the given seller and order.
@@ -32,10 +26,10 @@ class OrderController extends Controller
      */
     protected function getPurchase($order, $sellerId)
     {
-        $purchase = $order->purchases->firstWhere('seller_id', $sellerId);
+        $purchase = $order->purchases->firstWhere('user_id', $sellerId);
         if (!$purchase) {
             $purchase = new Purchase(
-                ['seller_id' => $sellerId, 'order_id' => $order->id]
+                ['user_id' => $sellerId, 'order_id' => $order->id]
             );
             $purchase->status = Purchase::SHOPPING_CART;
             $purchase->save();
@@ -49,7 +43,7 @@ class OrderController extends Controller
     protected function currentUserOrder()
     {
         $user = Auth::user();
-        $order = Order::firstOrNew(['buyer_id' => $user->id, 'status' => Order::SHOPPING_CART]);
+        $order = Order::firstOrNew(['user_id' => $user->id, 'status' => Order::SHOPPING_CART]);
         $order->status = Order::SHOPPING_CART;
         $order->save();
         return $order;

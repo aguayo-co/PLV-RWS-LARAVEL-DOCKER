@@ -17,8 +17,11 @@ class CreatePurchasesTable extends Migration
             $table->increments('id');
             $table->integer('order_id')->unsigned();
             $table->foreign('order_id')->references('id')->on('orders');
-            $table->integer('seller_id')->unsigned();
-            $table->foreign('seller_id')->references('id')->on('users');
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->integer('shipping_method_id')->unsigned();
+            $table->foreign('shipping_method_id')->references('id')->on('shipping_methods');
+            $table->json('shipping_details')->nullable();
             $table->tinyInteger('status')->unsigned();
             $table->timestamps();
         });

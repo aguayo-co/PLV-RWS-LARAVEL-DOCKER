@@ -20,12 +20,13 @@ class Purchase extends Model
     const COMPLETED_PARTIAL = 92;
     const CANCELED = 99;
 
-    protected $fillable = ['seller_id', 'order_id'];
+    protected $fillable = ['user_id', 'order_id'];
+    protected $with = ['products'];
 
     /**
      * Get the user that sells this.
      */
-    public function seller()
+    public function user()
     {
         return $this->belongsTo('App\User');
     }
