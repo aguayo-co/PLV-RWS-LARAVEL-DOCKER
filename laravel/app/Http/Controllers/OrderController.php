@@ -39,15 +39,18 @@ class OrderController extends Controller
     }
 
     /**
-     * Get a Sale model for the given seller and order.
+     * Get an Order model for the current user.
      */
     protected function currentUserOrder()
     {
         $user = Auth::user();
-        $order = Order::firstOrNew(['user_id' => $user->id, 'status' => Order::SHOPPING_CART]);
-        $order->user_id = $user->id;
-        $order->status = Order::SHOPPING_CART;
-        $order->save();
+        $order = Order::where(['user_id' => $user->id, 'status' => Order::SHOPPING_CART])->first();
+        if (!$order) {
+            $order = new Order();
+            $order->user_id = $user->id;
+            $order->status = Order::SHOPPING_CART;
+            $order->save();
+        }
         return $order;
     }
 
