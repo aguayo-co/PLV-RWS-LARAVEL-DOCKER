@@ -37,10 +37,12 @@ class CategoryController extends Controller
             ],
         ];
 
+        // Custom rule needs message attached to it.
+        // Can't use ValidationMessages for this one.
         if ($category) {
             $rules['parent_id'][] = function ($attribute, $value, $fail) use ($category) {
                 if (count($category->children) && $value) {
-                    return $fail(trans('Esta categoría tiene hijos. No pude tener un padre.'));
+                    return $fail(__('Esta categoría tiene hijos. No pude tener un padre.'));
                 }
             };
         };
@@ -50,7 +52,7 @@ class CategoryController extends Controller
 
     protected function validationMessages()
     {
-        return ['parent_id.exists' => trans('validation.not_in')];
+        return ['parent_id.exists' => __('validation.not_in')];
     }
 
     protected function alterIndexQuery()

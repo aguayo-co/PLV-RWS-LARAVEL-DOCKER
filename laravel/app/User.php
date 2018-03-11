@@ -37,6 +37,7 @@ class User extends Authenticatable
         'picture',
         'vacation_mode',
         'group_ids',
+        'shipping_method_ids',
     ];
 
     /**
@@ -128,6 +129,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Group');
     }
 
+    public function shippingMethods()
+    {
+        return $this->belongsToMany('App\ShippingMethod');
+    }
+
     protected function getFollowersCountAttribute()
     {
         return $this->followers->count();
@@ -165,6 +171,14 @@ class User extends Authenticatable
             return;
         }
         $this->groups()->sync($groupIds);
+    }
+
+    protected function setShippingMethodIdsAttribute(array $shippingMethodIds)
+    {
+        if ($this->saveLater('shipping_method_ids', $shippingMethodIds)) {
+            return;
+        }
+        $this->shippingMethods()->sync($shippingMethodIds);
     }
 
     protected function getCoverAttribute()

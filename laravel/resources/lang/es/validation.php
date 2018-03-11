@@ -44,7 +44,7 @@ return [
     'email.exists'         => 'Hay otro usuario registrado con el mismo correo.',
     'file'                 => 'El campo :attribute debe ser un archivo.',
     'filled'               => 'El campo :attribute es obligatorio.',
-    'exists'               => 'El campo :attribute no existe.',
+    'exists'               => 'El campo :attribute es inválido.',
     'empty_with'           => 'Sólo puede enviarse :attribute o :other, no los dos.',
     'image'                => 'El campo :attribute debe ser una imagen.',
     'in'                   => 'El campo :attribute debe ser igual a alguno de estos valores :values.',

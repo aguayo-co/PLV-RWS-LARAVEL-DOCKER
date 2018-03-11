@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Address;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
 use App\Gateways\Gateway;
 use App\Order;
 use App\Payment;
@@ -55,78 +55,69 @@ class OrderController extends Controller
     }
 
     /**
-     * Validate that the IDs we are processing actually exist.
-     */
-    protected function validateProductIds($productIds)
-    {
-        $data = ['product_ids' => $productIds];
-        $rules = [
-            'product_ids' => 'array',
-            'product_ids.*' => [
-                'integer',
-                Rule::exists('products', 'id')->where(function ($query) {
-                    $query->where('status', Product::AVAILABLE);
-                }),
-            ]
-        ];
-        $messages = ['product_ids.*.exists' => trans('validation.available')];
-        return Validator::make($data, $rules, $messages)->validate();
-    }
-
-    /**
      * Get the products and group them by the user_id..
      */
     protected function getProductsByUser($productIds)
     {
-        $this->validateProductIds($productIds);
         return Product::whereIn('id', $productIds)->where('status', Product::AVAILABLE)->get()->groupBy('user_id');
     }
 
     /**
-     * Add products to the current user's cart/Order.
+     * Add products to the given cart/Order.
      */
-    public function addProducts(Request $request)
+    protected function addProducts($order, $productIds)
     {
-        $order = $this->currentUserOrder();
-        foreach ($this->getProductsByUser($request->ids) as $userId => $products) {
+        foreach ($this->getProductsByUser($productIds) as $userId => $products) {
             $sale = $this->getSale($order, $userId);
             $sale->products()->syncWithoutDetaching($products->pluck('id'));
         }
 
-        return $order->fresh();
+        return $order;
     }
 
     /**
-     * Remove products from the current user's cart/Order.
+     * Remove products from the given cart/Order.
      */
-    public function removeProducts(Request $request)
+    protected function removeProducts($order, $productIds)
     {
-        $order = $this->currentUserOrder();
         foreach ($order->sales as $sale) {
-            $sale->products()->detach($request->ids);
+            $sale->products()->detach($productIds);
+            $sale->load('products');
             if (!count($sale->products)) {
                 $sale->delete();
             }
         }
 
-        return $order->fresh();
-    }
-
-    /**
-     * Set shipping address to the Order.
-     */
-    public function setShippingAddress(Request $request, Address $address)
-    {
-        $order = $this->currentUserOrder();
         return $order;
     }
 
-    /**
-     * Return the current user's shopping cart/Order.
-     */
-    public function getCart(Request $request)
+    protected function setShippingMethods($order, $shippingMethods)
     {
-        return $this->show($request, $this->currentUserOrder());
+        foreach ($shippingMethods as $saleId => $shippingMethodId) {
+            $sale = $order->sales->firstWhere('id', $saleId);
+            $sale->shipping_method_id = $shippingMethodId;
+            $sale->save();
+        }
+        return $order;
+    }
+
+    protected function markSalesAsReceived($order, $saleIds)
+    {
+        foreach ($saleIds as $saleId) {
+            $sale = $order->sales->firstWhere('id', $saleId);
+            $sale->received = now();
+            $sale.save();
+        }
+    }
+
+    /**
+     * Mark Order and its Sales as Payed.
+     */
+    public function approveOrder($order)
+    {
+        Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYED]);
+        $order->status = Order::PAYED;
+        $order->save();
     }
 
     protected function validateOrderCanCheckout($order)
@@ -138,6 +129,176 @@ class OrderController extends Controller
         if ($order->products->where('status', '<>', Product::AVAILABLE)->count()) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some products are not available anymore.');
         }
+    }
+
+    protected function validationMessages()
+    {
+        return ['product_ids.*.exists' => __('validation.available')];
+    }
+
+    /**
+     * Return an array of validations rules to apply to the request data.
+     *
+     * @return array
+     */
+    protected function validationRules(?Model $order)
+    {
+        return [
+            'address_id' => [
+                'integer',
+                Rule::exists('addresses', 'id')->where(function ($query) use ($order) {
+                    $query->where('user_id', $order->user_id);
+                }),
+            ],
+
+            'add_product_ids' => 'array',
+            'add_product_ids.*' => [
+                'integer',
+                Rule::exists('products', 'id')->where(function ($query) {
+                    $query->where('status', Product::AVAILABLE);
+                }),
+            ],
+
+            'remove_product_ids' => 'array',
+            'remove_product_ids.*' => 'integer|exists:products,id',
+
+            'received_sale_ids' => 'array',
+            'received_sale_ids.*' => [
+                'integer',
+                $this->getReceivableSaleRule($order)
+            ],
+
+            'shipping_methods' => 'array',
+            'shipping_methods.*' => [
+                'integer',
+                $this->getValidShippingMethodRule($order)
+            ]
+        ];
+    }
+
+    /**
+     * Rule that validates that the give shipping method is
+     * allowed by the owner of the sale item to which it is being assigned.
+     */
+    protected function getValidShippingMethodRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            if (!$value) {
+                return;
+            }
+            $saleId = str_replace('shipping_methods.', '', $attribute);
+            $sale = $order->sales->firstWhere('id', $saleId);
+            if (!$sale) {
+                return $fail(__('La venta :sale_id no existe o no es parte de esta orden.', ['sale_id' => $saleId]));
+            }
+            $query = DB::table('shipping_method_user')->where(
+                ['user_id' => $sale->user_id, 'shipping_method_id' => $value]
+            );
+            if (!$query->count()) {
+                $error = __(
+                    'El método de envío :value no es válido para la venta :sale_id.',
+                    ['value' => $value, 'sale_id' => $saleId]
+                );
+                return $fail($error);
+            }
+            return;
+        };
+    }
+
+    /**
+     * Rule that validates a a Sale can be marked as received.
+     */
+    protected function getReceivableSaleRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            if (!$value) {
+                return;
+            }
+            $sale = $order->sales->firstWhere('id', $value);
+            if (!$sale) {
+                return $fail(__('La venta :value no existe o no es parte de esta orden.', ['value' => $value]));
+            }
+
+            if ($sale->status < Sale::PAYED) {
+                $error = __(
+                    __('La venta :sale_id venta no se puede marcar cómo recibida.'),
+                    ['sale_id' => $value]
+                );
+                return $fail($error);
+            }
+            return;
+        };
+    }
+
+    /**
+     * Alter data to be passed to fill method.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function alterFillData($data, Model $model = null)
+    {
+        if ($addressId = array_get($data, 'address_id')) {
+            $data['shipping_address'] = Address::where('id', $addressId)->first();
+        }
+        return $data;
+    }
+
+    /**
+     * An alias for the show() method for the current logged in user.
+     */
+    public function getShoppingCart(Request $request)
+    {
+        return $this->show($request, $this->currentUserOrder());
+    }
+
+    /**
+     * An alias for the update() method for the current logged in user.
+     */
+    public function updateShoppingCart(Request $request)
+    {
+        $order = $this->currentUserOrder();
+
+        return $this->update($request, $order);
+    }
+
+    /**
+     * An Order only accepts changes when in SHOPPING_CART.
+     *
+     * Make shipping_address if changes are accepted.
+     */
+    public function update(Request $request, Model $order)
+    {
+        if ($order->status >= Order::PAYMENT) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order can not be changed once payment has started.');
+        }
+
+        $order->fillable(['shipping_address']);
+        return parent::update($request, $order);
+    }
+
+    /**
+     * Perform changes to associated Models.
+     */
+    public function postUpdate(Request $request, Model $order)
+    {
+        if ($addProductIds = $request->add_product_ids) {
+            $this->addProducts($order, $addProductIds);
+        }
+
+        if ($removeProductIds = $request->remove_product_ids) {
+            $this->removeProducts($order, $removeProductIds);
+        }
+
+        if ($shippingMethods = $request->shipping_methods) {
+            $this->setShippingMethods($order, $shippingMethods);
+        }
+
+        if ($receivedSaleIds = $request->received_sale_ids) {
+            $this->markSalesAsReceived($order, $receivedSaleIds);
+        }
+
+        return parent::postUpdate($request, $order);
     }
 
     /**
@@ -168,16 +329,6 @@ class OrderController extends Controller
         });
 
         return $payment;
-    }
-
-    /**
-     * Return the current user's shopping cart/Order.
-     */
-    public function approveOrder($order)
-    {
-        Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYED]);
-        $order->status = Order::PAYED;
-        $order->save();
     }
 
     /**

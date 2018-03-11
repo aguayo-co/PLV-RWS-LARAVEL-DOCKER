@@ -56,11 +56,11 @@ class ResetPasswordController extends Controller
 
         $user = $this->broker()->getUser(['email' => $email]);
         if (is_null($user)) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_USER));
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, __(Password::INVALID_USER));
         }
 
         if (!$this->broker()->tokenExists($user, $request->token)) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_TOKEN));
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, __(Password::INVALID_TOKEN));
         }
 
         return $user;

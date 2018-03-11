@@ -80,7 +80,7 @@ class ProductController extends Controller
 
     protected function validationMessages()
     {
-        return ['category_id.exists' => trans('validation.not_in')];
+        return ['category_id.exists' => __('validation.not_in')];
     }
 
     protected function alterFillData($data, Model $product = null)

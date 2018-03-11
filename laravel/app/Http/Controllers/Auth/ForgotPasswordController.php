@@ -51,7 +51,7 @@ class ForgotPasswordController extends Controller
 
         return $response == Password::RESET_LINK_SENT
                     ? $this->sendResponse($response)
-                    : abort(Response::HTTP_NOT_FOUND, trans($response));
+                    : abort(Response::HTTP_NOT_FOUND, __($response));
     }
 
     /**
@@ -68,11 +68,11 @@ class ForgotPasswordController extends Controller
 
         $user = $this->broker()->getUser(['email' => $email]);
         if (is_null($user)) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_USER));
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, __(Password::INVALID_USER));
         }
 
         if (!$this->broker()->tokenExists($user, $request->token)) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, trans(Password::INVALID_TOKEN));
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, __(Password::INVALID_TOKEN));
         }
 
         return $this->sendResponse('passwords.token.valid');
@@ -86,7 +86,7 @@ class ForgotPasswordController extends Controller
      */
     protected function sendResponse($response)
     {
-        return Response(['message' => trans($response)]);
+        return Response(['message' => __($response)]);
     }
 
     /**

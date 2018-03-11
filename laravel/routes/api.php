@@ -79,9 +79,8 @@ Route::name('api.')->group(function () {
         });
 
         # Routes for shopping cart and payments.
-        Route::get('/shopping_cart', 'OrderController@getCart')->name('shopping_cart');
-        Route::patch('/shopping_cart/products', 'OrderController@addProducts')->name('shopping_cart.products');
-        Route::delete('/shopping_cart/products', 'OrderController@removeProducts');
+        Route::get('/shopping_cart', 'OrderController@getShoppingCart')->name('shopping_cart');
+        Route::patch('/shopping_cart', 'OrderController@updateShoppingCart')->name('shopping_cart.update');
         Route::get('/shopping_cart/payment', 'OrderController@createPayment')->name('shopping_cart.payment');
     });
 });

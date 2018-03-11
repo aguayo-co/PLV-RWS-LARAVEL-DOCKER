@@ -20,6 +20,16 @@ class ShippingMethod extends Model
         return 'slug';
     }
 
+    public function users()
+    {
+        return $this->belongsToMany('App\User');
+    }
+
+    public function sales()
+    {
+        return $this->hasMany('App\Sale');
+    }
+
     public function setNameAttribute($name)
     {
         $this->attributes['name'] = $name;

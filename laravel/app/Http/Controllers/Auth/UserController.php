@@ -41,6 +41,8 @@ class UserController extends Controller
             'vacation_mode' => 'boolean',
             'group_ids' => 'array',
             'group_ids.*' => 'integer|exists:groups,id',
+            'shipping_method_ids' => 'array',
+            'shipping_method_ids.*' => 'integer|exists:shipping_methods,id',
             'following_add' => 'array',
             'following_add.*' => 'integer|exists:users,id|different:id',
             'following_remove' => 'array',
@@ -51,9 +53,9 @@ class UserController extends Controller
     protected function validationMessages()
     {
         return [
-            'exists.unique' => trans('validation.email.exists'),
-            'following_ids.*.different' => trans('validation.different.self'),
-            'following_add.*.different' => trans('validation.different.self'),
+            'exists.unique' => __('validation.email.exists'),
+            'following_ids.*.different' => __('validation.different.self'),
+            'following_add.*.different' => __('validation.different.self'),
         ];
     }
 

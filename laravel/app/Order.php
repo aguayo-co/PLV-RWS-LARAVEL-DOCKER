@@ -54,4 +54,14 @@ class Order extends Model
     {
         return $this->products->where('status', Product::AVAILABLE)->sum('price');
     }
+
+    public function setShippingAddressAttribute($value)
+    {
+        $this->attributes['shipping_address'] = json_encode($value);
+    }
+
+    public function getShippingAddressAttribute($value)
+    {
+        return json_decode($value);
+    }
 }

@@ -73,7 +73,10 @@ class Controller extends BaseController
     protected function validate(array $data, Model $model = null)
     {
         # This is a hack to ensure we don't pass a string we can't put in the DB.
-        $rules = $this->validationRules($model);
+        if (!$rules = $this->validationRules($model)) {
+            return;
+        }
+
         foreach ($rules as &$rule) {
             if (is_string($rule) && strpos($rule, 'string') !== false && strpos($rule, 'max:') === false) {
                 $rule = $rule . '|max:' . Schema::getFacadeRoot()::$defaultStringLength;
@@ -217,8 +220,10 @@ class Controller extends BaseController
     public function update(Request $request, Model $model)
     {
         $data = $request->all();
-        $this->validate($this->alterValidateData($data, $model), $model);
-        $model->fill($this->alterFillData($data))->save();
+        if ($data) {
+            $this->validate($this->alterValidateData($data, $model), $model);
+            $model->fill($this->alterFillData($data))->save();
+        }
         $model = $this->postUpdate($request, $model);
         return $model;
     }
