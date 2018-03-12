@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.7.4
+version: 0.7.5
 baseUri: https://prilov.aguayo.co/api
 documentation:
 - title: Introducción
@@ -695,12 +695,6 @@ resourceTypes:
     patch:
       securedBy: [token: { scopes: [ owner ] }]
       is: [ expanded ]
-  /category/{category-slug}:
-    get:
-      is: [ expanded, singleItemResponse, sortable, filterable, searchable ]
-  /campaign/{campaign-slug}:
-    get:
-      is: [ expanded, singleItemResponse, sortable, filterable, searchable ]
 
 /shipping_methods:
   type: collection
