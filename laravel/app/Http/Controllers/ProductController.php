@@ -24,6 +24,7 @@ class ProductController extends Controller
     ];
     public static $allowedWhereHas = ['color_ids' => 'colors', 'campaign_ids' => 'campaigns'];
     public static $allowedWhereBetween = ['price'];
+    public static $allowedWhereLike = ['slug'];
 
     public static $searchIn = ['title', 'description'];
 

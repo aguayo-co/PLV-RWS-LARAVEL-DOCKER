@@ -13,6 +13,7 @@ trait CanFilter
     public static $allowedWhereHas = []; # Example: ['query_name' => 'relation' , 'color_ids' => 'colors']
     public static $allowedWhereBetween = [];
     public static $allowedWhereDates = ['created_at', 'updated_at'];
+    public static $allowedWhereLike = [];
 
     /**
      * Generates an array off [columns => [value, value, value, ...]] to by used with whereIn
@@ -95,6 +96,24 @@ trait CanFilter
     }
 
     /**
+     * Generates an array off [columns => value] to by used with whereBetween
+     * clauses on a query, filtered with acceptable columns.
+     *
+     * @param  array $filters
+     * @param  array $allowed
+     * @return array
+     */
+    protected function getWhereLike(array $filters, array $allowed)
+    {
+        $filters = $filters ?: [];
+        $readyFilters = [];
+        foreach (array_only($filters, $allowed) as $column => $values) {
+            $readyFilters[$column] = $values;
+        }
+        return $readyFilters;
+    }
+
+    /**
      * Apply orderBy clauses to the given query.
      *
      * @param  \Illuminate\Http\Request $request
@@ -108,6 +127,7 @@ trait CanFilter
         $allowedWhereHas = $controllerClass::$allowedWhereHas;
         $allowedWhereBetween = $controllerClass::$allowedWhereBetween;
         $allowedWhereDates = $controllerClass::$allowedWhereDates;
+        $allowedWhereLike = $controllerClass::$allowedWhereLike;
 
         $filters = $request->query('filter') ?: [];
         foreach ($this->getWhereIn($filters, $allowedWhereIn) as $column => $in) {
@@ -123,6 +143,9 @@ trait CanFilter
         }
         foreach ($this->getWhereDates($filters, $allowedWhereDates) as $column => $between) {
             $query = $query->whereBetween($column, $between);
+        }
+        foreach ($this->getWhereLike($filters, $allowedWhereLike) as $column => $like) {
+            $query = $query->where($column, 'like', $like);
         }
         return $query;
     }

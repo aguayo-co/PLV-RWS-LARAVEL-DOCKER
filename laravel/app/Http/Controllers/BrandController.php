@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BrandController extends Controller
 {
     protected $modelClass = Brand::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $brand = null)
     {

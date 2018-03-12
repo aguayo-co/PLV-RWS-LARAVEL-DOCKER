@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class GroupController extends Controller
 {
     protected $modelClass = Group::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $group = null)
     {

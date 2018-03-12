@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 class CategoryController extends Controller
 {
     protected $modelClass = Category::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $category = null)
     {

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class StatusController extends Controller
 {
     protected $modelClass = Status::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $status = null)
     {

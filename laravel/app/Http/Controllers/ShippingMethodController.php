@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class ShippingMethodController extends Controller
 {
     protected $modelClass = ShippingMethod::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $shippingMethod = null)
     {
