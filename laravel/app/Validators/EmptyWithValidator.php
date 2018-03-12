@@ -7,9 +7,9 @@ class EmptyWithValidator
     public function validateEmptyWith($attribute, $value, $params, $validator)
     {
         $data = $validator->getData();
-        $other = $params[0];
+        $otherField = $params[0];
 
-        return $value && array_has($data, $other) && $data[$other] ? false : true;
+        return $value && array_has($data, $otherField) && $data[$otherField] ? false : true;
     }
 
     public function replaceEmptyWith($message, $attribute, $value, $params, $validator)

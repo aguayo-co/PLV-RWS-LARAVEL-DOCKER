@@ -42,7 +42,7 @@ class MercadoPago implements PaymentGateway
 
     public function getPaymentRequest(Payment $payment, $data)
     {
-        $buyer = $payment->order->buyer;
+        $buyer = $payment->order->user;
         $mercadoPago = new MP($this->getClientId(), $this->getClientSecret());
 
         $preferenceData = [

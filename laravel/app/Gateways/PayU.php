@@ -64,7 +64,7 @@ class PayU implements PaymentGateway
 
     public function getPaymentRequest(Payment $payment, $data)
     {
-        $buyer = $payment->order->buyer;
+        $buyer = $payment->order->user;
         return [
             'public_data' => [
                 'test' => $this->testMode(),

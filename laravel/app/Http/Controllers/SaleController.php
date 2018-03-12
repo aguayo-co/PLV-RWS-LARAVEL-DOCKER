@@ -7,7 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
+/**
+ * This Controller handles actions initiated by the Seller,
+ * or by Admins but when modifying a Sale for a Seller.
+ *
+ * Actions that should be taken by the Buyer should be handled in the
+ * Order Controller.
+ * A Buyer should not act directly on the Sale, but always through
+ * the Order.
+ */
 class SaleController extends Controller
 {
     protected $modelClass = Sale::class;
@@ -27,35 +37,9 @@ class SaleController extends Controller
         return [
             'status' => [
                 'integer',
-                Rule::in([Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED]),
+                Rule::in([Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED, Sale::STATUS_CANCELED]),
             ],
         ];
-    }
-
-    /**
-     * Alter data to be passed to fill method.
-     *
-     * @param  array  $data
-     * @return array
-     */
-    protected function alterFillData($data, Model $sale = null)
-    {
-        $status = array_get($data, 'status');
-        switch (array_get($data, 'status')) {
-            case Sale::STATUS_DELIVERED:
-                if (!$sale->delivered) {
-                    $data['delivered'] = now();
-                };
-                // If marked as delivered, has to be marked as shipped.
-                // Do not break the switch to check and fill below.
-            case Sale::STATUS_SHIPPED:
-                if (!$sale->shipped) {
-                    $data['shipped'] = now();
-                }
-        }
-        // Status should never go back, always advance.
-        $data['status'] = max($status, $sale->status);
-        return $data;
     }
 
     protected function validate(array $data, Model $sale = null)
@@ -73,6 +57,13 @@ class SaleController extends Controller
             abort(
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Can not be set as delivered when Sale not PAYED.'
+            );
+        }
+
+        if ($status == Sale::STATUS_CANCELED && !Auth::user()->hasRole('admin')) {
+            abort(
+                Response::HTTP_FORBIDDEN,
+                'Only an Admin can cancel a Sale.'
             );
         }
     }

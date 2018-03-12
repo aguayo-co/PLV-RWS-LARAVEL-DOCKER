@@ -4,17 +4,19 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasStatuses;
+use App\Traits\HasStatusHistory;
 
 class Order extends Model
 {
     use HasStatuses;
+    use HasStatusHistory;
 
     const STATUS_SHOPPING_CART = 10;
     const STATUS_PAYMENT = 20;
     const STATUS_PAYED = 30;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = [];
+    protected $fillable = ['shipping_address'];
     protected $with = ['sales'];
     protected $appends = ['total'];
 

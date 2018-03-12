@@ -4,10 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasStatuses;
+use App\Traits\HasStatusHistory;
 
 class Sale extends Model
 {
     use HasStatuses;
+    use HasStatusHistory;
 
     // Numbers are used to know when an action can be taken.
     // For instance, an order can not be marked as shipped if it
@@ -24,7 +26,7 @@ class Sale extends Model
     const STATUS_COMPLETED_PARTIAL = 92;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = ['shipment_details', 'delivered', 'shipped', 'status'];
+    protected $fillable = ['shipment_details', 'status'];
     protected $with = ['products', 'shippingMethod'];
 
     /**

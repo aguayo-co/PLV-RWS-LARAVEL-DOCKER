@@ -14,12 +14,11 @@ class CreateShippingMethodUserPivotTable extends Migration
     public function up()
     {
         Schema::create('shipping_method_user', function (Blueprint $table) {
-            $table->increments('id');
             $table->integer('shipping_method_id')->unsigned()->index();
             $table->foreign('shipping_method_id')->references('id')->on('shipping_methods')->onDelete('cascade');
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps();
+            $table->primary(['shipping_method_id', 'user_id']);
         });
     }
 
