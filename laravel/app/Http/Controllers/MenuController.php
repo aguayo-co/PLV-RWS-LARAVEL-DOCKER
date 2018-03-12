@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class MenuController extends Controller
 {
     protected $modelClass = Menu::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $menu = null)
     {

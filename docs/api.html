@@ -216,18 +216,22 @@ PATCH
 </code></pre><h3 id="ordenamiento"><a href="#ordenamiento">Ordenamiento</a></h3><p>Algunas de las peticiones permiten ordenar los resultados por criterios enviados por URL. Cuando una petición es ordenable, se debe pasar un parámetro <code>orderby</code> en la url con los valores por los que se quiere ordenar separados por coma. Cuando un valor se quiere ordenar de forma descendente, se debe anteponer el signo <code>-</code> al mismo.</p><p>Cualquier petición que sea ordenable tiene los siguientes parámetros disponibles:</p><ul><li>updated_at</li><li>created_id</li><li>id</li></ul><p>Ejemplo:</p><pre><code>?orderby=id # Ordena por ID de forma ascendente
 ?orderby=-id # Ordena por ID de forma descendente
 ?orderby=updated_at,id #Ordena primero por fecha de actualización, y después por ID.
-</code></pre><p>Algunas coleciones tendrán otras opciones de ordenamiento.</p><h3 id="filtrado"><a href="#filtrado">Filtrado</a></h3><p>En general, cualquier petición que sea ordenable, es filtrable. Existen 2 tipos de filtros:</p><ul><li>ContenidoEn Este filtro recibe una lista de valores separados por comas, y se devuelven los resultados que tengan cualquiera de estos. Por ejemplo productos que pertenecen a ciertas categorías.</li><li>Entre Este filtro recibe dos valores separados por comas y se devuelven los resultados que tengan valores contenidos entre estos dos, incluyendo los dos valores. Por ejemplo productos que están entre dos precios.</li></ul><p>Los filtros se pasan por parametros de URL como arreglos de la siguiente forma:</p><pre><code># genérico:
+</code></pre><p>Algunas coleciones tendrán otras opciones de ordenamiento.</p><h3 id="filtrado"><a href="#filtrado">Filtrado</a></h3><p>En general, cualquier petición que sea ordenable, es filtrable. Existen 3 tipos de filtros:</p><ul><li>ContenidoEn Este filtro recibe una lista de valores separados por comas, y se devuelven los resultados que tengan cualquiera de estos. Por ejemplo productos que pertenecen a ciertas categorías.</li><li>Entre Este filtro recibe dos valores separados por comas y se devuelven los resultados que tengan valores contenidos entre estos dos, incluyendo los dos valores. Por ejemplo productos que están entre dos precios.</li><li>Como Este filtro hace búsquedas de un patron de texto en una campo determinado, y devuelve los resultados que contengan dicho patrón. Acepta dos comodines. <code>%</code> para múltiples caracteres. <code>_</code> para un caracter.</li></ul><p>Los filtros se pasan por parametros de URL como arreglos de la siguiente forma:</p><pre><code># genérico:
 ?filter[{{ filtro }}]={{ valore1,valor2 }}
 
-# productos entre dos precios, tipo Entre.
+# resultados entre dos precios, tipo Entre.
 ?filter[price]=1000,2500
 
-# productos con colores, tipo ContenidoEn.
+# resultados con colores, tipo ContenidoEn.
 ?filter[color_ids]=1,3,5
 
-# los dos filtroa al tiempo:
+# los dos filtros al tiempo:
 ?filter[color_ids]=1,3,5&amp;filter[price]=1000,2500
-</code></pre><p>Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:</p><table class="table"><thead><tr><th>filtro</th><th>tipo</th></tr></thead><tbody><tr><td>id</td><td>ContenidoEn</td></tr><tr><td>updated_at</td><td>Entre</td></tr><tr><td>created_at</td><td>Entre</td></tr></tbody></table><h3 id="b_squedas"><a href="#b_squedas">Búsquedas</a></h3><p>Cuando una colección permita realizar búsquedas de texto, el criterio de búsqueda se debe pasar por URL con el el parámetro <code>q</code></p><p>Ejemplo:</p><pre><code>?q=pantalon negro
+
+# resultados cuyo slug termine con "magia".
+# Importante tener en cuenta la codificacion de caracteres para URL.
+?filter[slug]=%25magia
+</code></pre><p>Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:</p><table class="table"><thead><tr><th>filtro</th><th>tipo</th></tr></thead><tbody><tr><td>id</td><td>ContenidoEn</td></tr><tr><td>updated_at</td><td>Entre</td></tr><tr><td>created_at</td><td>Entre</td></tr></tbody></table><p>Las colecciones que tengan campo <code>slug</code> aceptan el siguiente filtro:</p><table class="table"><thead><tr><th>filtro</th><th>tipo</th></tr></thead><tbody><tr><td>slug</td><td>Como</td></tr></tbody></table><h3 id="b_squedas"><a href="#b_squedas">Búsquedas</a></h3><p>Cuando una colección permita realizar búsquedas de texto, el criterio de búsqueda se debe pasar por URL con el el parámetro <code>q</code></p><p>Ejemplo:</p><pre><code>?q=pantalon negro
 </code></pre><p>Las búsquedas de texto no son eficientes en MySQL, sobre todo cuando se combina con ordenado o filtrado.</p><h3 id="autenticaci_n"><a href="#autenticaci_n">Autenticación</a></h3><p>Existen 2 tipos de usuarios en el portal:</p><ul><li>Autenticado</li><li>No Autenticado</li></ul><p>Un usuario se considera autenticado cuando envía una petición con un token Bearer como encabezado:</p><pre><code>Authorization: Bearer TOKEN
 </code></pre><p>Cada sesión de usuario tendrá un tóken diferente, de esta forma el usuario puede estar autenticado en multiples dispositivos a la vez.</p><p>Cuando un usuario cambia de contraseña, todos los tokens serán invalidados.</p><p>Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario. Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:</p><pre><code>{
   "id": 8,

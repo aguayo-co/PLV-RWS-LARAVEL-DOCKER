@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ConditionController extends Controller
 {
     protected $modelClass = Condition::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $condition = null)
     {

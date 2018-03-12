@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class CampaignController extends Controller
 {
     protected $modelClass = Campaign::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $campaign = null)
     {

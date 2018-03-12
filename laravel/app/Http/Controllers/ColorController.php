@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ColorController extends Controller
 {
     protected $modelClass = Color::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $color = null)
     {

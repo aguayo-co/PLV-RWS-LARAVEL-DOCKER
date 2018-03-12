@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class BannerController extends Controller
 {
     protected $modelClass = Banner::class;
+    public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $banner = null)
     {
