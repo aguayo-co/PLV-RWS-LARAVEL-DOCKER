@@ -5,14 +5,17 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\SaveLater;
+use App\Traits\HasStatuses;
 
 class Product extends Model
 {
     use SaveLater;
+    use HasStatuses;
 
-    const UNPUBLISHED = 0;
-    const AVAILABLE = 10;
-    const UNAVAILABLE = 20;
+    const STATUS_UNPUBLISHED = 0;
+    const STATUS_AVAILABLE = 10;
+    const STATUS_UNAVAILABLE = 20;
+    const STATUS_SOLD = 30;
 
     protected const IMAGES_BASE_PATH = 'public/product/images/';
 

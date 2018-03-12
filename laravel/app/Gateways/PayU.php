@@ -90,9 +90,9 @@ class PayU implements PaymentGateway
     {
         switch ($statePol) {
             case 4:
-                return Payment::SUCCESS;
+                return Payment::STATUS_SUCCESS;
             default:
-                return Payment::ERROR;
+                return Payment::STATUS_ERROR;
         }
     }
 

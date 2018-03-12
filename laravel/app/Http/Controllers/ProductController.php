@@ -98,7 +98,7 @@ class ProductController extends Controller
     protected function alterIndexQuery()
     {
         return function ($query) {
-            return $query->where('status', Product::AVAILABLE);
+            return $query->where('status', Product::STATUS_AVAILABLE);
         };
     }
 }

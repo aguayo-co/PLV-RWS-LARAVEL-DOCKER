@@ -3,12 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasStatuses;
 
 class Payment extends Model
 {
-    const PENDING = 00;
-    const SUCCESS = 10;
-    const ERROR = 99;
+    use HasStatuses;
+
+    const STATUS_PENDING = 00;
+    const STATUS_SUCCESS = 10;
+    const STATUS_ERROR = 99;
 
     protected $fillable = ['order_id', 'status'];
     protected $hidden = ['request'];

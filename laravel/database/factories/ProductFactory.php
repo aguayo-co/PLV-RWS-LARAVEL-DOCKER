@@ -22,7 +22,7 @@ $factory->define(App\Product::class, function (Faker $faker) {
         'category_id' => Category::whereNotNull('parent_id')->get()->random()->id,
         'condition_id' => Condition::all()->random()->id,
         'status_id' => Status::all()->random()->id,
-        'status' => Product::AVAILABLE,
+        'status' => Product::STATUS_AVAILABLE,
         'images' => [UploadedFile::fake()->image('image'), UploadedFile::fake()->image('image'),],
     ];
 });

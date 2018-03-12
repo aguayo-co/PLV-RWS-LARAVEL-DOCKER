@@ -222,7 +222,7 @@ class Controller extends BaseController
         $data = $request->all();
         if ($data) {
             $this->validate($this->alterValidateData($data, $model), $model);
-            $model->fill($this->alterFillData($data))->save();
+            $model->fill($this->alterFillData($data, $model))->save();
         }
         $model = $this->postUpdate($request, $model);
         return $model;

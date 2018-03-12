@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Sale;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SaleController extends Controller
 {
@@ -23,8 +25,10 @@ class SaleController extends Controller
     protected function validationRules(?Model $sale)
     {
         return [
-            'shipped' => 'bool',
-            'delivered' => 'bool',
+            'status' => [
+                'integer',
+                Rule::in([Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED]),
+            ],
         ];
     }
 
@@ -36,35 +40,47 @@ class SaleController extends Controller
      */
     protected function alterFillData($data, Model $sale = null)
     {
-        // I $sale is null, shipped and delivered will not exist due to validations.
-        if ((array_get($data, 'delivered') || array_get($data, 'shipped')) && !$sale->shipped) {
-            $data['shipped'] = now();
+        $status = array_get($data, 'status');
+        switch (array_get($data, 'status')) {
+            case Sale::STATUS_DELIVERED:
+                if (!$sale->delivered) {
+                    $data['delivered'] = now();
+                };
+                // If marked as delivered, has to be marked as shipped.
+                // Do not break the switch to check and fill below.
+            case Sale::STATUS_SHIPPED:
+                if (!$sale->shipped) {
+                    $data['shipped'] = now();
+                }
         }
-        // I $sale is null, delivered will not exist due to validations.
-        if (array_get($data, 'delivered') && !$sale->delivered) {
-            $data['delivered'] = now();
-        }
+        // Status should never go back, always advance.
+        $data['status'] = max($status, $sale->status);
         return $data;
     }
 
-    public function update(Request $request, Model $sale)
+    protected function validate(array $data, Model $sale = null)
     {
-        if ($sale->status < Sale::PAYED) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale can not be changed until it has been PAYED.');
-        }
-
-        if ($request->shipped && $sale->status < Sale::PAYED) {
+        parent::validate($data, $sale);
+        $status = array_get($data, 'status');
+        if ($status == Sale::STATUS_SHIPPED && $sale->status < Sale::STATUS_PAYED) {
             abort(
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Can not be set as shipped when Sale not PAYED.'
             );
         }
 
-        if ($request->delivered && $sale->status < Sale::PAYED) {
+        if ($status == Sale::STATUS_DELIVERED && $sale->status < Sale::STATUS_PAYED) {
             abort(
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Can not be set as delivered when Sale not PAYED.'
             );
+        }
+    }
+
+    public function update(Request $request, Model $sale)
+    {
+        if ($sale->status < Sale::STATUS_PAYED) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale can not be changed until it has been PAYED.');
         }
         return parent::update($request, $sale);
     }

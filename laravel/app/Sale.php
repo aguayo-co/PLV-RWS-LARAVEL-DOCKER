@@ -3,27 +3,28 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasStatuses;
 
 class Sale extends Model
 {
+    use HasStatuses;
+
     // Numbers are used to know when an action can be taken.
     // For instance, an order can not be marked as shipped if it
     // has not been payed: "status < PAYED".
     // But once it passes that stage, can be marked as shipped at any time.
-    const SHOPPING_CART = 10;
-    const PAYMENT = 20;
-    const PAYED = 30;
-    const SHIPPED = 40;
-    const DELIVERED = 41;
-    const RECEIVED = 49;
-    const RETURNED = 60;
-    const RETURNED_PARTIAL = 61;
-    const COMPLETED = 90;
-    const COMPLETED_RETURNED = 91;
-    const COMPLETED_PARTIAL = 92;
-    const CANCELED = 99;
+    const STATUS_SHOPPING_CART = 10;
+    const STATUS_PAYMENT = 20;
+    const STATUS_PAYED = 30;
+    const STATUS_SHIPPED = 40;
+    const STATUS_DELIVERED = 41;
+    const STATUS_RECEIVED = 49;
+    const STATUS_COMPLETED = 90;
+    const STATUS_COMPLETED_RETURNED = 91;
+    const STATUS_COMPLETED_PARTIAL = 92;
+    const STATUS_CANCELED = 99;
 
-    protected $fillable = ['shipment_details', 'delivered', 'shipped'];
+    protected $fillable = ['shipment_details', 'delivered', 'shipped', 'status'];
     protected $with = ['products', 'shippingMethod'];
 
     /**

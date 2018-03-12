@@ -82,13 +82,13 @@ class MercadoPago implements PaymentGateway
     {
         switch ($status) {
             case 'approved':
-                return Payment::SUCCESS;
+                return Payment::STATUS_SUCCESS;
             case 'pending':
             case 'rejected':
             case 'in_process':
-                return Payment::PENDING;
+                return Payment::STATUS_PENDING;
             default:
-                return Payment::ERROR;
+                return Payment::STATUS_ERROR;
         }
     }
 

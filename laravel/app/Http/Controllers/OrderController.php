@@ -32,7 +32,7 @@ class OrderController extends Controller
             $sale->user_id = $sellerId;
             $sale->order_id = $order->id;
 
-            $sale->status = Sale::SHOPPING_CART;
+            $sale->status = Sale::STATUS_SHOPPING_CART;
             $sale->save();
         }
         return $sale;
@@ -44,11 +44,11 @@ class OrderController extends Controller
     protected function currentUserOrder()
     {
         $user = Auth::user();
-        $order = Order::where(['user_id' => $user->id, 'status' => Order::SHOPPING_CART])->first();
+        $order = Order::where(['user_id' => $user->id, 'status' => Order::STATUS_SHOPPING_CART])->first();
         if (!$order) {
             $order = new Order();
             $order->user_id = $user->id;
-            $order->status = Order::SHOPPING_CART;
+            $order->status = Order::STATUS_SHOPPING_CART;
             $order->save();
         }
         return $order;
@@ -59,7 +59,8 @@ class OrderController extends Controller
      */
     protected function getProductsByUser($productIds)
     {
-        return Product::whereIn('id', $productIds)->where('status', Product::AVAILABLE)->get()->groupBy('user_id');
+        return Product::whereIn('id', $productIds)->where('status', Product::STATUS_AVAILABLE)
+            ->get()->groupBy('user_id');
     }
 
     /**
@@ -106,7 +107,10 @@ class OrderController extends Controller
         foreach ($saleIds as $saleId) {
             $sale = $order->sales->firstWhere('id', $saleId);
             $sale->received = now();
-            $sale.save();
+            $sale->delivered = $sale->delivered ?: $sale->received;
+            $sale->shipped = $sale->shipped ?: $sale->received;
+            $sale->status = max(Sale::STATUS_RECEIVED, $sale->status);
+            $sale->save();
         }
     }
 
@@ -115,18 +119,18 @@ class OrderController extends Controller
      */
     public function approveOrder($order)
     {
-        Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYED]);
-        $order->status = Order::PAYED;
+        Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::STATUS_PAYED]);
+        $order->status = max(Order::STATUS_PAYED, $order->status);
         $order->save();
     }
 
     protected function validateOrderCanCheckout($order)
     {
-        if (!$order->products->where('status', Product::AVAILABLE)->count()) {
+        if (!$order->products->where('status', Product::STATUS_AVAILABLE)->count()) {
             abort(Response::HTTP_FAILED_DEPENDENCY, 'No products in shopping cart.');
         }
 
-        if ($order->products->where('status', '<>', Product::AVAILABLE)->count()) {
+        if ($order->products->where('status', '<>', Product::STATUS_AVAILABLE)->count()) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some products are not available anymore.');
         }
     }
@@ -155,7 +159,7 @@ class OrderController extends Controller
             'add_product_ids.*' => [
                 'integer',
                 Rule::exists('products', 'id')->where(function ($query) {
-                    $query->where('status', Product::AVAILABLE);
+                    $query->where('status', Product::STATUS_AVAILABLE);
                 }),
             ],
 
@@ -206,7 +210,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Rule that validates a a Sale can be marked as received.
+     * Rule that validates that a Sale can be marked as received.
      */
     protected function getReceivableSaleRule($order)
     {
@@ -219,9 +223,17 @@ class OrderController extends Controller
                 return $fail(__('La venta :value no existe o no es parte de esta orden.', ['value' => $value]));
             }
 
-            if ($sale->status < Sale::PAYED) {
+            if ($sale->status < Sale::STATUS_PAYED) {
                 $error = __(
                     __('La venta :sale_id venta no se puede marcar cómo recibida.'),
+                    ['sale_id' => $value]
+                );
+                return $fail($error);
+            }
+
+            if ($sale->received) {
+                $error = __(
+                    __('La venta :sale_id ya fue marcada como recibida.'),
                     ['sale_id' => $value]
                 );
                 return $fail($error);
@@ -263,13 +275,13 @@ class OrderController extends Controller
     }
 
     /**
-     * An Order only accepts changes when in SHOPPING_CART.
+     * An Order only accepts changes when in STATUS_SHOPPING_CART.
      *
      * Make shipping_address if changes are accepted.
      */
     public function update(Request $request, Model $order)
     {
-        if ($order->status >= Order::PAYMENT) {
+        if ($order->status >= Order::STATUS_PAYMENT) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order can not be changed once payment has started.');
         }
 
@@ -314,18 +326,18 @@ class OrderController extends Controller
 
         $payment = new Payment();
         $payment->gateway = $gateway->getName();
-        $payment->status = Payment::PENDING;
+        $payment->status = Payment::STATUS_PENDING;
         $payment->order_id = $order->id;
         $payment->save();
 
         $payment->request = $gateway->paymentRequest($payment, $request->all());
         $payment->save();
 
-        $order->status = Order::PAYMENT;
+        $order->status = Order::STATUS_PAYMENT;
         DB::transaction(function () use ($order) {
             $order->save();
-            Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::PAYMENT]);
-            Product::whereIn('id', $order->products->pluck('id'))->update(['status' => Product::UNAVAILABLE]);
+            Sale::whereIn('id', $order->sales->pluck('id'))->update(['status' => Sale::STATUS_PAYMENT]);
+            Product::whereIn('id', $order->products->pluck('id'))->update(['status' => Product::STATUS_UNAVAILABLE]);
         });
 
         return $payment;
@@ -340,7 +352,7 @@ class OrderController extends Controller
             $gateway = new Gateway($gateway);
             $payment = $gateway->processCallback($request->all());
 
-            if ($payment->status == Payment::SUCCESS) {
+            if ($payment->status == Payment::STATUS_SUCCESS) {
                 $this->approveOrder($payment->order);
             }
         });
