@@ -50,10 +50,6 @@ Route::name('api.')->group(function () {
     Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}/{slug?}', 'ProductController@show')
         ->name('product.get')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
-    Route::get('products/category/{category}', 'CategoryController@show')
-        ->name('products.category.get')->where('category', SLUG_REGEX);
-    Route::get('products/campaign/{campaign}', 'CampaignController@show')
-        ->name('products.campaign.get')->where('campaign', SLUG_REGEX);
 
     Route::middleware('auth:api')->group(function () {
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);

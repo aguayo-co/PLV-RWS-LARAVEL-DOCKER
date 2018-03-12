@@ -63,20 +63,6 @@ class CategoryController extends Controller
     public function show(Request $request, Model $category)
     {
         $category = parent::show($request, $category)->load(['children', 'parent']);
-
-        # Products including those of subcategories.
-        $products = Product::where(function ($query) use ($category) {
-            # Query grouping creates an OR condition.
-            # Products within or category
-            $query->where('category_id', $category->id)
-            # OR within its subcategories.
-            ->orWhereHas('category', function ($query) use ($category) {
-                $query->where('parent_id', $category->id);
-            });
-        });
-        $products = $this->applyParamsToQuery($request, $products, ProductController::class);
-        $category->products = $products->simplePaginate($request->items);
-
         return $category;
     }
 }

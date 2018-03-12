@@ -25,14 +25,4 @@ class CampaignController extends Controller
             'slug' => 'string|unique:campaigns,slug' . $ignore,
         ];
     }
-
-    public function show(Request $request, Model $campaign)
-    {
-        $campaign = parent::show($request, $campaign);
-
-        $products = $this->applyParamsToQuery($request, $campaign->products(), ProductController::class);
-        $campaign->products = $products->simplePaginate($request->items);
-
-        return $campaign;
-    }
 }
