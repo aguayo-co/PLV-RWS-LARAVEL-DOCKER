@@ -157,27 +157,34 @@ documentation:
 - title: Filtrado
   content: |
     En general, cualquier petición que sea ordenable, es filtrable.
-    Existen 2 tipos de filtros:
+    Existen 3 tipos de filtros:
     - ContenidoEn
     Este filtro recibe una lista de valores separados por comas, y se devuelven los resultados que tengan
     cualquiera de estos. Por ejemplo productos que pertenecen a ciertas categorías.
     - Entre
     Este filtro recibe dos valores separados por comas y se devuelven los resultados que tengan valores contenidos
     entre estos dos, incluyendo los dos valores. Por ejemplo productos que están entre dos precios.
+    - Como
+    Este filtro hace búsquedas de un patron de texto en una campo determinado, y devuelve los resultados
+    que contengan dicho patrón. Acepta dos comodines. `%` para múltiples caracteres. `_` para un caracter.
 
     Los filtros se pasan por parametros de URL como arreglos de la siguiente forma:
     ```
     # genérico:
     ?filter[{{ filtro }}]={{ valore1,valor2 }}
 
-    # productos entre dos precios, tipo Entre.
+    # resultados entre dos precios, tipo Entre.
     ?filter[price]=1000,2500
 
-    # productos con colores, tipo ContenidoEn.
+    # resultados con colores, tipo ContenidoEn.
     ?filter[color_ids]=1,3,5
 
-    # los dos filtroa al tiempo:
+    # los dos filtros al tiempo:
     ?filter[color_ids]=1,3,5&filter[price]=1000,2500
+
+    # resultados cuyo slug termine con "magia".
+    # Importante tener en cuenta la codificacion de caracteres para URL.
+    ?filter[slug]=%25magia
     ```
 
     Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:
@@ -187,6 +194,12 @@ documentation:
     |id|ContenidoEn|
     |updated_at|Entre|
     |created_at|Entre|
+
+    Las colecciones que tengan campo `slug` aceptan el siguiente filtro:
+
+    |filtro|tipo|
+    |------|----|
+    |slug|Como|
 
 - title: Búsquedas
   content: |
