@@ -60,8 +60,17 @@ class User extends Authenticatable
         'followers_count',
     ];
 
-    protected $appends = ['cover', 'picture', 'following_ids', 'followers_ids', 'following_count', 'followers_count'];
-    protected $with = ['roles', 'groups'];
+    protected $appends = [
+        'cover',
+        'picture',
+        'following_ids',
+        'followers_ids',
+        'following_count',
+        'followers_count',
+        'shipping_method_ids',
+        'group_ids'
+    ];
+    protected $with = ['roles', 'groups', 'shippingMethods'];
 
     public static function boot()
     {
@@ -144,7 +153,6 @@ class User extends Authenticatable
         return $this->following->count();
     }
 
-
     protected function getFollowersIdsAttribute()
     {
         return $this->followers->pluck('id')->all();
@@ -173,12 +181,22 @@ class User extends Authenticatable
         $this->groups()->sync($groupIds);
     }
 
+    protected function getGroupIdsAttribute()
+    {
+        return $this->groups->pluck('id')->all();
+    }
+
     protected function setShippingMethodIdsAttribute(array $shippingMethodIds)
     {
         if ($this->saveLater('shipping_method_ids', $shippingMethodIds)) {
             return;
         }
         $this->shippingMethods()->sync($shippingMethodIds);
+    }
+
+    protected function getShippingMethodIdsAttribute()
+    {
+        return $this->shippingMethods->pluck('id')->all();
     }
 
     protected function getCoverAttribute()
