@@ -2,84 +2,112 @@
 
 namespace App\Http\Controllers;
 
+use App\Gateways\Gateway;
+use App\Http\Traits\CurrentUserOrder;
+use App\Order;
 use App\Payment;
+use App\Product;
+use App\Sale;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    use CurrentUserOrder;
+
+    protected $modelClass = Payment::class;
+
     /**
-     * Display a listing of the resource.
+     * Return an array of validations rules to apply to the request data.
      *
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function index()
+    protected function validationRules(?Model $order)
     {
-        //
+        return [];
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Validate that an order can be sent to Checkout.
      */
-    public function create()
+    protected function validateOrderCanCheckout($order)
     {
-        //
+        if (!$order->products->where('status', Product::STATUS_AVAILABLE)->count()) {
+            abort(Response::HTTP_FAILED_DEPENDENCY, 'No products in shopping cart.');
+        }
+
+        if ($order->products->where('status', '<>', Product::STATUS_AVAILABLE)->count()) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some products are not available anymore.');
+        }
+
+        if ($order->sales->where('shipping_method_id', null)->count()) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some sales do not have a ShippingMethod.');
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Create a new payment for the given order, with the given gateway.
+     */
+    protected function getPayment(Gateway $gateway, Model $order)
+    {
+        $payment = new Payment();
+        $payment->gateway = $gateway->getName();
+        $payment->status = Payment::STATUS_PENDING;
+        $payment->order_id = $order->id;
+        $payment->save();
+
+        return $payment;
+    }
+
+    /**
+     * Create a new payment for the current user.
      */
     public function store(Request $request)
     {
-        //
+        $order = $this->currentUserOrder();
+
+        $this->validateOrderCanCheckout($order);
+
+        // Get the gateway to use.
+        $gateway = new Gateway($request->gateway);
+        // Create a Payment model with the selected gateway.
+        $payment = $this->getPayment($gateway, $order);
+        // Save the Gateway's request data in the Payment model.
+        $payment->request = $gateway->paymentRequest($payment, $request->all());
+        $payment->save();
+
+        $order->status = Order::STATUS_PAYMENT;
+        DB::transaction(function () use ($order) {
+            $order->save();
+            foreach ($order->sales as $sale) {
+                $sale->status = Sale::STATUS_PAYMENT;
+                $sale->save();
+            }
+            foreach ($order->products as $product) {
+                $product->status = Product::STATUS_UNAVAILABLE;
+                $product->save();
+            }
+        });
+
+        return $payment;
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
+     * Process a callback from the gateway.
      */
-    public function show(Payment $payment)
+    public function gatewayCallback(Request $request, $gateway)
     {
-        //
-    }
+        DB::transaction(function () use ($request, $gateway) {
+            $gateway = new Gateway($gateway);
+            $payment = $gateway->processCallback($request->all());
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Payment $payment)
-    {
-        //
-    }
+            if ($payment->status == Payment::STATUS_SUCCESS) {
+                $this->approveOrder($payment->order);
+            }
+        });
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Payment $payment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Payment  $payment
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Payment $payment)
-    {
-        //
+        return 'Prilov!';
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rule;
 
-class CategoryController extends Controller
+class CategoryController extends AdminController
 {
     protected $modelClass = Category::class;
     public static $allowedWhereLike = ['slug'];

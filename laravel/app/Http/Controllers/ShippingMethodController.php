@@ -6,7 +6,7 @@ use App\ShippingMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class ShippingMethodController extends Controller
+class ShippingMethodController extends AdminController
 {
     protected $modelClass = ShippingMethod::class;
     public static $allowedWhereLike = ['slug'];

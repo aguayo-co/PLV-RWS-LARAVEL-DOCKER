@@ -36,7 +36,7 @@ class ProductController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('role:seller|admin', ['only' => ['store', 'update']]);
+        $this->middleware('role:seller|admin')->only(['store', 'update']);
     }
 
     protected function alterValidateData($data, Model $product = null)

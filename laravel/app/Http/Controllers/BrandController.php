@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Brand;
 use Illuminate\Database\Eloquent\Model;
 
-class BrandController extends Controller
+class BrandController extends AdminController
 {
     protected $modelClass = Brand::class;
     public static $allowedWhereLike = ['slug'];

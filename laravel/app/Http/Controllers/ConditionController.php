@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Condition;
 use Illuminate\Database\Eloquent\Model;
 
-class ConditionController extends Controller
+class ConditionController extends AdminController
 {
     protected $modelClass = Condition::class;
     public static $allowedWhereLike = ['slug'];

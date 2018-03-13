@@ -6,7 +6,7 @@ use App\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 
-class CampaignController extends Controller
+class CampaignController extends AdminController
 {
     protected $modelClass = Campaign::class;
     public static $allowedWhereLike = ['slug'];

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Color;
 use Illuminate\Database\Eloquent\Model;
 
-class ColorController extends Controller
+class ColorController extends AdminController
 {
     protected $modelClass = Color::class;
     public static $allowedWhereLike = ['slug'];

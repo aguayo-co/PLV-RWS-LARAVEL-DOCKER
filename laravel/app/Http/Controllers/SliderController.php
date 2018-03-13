@@ -6,7 +6,7 @@ use App\Slider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class SliderController extends Controller
+class SliderController extends AdminController
 {
     protected $modelClass = Slider::class;
 

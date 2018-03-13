@@ -24,29 +24,39 @@ function create_get_routes($model, $regex, $snakes, $snake)
 
 function create_admin_routes($model, $regex, $snakes, $snake, $plural)
 {
-    Route::group(['middleware' => ['auth:api', 'role:admin']], function () use ($model, $regex, $snakes, $snake, $plural) {
-        Route::post($snakes, $model . 'Controller@store')->name($snake . '.create');
-        Route::patch($snakes . '/{' . $snake . '}', $model . 'Controller@update')
-            ->name($snake . '.update')->where($snake, SLUG_REGEX);
-        Route::delete($snakes . '/{' . $snake . '}', $model . 'Controller@delete')
-            ->name($snake . '.delete')->where($snake, SLUG_REGEX);
-    });
+    Route::post($snakes, $model . 'Controller@store')->name($snake . '.create');
+    Route::patch($snakes . '/{' . $snake . '}', $model . 'Controller@update')
+        ->name($snake . '.update')->where($snake, SLUG_REGEX);
+    Route::delete($snakes . '/{' . $snake . '}', $model . 'Controller@delete')
+        ->name($snake . '.delete')->where($snake, SLUG_REGEX);
 }
 
+/**
+ * Create CRUD routes that have:
+ * - Public GET access.
+ * - Protected POST, PATCH and DELETE access.
+ */
 function create_crud_routes($model, $regex)
 {
     extract(expand_names($model));
 
     create_get_routes($model, $regex, $snakes, $snake);
-    create_admin_routes($model, $regex, $snakes, $snake, $plural);
+    Route::group(['middleware' => ['auth:api']], function () use ($model, $regex, $snakes, $snake, $plural) {
+        create_admin_routes($model, $regex, $snakes, $snake, $plural);
+    });
 }
 
-function create_private_crud_routes($model, $regex)
+/**
+ * Create CRUD routes that have:
+ * - Protected GET.
+ * - Protected POST, PATCH and DELETE access.
+ */
+function create_protected_crud_routes($model, $regex)
 {
     extract(expand_names($model));
 
-    Route::group(['middleware' => ['auth:api', 'owner_or_admin']], function () use ($model, $regex, $snakes, $snake) {
+    Route::group(['middleware' => ['auth:api']], function () use ($model, $regex, $snakes, $snake, $plural) {
         create_get_routes($model, $regex, $snakes, $snake);
+        create_admin_routes($model, $regex, $snakes, $snake, $plural);
     });
-    create_admin_routes($model, $regex, $snakes, $snake, $plural);
 }

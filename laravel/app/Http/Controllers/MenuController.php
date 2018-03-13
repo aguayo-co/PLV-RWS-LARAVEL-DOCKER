@@ -6,7 +6,7 @@ use App\Menu;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class MenuController extends Controller
+class MenuController extends AdminController
 {
     protected $modelClass = Menu::class;
     public static $allowedWhereLike = ['slug'];

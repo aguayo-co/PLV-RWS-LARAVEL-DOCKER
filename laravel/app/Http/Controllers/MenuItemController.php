@@ -7,7 +7,7 @@ use App\MenuItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class MenuItemController extends Controller
+class MenuItemController extends AdminController
 {
     protected $modelClass = MenuItem::class;
 

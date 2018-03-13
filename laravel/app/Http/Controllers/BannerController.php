@@ -6,7 +6,7 @@ use App\Banner;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
-class BannerController extends Controller
+class BannerController extends AdminController
 {
     protected $modelClass = Banner::class;
     public static $allowedWhereLike = ['slug'];

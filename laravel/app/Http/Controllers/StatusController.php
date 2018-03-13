@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Status;
 use Illuminate\Database\Eloquent\Model;
 
-class StatusController extends Controller
+class StatusController extends AdminController
 {
     protected $modelClass = Status::class;
     public static $allowedWhereLike = ['slug'];

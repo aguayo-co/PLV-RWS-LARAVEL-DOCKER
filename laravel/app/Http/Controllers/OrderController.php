@@ -3,17 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Address;
-use Illuminate\Database\Eloquent\Model;
-use App\Gateways\Gateway;
+use App\Http\Traits\CurrentUserOrder;
 use App\Order;
-use App\Payment;
 use App\Product;
 use App\Sale;
-use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 /**
  * This Controller handles actions taken on the Order and
@@ -24,6 +21,8 @@ use Illuminate\Support\Facades\DB;
  */
 class OrderController extends Controller
 {
+    use CurrentUserOrder;
+
     protected $modelClass = Order::class;
 
     /**
@@ -42,37 +41,6 @@ class OrderController extends Controller
             $sale->save();
         }
         return $sale;
-    }
-
-    /**
-     * Get an Order model for the current user.
-     */
-    protected function currentUserOrder()
-    {
-        $user = Auth::user();
-        $order = Order::where(['user_id' => $user->id, 'status' => Order::STATUS_SHOPPING_CART])->first();
-        if (!$order) {
-            $order = new Order();
-            $order->user_id = $user->id;
-            $order->status = Order::STATUS_SHOPPING_CART;
-            $order->save();
-        }
-        return $order;
-    }
-
-    /**
-     * Create a new payment for the given order, with the given gateway.
-     */
-    protected function getPayment(Gateway $gateway, Model $order)
-    {
-
-        $payment = new Payment();
-        $payment->gateway = $gateway->getName();
-        $payment->status = Payment::STATUS_PENDING;
-        $payment->order_id = $order->id;
-        $payment->save();
-
-        return $payment;
     }
 
     /**
@@ -143,24 +111,6 @@ class OrderController extends Controller
         }
         $order->status = Order::STATUS_PAYED;
         $order->save();
-    }
-
-    /**
-     * Validate that an order can be sent to Checkout.
-     */
-    protected function validateOrderCanCheckout($order)
-    {
-        if (!$order->products->where('status', Product::STATUS_AVAILABLE)->count()) {
-            abort(Response::HTTP_FAILED_DEPENDENCY, 'No products in shopping cart.');
-        }
-
-        if ($order->products->where('status', '<>', Product::STATUS_AVAILABLE)->count()) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some products are not available anymore.');
-        }
-
-        if ($order->sales->where('shipping_method_id', null)->count()) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some sales do not have a ShippingMethod.');
-        }
     }
 
     /**
@@ -282,7 +232,7 @@ class OrderController extends Controller
      * @param  array  $data
      * @return array
      */
-    protected function alterValidateData($data, Model $model = null)
+    protected function alterValidateData($data, Model $order = null)
     {
         if ($sales = array_get($data, 'sales')) {
             foreach ($sales as $saleId => $values) {
@@ -292,7 +242,7 @@ class OrderController extends Controller
         return $data;
     }
 
-    protected function alterFillData($data, Model $model = null)
+    protected function alterFillData($data, Model $order = null)
     {
         // Never allow shipping_address to be used or passed.
         array_forget($data, 'shipping_address');
@@ -340,55 +290,5 @@ class OrderController extends Controller
         }
 
         return parent::postUpdate($request, $order);
-    }
-
-    /**
-     * Create a new payment for the current user.
-     */
-    public function createPayment(Request $request)
-    {
-        $order = $this->currentUserOrder();
-
-        $this->validateOrderCanCheckout($order);
-
-        // Get the gateway to use.
-        $gateway = new Gateway($request->gateway);
-        // Create a Payment model with the selected gateway.
-        $payment = $this->getPayment($gateway, $order);
-        // Save the Gateway's request data in the Payment model.
-        $payment->request = $gateway->paymentRequest($payment, $request->all());
-        $payment->save();
-
-        $order->status = Order::STATUS_PAYMENT;
-        DB::transaction(function () use ($order) {
-            $order->save();
-            foreach ($order->sales as $sale) {
-                $sale->status = Sale::STATUS_PAYMENT;
-                $sale->save();
-            }
-            foreach ($order->products as $product) {
-                $product->status = Product::STATUS_UNAVAILABLE;
-                $product->save();
-            }
-        });
-
-        return $payment;
-    }
-
-    /**
-     * Process a callback from the gateway.
-     */
-    public function gatewayCallback(Request $request, $gateway)
-    {
-        DB::transaction(function () use ($request, $gateway) {
-            $gateway = new Gateway($gateway);
-            $payment = $gateway->processCallback($request->all());
-
-            if ($payment->status == Payment::STATUS_SUCCESS) {
-                $this->approveOrder($payment->order);
-            }
-        });
-
-        return 'Prilov!';
     }
 }

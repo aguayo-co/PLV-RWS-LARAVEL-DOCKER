@@ -6,7 +6,7 @@ use App\Group;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 
-class GroupController extends Controller
+class GroupController extends AdminController
 {
     protected $modelClass = Group::class;
     public static $allowedWhereLike = ['slug'];

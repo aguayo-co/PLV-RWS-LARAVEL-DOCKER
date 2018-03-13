@@ -11,6 +11,6 @@ use Illuminate\Http\Request;
 include_once 'helpers.php';
 
 Route::name('callback.')->group(function () {
-    Route::match(['get', 'post'], '/gateway/{gateway}', 'OrderController@gatewayCallback')->name('gateway')
+    Route::match(['get', 'post'], '/gateway/{gateway}', 'PaymentController@gatewayCallback')->name('gateway')
     ->where('gateway', SLUG_REGEX);
 });

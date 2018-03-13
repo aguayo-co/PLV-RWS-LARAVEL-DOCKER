@@ -46,8 +46,8 @@ Route::name('api.')->group(function () {
     create_crud_routes('Slider', SLUG_REGEX);
     create_crud_routes('Status', SLUG_REGEX);
 
-    create_private_crud_routes('Order', ID_REGEX);
-    create_private_crud_routes('Sale', ID_REGEX);
+    create_protected_crud_routes('Order', ID_REGEX);
+    create_protected_crud_routes('Sale', ID_REGEX);
 
     # Public product routes
     Route::get('products', 'ProductController@index')->name('products');
@@ -68,15 +68,12 @@ Route::name('api.')->group(function () {
         Route::post('products', 'ProductController@store')->name('product.create');
         Route::patch('products/{product}/{slug?}', 'ProductController@update')
             ->name('product.update')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
-
-        Route::middleware('role:admin')->group(function () {
-            Route::delete('products/{product}/{slug?}', 'ProductController@delete')
-                ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
-        });
+        Route::delete('products/{product}/{slug?}', 'ProductController@delete')
+            ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
 
         # Routes for shopping cart and payments.
         Route::get('/shopping_cart', 'OrderController@getShoppingCart')->name('shopping_cart');
         Route::patch('/shopping_cart', 'OrderController@updateShoppingCart')->name('shopping_cart.update');
-        Route::get('/shopping_cart/payment', 'OrderController@createPayment')->name('shopping_cart.payment');
+        Route::get('/shopping_cart/payment', 'PaymentController@store')->name('shopping_cart.payment.create');
     });
 });

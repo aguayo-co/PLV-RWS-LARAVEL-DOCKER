@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\CanFilter;
+use App\Http\Traits\CanOrderBy;
+use App\Http\Traits\CanSearch;
 use Exception;
-use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\QueryException;
-use App\Http\Traits\CanOrderBy;
-use App\Http\Traits\CanFilter;
-use App\Http\Traits\CanSearch;
 
 class Controller extends BaseController
 {
@@ -33,12 +33,17 @@ class Controller extends BaseController
         /**
          * Only an admin or the owner can update models.
          */
-        $this->middleware('owner_or_admin', ['only' => ['update', 'delete']]);
+        $this->middleware('owner_or_admin')->only(['update', 'delete']);
 
         /**
-         * The value of user_id mus be the same as the logged user.
+         * Only admin can assign ownership to a different user.
          */
-        $this->middleware('self_or_admin', ['only' => ['update', 'store']]);
+        $this->middleware('self_or_admin')->only(['update', 'store']);
+
+        /**
+         * Only admin can delete a model.
+         */
+        $this->middleware('role:admin')->only('delete');
     }
 
     /**

@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Sale;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 /**
  * This Controller handles actions initiated by the Seller,
