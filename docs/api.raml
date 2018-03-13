@@ -557,6 +557,27 @@ resourceTypes:
     }
     ```
 
+    ##### Productos favoritos
+
+    Los usuarios pueden tener productos marcados como favoritos. Para esto se usan los siguientes campos:
+
+    En las peticiones:
+    ```
+    # Agrega a favoritos los productos 4 y 6.
+    # Elimina de favoritos el producto 1.
+    {
+      "favorites_add": [4, 6],
+      "favorites_remove": [1]
+    }
+    ```
+    ```
+    En las respuestas:
+    # Favoritos actuales:
+    {
+      "favorites_ids": [4, 6]
+    }
+    ```
+
   post:
     is: [ logged, createItemPost ]
   /{user-id}:
