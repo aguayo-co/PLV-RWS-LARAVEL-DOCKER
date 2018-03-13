@@ -15,7 +15,7 @@ $factory->define(App\Product::class, function (Faker $faker) {
         'description' => $faker->paragraph,
         'dimensions' => $faker->sentence,
         'original_price' => $faker->numberBetween(0, 999999),
-        'price' => $faker->numberBetween(0, 999999),
+        'price' => $faker->numberBetween(0, 499999),
         'commission' => $faker->numberBetween(0, 100),
         'user_id' => User::all()->random()->id,
         'brand_id' => Brand::all()->random()->id,

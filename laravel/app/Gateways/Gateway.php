@@ -65,10 +65,13 @@ class Gateway
         $gateway = $this->gateway;
         $gateway->validateCallbackData($data);
         $gateway->setCallback($data);
+
         $payment = $this->getPaymentFromReference($gateway->getReference());
         $payment->status = $gateway->getStatus();
+
         $attempts = $payment->attempts;
         $attempts[] = $gateway->getData();
+
         $payment->attempts = $attempts;
         $payment->save();
 

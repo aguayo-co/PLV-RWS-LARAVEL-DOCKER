@@ -61,6 +61,21 @@ class OrderController extends Controller
     }
 
     /**
+     * Create a new payment for the given order, with the given gateway.
+     */
+    protected function getPayment(Gateway $gateway, Model $order)
+    {
+
+        $payment = new Payment();
+        $payment->gateway = $gateway->getName();
+        $payment->status = Payment::STATUS_PENDING;
+        $payment->order_id = $order->id;
+        $payment->save();
+
+        return $payment;
+    }
+
+    /**
      * Get the products and group them by the user_id..
      */
     protected function getProductsByUser($productIds)
@@ -336,14 +351,11 @@ class OrderController extends Controller
 
         $this->validateOrderCanCheckout($order);
 
+        // Get the gateway to use.
         $gateway = new Gateway($request->gateway);
-
-        $payment = new Payment();
-        $payment->gateway = $gateway->getName();
-        $payment->status = Payment::STATUS_PENDING;
-        $payment->order_id = $order->id;
-        $payment->save();
-
+        // Create a Payment model with the selected gateway.
+        $payment = $this->getPayment($gateway, $order);
+        // Save the Gateway's request data in the Payment model.
         $payment->request = $gateway->paymentRequest($payment, $request->all());
         $payment->save();
 
