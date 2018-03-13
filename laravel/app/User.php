@@ -63,14 +63,16 @@ class User extends Authenticatable
     protected $appends = [
         'cover',
         'picture',
+        'shipping_method_ids',
+        'favorites_ids',
+        'group_ids',
+        # These should be hidden to avoid circular references.
         'following_ids',
         'followers_ids',
         'following_count',
         'followers_count',
-        'shipping_method_ids',
-        'group_ids'
     ];
-    protected $with = ['roles', 'groups', 'shippingMethods'];
+    protected $with = ['roles', 'groups', 'shippingMethods', 'favorites:id'];
 
     public static function boot()
     {
@@ -144,34 +146,9 @@ class User extends Authenticatable
         return $this->belongsToMany('App\ShippingMethod');
     }
 
-    protected function getFollowersCountAttribute()
+    public function favorites()
     {
-        return $this->followers->count();
-    }
-
-    protected function getFollowingCountAttribute()
-    {
-        return $this->following->count();
-    }
-
-    protected function getFollowersIdsAttribute()
-    {
-        return $this->followers->pluck('id')->all();
-    }
-
-    protected function getFollowingIdsAttribute()
-    {
-        return $this->following->pluck('id')->all();
-    }
-
-    public function followers()
-    {
-        return $this->belongsToMany(User::class, 'follower_followee', 'followee_id', 'follower_id');
-    }
-
-    public function following()
-    {
-        return $this->belongsToMany(User::class, 'follower_followee', 'follower_id', 'followee_id');
+        return $this->belongsToMany('App\Product', 'favorites');
     }
 
     protected function setGroupIdsAttribute(array $groupIds)
@@ -202,6 +179,20 @@ class User extends Authenticatable
         return $this->shippingMethods->pluck('id')->all();
     }
 
+    protected function setFavoritesIdsAttribute(array $favoritesIds)
+    {
+        if ($this->saveLater('favorites_ids', $favoritesIds)) {
+            return;
+        }
+        $this->favorites()->sync($favoritesIds);
+        $this->load('favorites');
+    }
+
+    protected function getFavoritesIdsAttribute()
+    {
+        return $this->favorites->pluck('id')->all();
+    }
+
     protected function getCoverAttribute()
     {
         return $this->getFileUrl('cover');
@@ -226,4 +217,40 @@ class User extends Authenticatable
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    #                                   #
+    # Begin Following-Follower methods. #
+    #                                   #
+    protected function getFollowersCountAttribute()
+    {
+        return $this->followers->count();
+    }
+
+    protected function getFollowingCountAttribute()
+    {
+        return $this->following->count();
+    }
+
+    protected function getFollowersIdsAttribute()
+    {
+        return $this->followers->pluck('id')->all();
+    }
+
+    protected function getFollowingIdsAttribute()
+    {
+        return $this->following->pluck('id')->all();
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follower_followee', 'followee_id', 'follower_id');
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follower_followee', 'follower_id', 'followee_id');
+    }
+    #                                 #
+    # End Following-Follower methods. #
+    #                                 #
 }

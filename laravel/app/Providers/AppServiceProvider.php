@@ -36,7 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Validator::replacer('empty_with', 'App\Validators\EmptyWithValidator@replaceEmptyWith');
 
         DB::listen(function ($query) {
-            Log::notice($query->sql);
+            Log::debug($query->sql);
         });
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Gateways;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Response;
 use App\Payment;
 

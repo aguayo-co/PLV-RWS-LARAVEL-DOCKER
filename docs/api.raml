@@ -408,6 +408,8 @@ types:
       following_ids?: integer[]
       following_add?: integer[]
       following_remove?: integer[]
+      favorites_add?: integer[]
+      favorites_remove?: integer[]
   UserExpanded:
     type: [User]
     properties:
@@ -419,6 +421,7 @@ types:
       following_ids?: integer[]
       followers_count?: integer
       following_count?: integer
+      favorites_ids?: integer[]
 
   UserLogged:
     type: UserExpanded
@@ -430,7 +433,7 @@ types:
       title: string
       slug?: string
       images: file[]
-      delete_images?: string[]
+      images_remove?: string[]
       description: string
       dimensions: string
       originalPrice: number
@@ -671,12 +674,12 @@ resourceTypes:
     ##### Agregar imágenes
 
     Las imágenes que se envíen en el campo `images`, serán aregadas al listado de imágenes que ya tenga
-    el producto. Para eliminar imágenes se debe enviar la información en un campo `delete_images`.
+    el producto. Para eliminar imágenes se debe enviar la información en un campo `images_remove`.
 
     ##### Eliminación de imágenes
 
     Para eliminar imágenes de los productos se debe pasar un arreglo con los nombres de las imagenes en le campo
-    **delete_images**. Cada nombre debe inluir la extension, si el archivo tiene una, pero no la ruta al mismo.
+    **images_remove**. Cada nombre debe inluir la extension, si el archivo tiene una, pero no la ruta al mismo.
 
     ###### Ejemplo:
 
@@ -689,7 +692,7 @@ resourceTypes:
 
     ````
     {
-      "delete_images": [
+      "images_remove": [
         "qwe1234567890",
         "asd0987654321.gif"
       ]

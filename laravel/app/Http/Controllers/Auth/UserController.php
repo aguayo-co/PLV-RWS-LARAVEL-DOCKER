@@ -47,6 +47,10 @@ class UserController extends Controller
             'following_add.*' => 'integer|exists:users,id|different:id',
             'following_remove' => 'array',
             'following_remove.*' => 'integer|exists:users,id',
+            'favorites_add' => 'array',
+            'favorites_add.*' => 'integer|exists:products,id',
+            'favorites_remove' => 'array',
+            'favorites_remove.*' => 'integer|exists:products,id',
         ];
     }
 
@@ -54,7 +58,6 @@ class UserController extends Controller
     {
         return [
             'exists.unique' => __('validation.email.exists'),
-            'following_ids.*.different' => __('validation.different.self'),
             'following_add.*.different' => __('validation.different.self'),
         ];
     }
@@ -64,7 +67,6 @@ class UserController extends Controller
      */
     public function postUpdate(Request $request, Model $user)
     {
-        $user = parent::postUpdate($request, $user);
         if ($request->password) {
             Token::destroy($user->tokens->pluck('id')->all());
             $user->api_token = $user->createToken('PrilovChangePassword')->accessToken;
@@ -77,7 +79,14 @@ class UserController extends Controller
             $user->following()->detach($request->following_remove);
         }
 
-        return $this->setVisibility($user);
+        if ($request->favorites_add) {
+            $user->favorites()->syncWithoutDetaching($request->favorites_add);
+        }
+        if ($request->favorites_remove) {
+            $user->favorites()->detach($request->favorites_remove);
+        }
+        $user = $this->setVisibility($user);
+        return parent::postUpdate($request, $user);
     }
 
     public function postStore(Request $request, Model $user)
