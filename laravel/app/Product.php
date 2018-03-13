@@ -63,6 +63,7 @@ class Product extends Model
             return;
         }
         $this->colors()->sync($colorIds);
+        $this->load('colors');
     }
 
     protected function getCampaignIdsAttribute()
@@ -76,6 +77,7 @@ class Product extends Model
             return;
         }
         $this->campaigns()->sync($campaignIds);
+        $this->load('campaigns');
     }
 
     protected function getImagePathAttribute()

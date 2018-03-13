@@ -2,6 +2,7 @@
 
 use Faker\Generator as Faker;
 use Illuminate\Http\UploadedFile;
+use App\ShippingMethod;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,7 @@ $factory->define(App\User::class, function (Faker $faker) {
 
 $factory->state(App\User::class, 'profile', function ($faker) {
     return [
+        'shipping_method_ids' => [ShippingMethod::all()->random()->id],
         'phone' => $faker->phoneNumber,
         'about' => $faker->paragraph,
         'cover' => UploadedFile::fake()->image('cover'),

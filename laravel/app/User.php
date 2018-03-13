@@ -94,6 +94,7 @@ class User extends Authenticatable
 
         switch (false) {
             case $this->about:
+            case $this->shipping_method_ids:
             case $this->cover:
             case $this->phone:
             case $this->picture:
@@ -179,6 +180,7 @@ class User extends Authenticatable
             return;
         }
         $this->groups()->sync($groupIds);
+        $this->load('groups');
     }
 
     protected function getGroupIdsAttribute()
@@ -192,6 +194,7 @@ class User extends Authenticatable
             return;
         }
         $this->shippingMethods()->sync($shippingMethodIds);
+        $this->load('shippingMethods');
     }
 
     protected function getShippingMethodIdsAttribute()

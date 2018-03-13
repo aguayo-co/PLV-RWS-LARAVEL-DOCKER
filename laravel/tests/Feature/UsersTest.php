@@ -7,6 +7,7 @@ use Laravel\Passport\Passport;
 use Tests\TestCase;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Password;
+use App\ShippingMethod;
 
 class UsersTest extends TestCase
 {
@@ -149,6 +150,7 @@ class UsersTest extends TestCase
     public function testSellerRoleIsAdded()
     {
         Role::create(['name' => 'seller']);
+        factory(ShippingMethod::class)->create();
         $user = factory(User::class)->states('profile')->create();
         $this->assertTrue($user->hasRole('seller'));
     }
@@ -156,8 +158,9 @@ class UsersTest extends TestCase
     public function testSellerRoleIsRemoved()
     {
         Role::create(['name' => 'seller']);
+        factory(ShippingMethod::class)->create();
         $user = factory(User::class)->states('profile')->create();
-        $user->cover = null;
+        $user->shipping_method_ids = [];
         $user->save();
         $this->assertFalse($user->hasRole('seller'));
     }
