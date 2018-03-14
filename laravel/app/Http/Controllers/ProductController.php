@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -21,6 +21,7 @@ class ProductController extends Controller
         'size_id',
         'condition_id',
         'status_id',
+        'status',
     ];
     public static $allowedWhereHas = ['color_ids' => 'colors', 'campaign_ids' => 'campaigns'];
     public static $allowedWhereBetween = ['price'];
@@ -37,6 +38,28 @@ class ProductController extends Controller
     {
         parent::__construct();
         $this->middleware('role:seller|admin')->only(['store', 'update']);
+        $this->middleware(self::class . '::validateIsPublished')->only(['show']);
+    }
+
+    /**
+     * Middleware that validates permissions to access unpublished products.
+     */
+    public static function validateIsPublished($request, $next)
+    {
+        $product = $request->product;
+        if ($product->status !== Product::STATUS_UNPUBLISHED) {
+            return $next($request);
+        }
+
+        $user = auth()->user();
+        if ($user && $user->hasRole('admin')) {
+            return $next($request);
+        }
+
+        if ($user && $user->is($product->user)) {
+            return $next($request);
+        }
+        abort(Response::HTTP_FORBIDDEN, 'Product not available for public view.');
     }
 
     protected function alterValidateData($data, Model $product = null)
@@ -103,12 +126,17 @@ class ProductController extends Controller
     }
 
     /**
-     * Only show available products on collections.
+     * Filter unpublished products on collections.
      */
     protected function alterIndexQuery()
     {
+        $user = auth()->user();
+        if ($user && $user->hasRole('admin')) {
+            return;
+        }
+
         return function ($query) {
-            return $query->where('status', Product::STATUS_AVAILABLE);
+            return $query->where('status', '>', Product::STATUS_UNPUBLISHED);
         };
     }
 }

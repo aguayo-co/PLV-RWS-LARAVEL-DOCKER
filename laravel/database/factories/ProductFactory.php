@@ -32,7 +32,9 @@ $factory->define(Product::class, function (Faker $faker) {
         'size_id' => Size::whereNotNull('parent_id')->get()->random()->id,
         'condition_id' => Condition::all()->random()->id,
         'status_id' => Status::all()->random()->id,
-        'status' => Product::STATUS_AVAILABLE,
+        'status' => $faker->randomElement(
+            [Product::STATUS_AVAILABLE, Product::STATUS_UNPUBLISHED, Product::STATUS_UNAVAILABLE]
+        ),
         'images' => [UploadedFile::fake()->image('image'), UploadedFile::fake()->image('image'),],
         'color_ids' => $faker->randomElements($colors, $colors_count),
         'campaign_ids' => $faker->randomElements($campaigns, $campaigns_count),
