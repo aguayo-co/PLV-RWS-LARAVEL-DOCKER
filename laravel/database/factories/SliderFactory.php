@@ -13,6 +13,7 @@ $factory->define(App\Slider::class, function (Faker $faker) {
         'image' => UploadedFile::fake()->image('image'),
         'orientation' => $faker->randomElement(['left', 'right']),
         'font_color' => $faker->randomElement(['white', 'black']),
+        'priority' => $faker->numberBetween(0, 100),
     ];
 });
 

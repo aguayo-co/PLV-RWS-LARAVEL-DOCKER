@@ -1,6 +1,7 @@
 <?php
 
 use Faker\Generator as Faker;
+use App\Group;
 use Illuminate\Http\UploadedFile;
 
 /*
@@ -15,11 +16,15 @@ use Illuminate\Http\UploadedFile;
 */
 
 $factory->define(App\User::class, function (Faker $faker) {
+    $groups = Group::setEagerLoads([])->get(['id'])->pluck('id')->all();
+    $groups_count = $faker->numberBetween(0, count($groups));
+
     return [
         'email' => $faker->unique()->safeEmail,
         'password' => 'secret',
         'first_name' => $faker->firstName,
         'last_name' => $faker->lastName,
+        'group_ids' => $faker->randomElements($groups, $groups_count),
     ];
 });
 
