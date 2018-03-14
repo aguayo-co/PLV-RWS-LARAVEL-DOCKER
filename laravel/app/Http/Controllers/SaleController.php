@@ -78,22 +78,22 @@ class SaleController extends Controller
     protected function validate(array $data, Model $sale = null)
     {
         parent::validate($data, $sale);
-        $status = array_get($data, 'status');
-        if ($status == Sale::STATUS_SHIPPED && $sale->status < Sale::STATUS_PAYED) {
+        $status = (int)array_get($data, 'status');
+        if ($status === Sale::STATUS_SHIPPED && $sale->status < Sale::STATUS_PAYED) {
             abort(
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Can not be set as shipped when Sale not PAYED.'
             );
         }
 
-        if ($status == Sale::STATUS_DELIVERED && $sale->status < Sale::STATUS_PAYED) {
+        if ($status === Sale::STATUS_DELIVERED && $sale->status < Sale::STATUS_PAYED) {
             abort(
                 Response::HTTP_UNPROCESSABLE_ENTITY,
                 'Can not be set as delivered when Sale not PAYED.'
             );
         }
 
-        if ($status == Sale::STATUS_CANCELED && !auth()->user()->hasRole('admin')) {
+        if ($status === Sale::STATUS_CANCELED && !auth()->user()->hasRole('admin')) {
             abort(
                 Response::HTTP_FORBIDDEN,
                 'Only an Admin can cancel a Sale.'

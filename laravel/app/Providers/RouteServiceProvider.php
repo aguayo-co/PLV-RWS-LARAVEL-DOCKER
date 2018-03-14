@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -41,6 +41,22 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('slider', \App\Slider::class);
         Route::model('status', \App\Status::class);
         Route::model('user', \App\User::class);
+
+        // A Rating does not exist on first access.
+        // Create a rating for the given SaleId if one does not exist.
+        Route::bind('rating', function ($saleId) {
+            $rating =  \App\Rating::where('sale_id', $saleId)->first();
+            if ($rating) {
+                return $rating;
+            }
+
+            \App\Sale::where('id', $saleId)->setEagerLoads([])->select('id')->firstOrFail();
+
+            $rating = new \App\Rating();
+            $rating->sale_id = $saleId;
+            $rating->save();
+            return $rating->fresh();
+        });
     }
 
     /**

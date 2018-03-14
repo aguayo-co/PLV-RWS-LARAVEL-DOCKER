@@ -49,10 +49,14 @@ Route::name('api.')->group(function () {
     create_protected_crud_routes('Order', ID_REGEX);
     create_protected_crud_routes('Sale', ID_REGEX);
 
-    # Public product routes
+    # Public Product routes
     Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}/{slug?}', 'ProductController@show')
         ->name('product.get')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
+
+    # Public Sales' rating routes.
+    Route::get('ratings', 'RatingController@index')->name('ratings');
+    Route::get('ratings/{rating}', 'RatingController@show')->name('rating.get')->where('rating', ID_REGEX);
 
     # Auth routes.
     # Only authenticated requests here.
@@ -70,6 +74,10 @@ Route::name('api.')->group(function () {
             ->name('product.update')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
         Route::delete('products/{product}/{slug?}', 'ProductController@delete')
             ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
+
+        # Routes for Sales' rating.
+        Route::patch('ratings/{rating}', 'RatingController@rate')->name('rating.update')->where('rating', ID_REGEX);
+        Route::delete('ratings/{rating}', 'RatingController@delete')->name('rating.delete')->where('rating', ID_REGEX);
 
         # Routes for shopping cart and payments.
         Route::get('/shopping_cart', 'OrderController@getShoppingCart')->name('shopping_cart');

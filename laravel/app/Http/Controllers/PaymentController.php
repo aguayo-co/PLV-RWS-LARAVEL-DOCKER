@@ -103,7 +103,7 @@ class PaymentController extends Controller
             $gateway = new Gateway($gateway);
             $payment = $gateway->processCallback($request->all());
 
-            if ($payment->status == Payment::STATUS_SUCCESS) {
+            if ($payment->status === Payment::STATUS_SUCCESS) {
                 $this->approveOrder($payment->order);
             }
         });

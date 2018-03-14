@@ -49,7 +49,7 @@ class ForgotPasswordController extends Controller
             $request->only('email')
         );
 
-        return $response == Password::RESET_LINK_SENT
+        return $response === Password::RESET_LINK_SENT
                     ? $this->sendResponse($response)
                     : abort(Response::HTTP_NOT_FOUND, __($response));
     }
