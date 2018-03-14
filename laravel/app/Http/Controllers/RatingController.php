@@ -17,6 +17,7 @@ class RatingController extends Controller
     {
         parent::__construct();
         $this->middleware(self::class . '::validateUserCanRate')->only(['rate']);
+        $this->middleware(self::class . '::validateSaleCanBeRated')->only(['rate']);
     }
 
     protected static function boot()
@@ -50,6 +51,20 @@ class RatingController extends Controller
         $buyer = $rating->sale->order->user;
         if ($request->only(['buyer_rating', 'buyer_comment']) && !$user->is($buyer)) {
             abort(Response::HTTP_FORBIDDEN, 'Only buyer or admin can set buyer rating.');
+        }
+
+        return $next($request);
+    }
+
+    /**
+     * Middleware that validates that a Sale can be rated.
+     */
+    public static function validateSaleCanBeRated($request, $next)
+    {
+        $rating = $request->rating;
+
+        if ($rating->sale->status < Sale::STATUS_PAYED) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale not ready to be rated.');
         }
 
         return $next($request);
