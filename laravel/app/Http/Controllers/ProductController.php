@@ -18,6 +18,7 @@ class ProductController extends Controller
         'id',
         'brand_id',
         'category_id',
+        'size_id',
         'condition_id',
         'status_id',
     ];
@@ -65,6 +66,14 @@ class ProductController extends Controller
                     $query->whereNotNull('parent_id');
                 }),
             ],
+            # Sólo permite una talla que tenga padre.
+            'size_id' => [
+                trim($required, '|'),
+                'integer',
+                Rule::exists('sizes', 'id')->where(function ($query) {
+                    $query->whereNotNull('parent_id');
+                }),
+            ],
             'color_ids' => $required . 'array|max:2',
             'color_ids.*' => 'integer|exists:colors,id',
             'campaign_ids' => 'array',
@@ -81,6 +90,7 @@ class ProductController extends Controller
     protected function validationMessages()
     {
         return ['category_id.exists' => __('validation.not_in')];
+        return ['size_id.exists' => __('validation.not_in')];
     }
 
     protected function alterFillData($data, Model $product = null)

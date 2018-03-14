@@ -44,6 +44,7 @@ Route::name('api.')->group(function () {
     create_crud_routes('Condition', SLUG_REGEX);
     create_crud_routes('Group', SLUG_REGEX);
     create_crud_routes('Slider', SLUG_REGEX);
+    create_crud_routes('Size', ID_REGEX);
     create_crud_routes('Status', SLUG_REGEX);
 
     create_protected_crud_routes('Order', ID_REGEX);

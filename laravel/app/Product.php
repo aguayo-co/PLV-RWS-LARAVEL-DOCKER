@@ -34,6 +34,7 @@ class Product extends Model
         'commission',
         'brand_id',
         'category_id',
+        'size_id',
         'condition_id',
         'status_id',
         'images',
@@ -41,7 +42,7 @@ class Product extends Model
         'color_ids',
         'campaign_ids',
     ];
-    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'condition', 'status', 'user'];
+    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'size.parent', 'condition', 'status', 'user'];
     protected $appends = ['images', 'color_ids', 'campaign_ids'];
 
     /**
@@ -137,6 +138,11 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo('App\Category');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo('App\Size');
     }
 
     public function colors()

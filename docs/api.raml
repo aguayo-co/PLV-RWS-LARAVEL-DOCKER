@@ -355,6 +355,20 @@ types:
         type: PaginatedResponse
         properties:
           data: ProductExpanded[]
+  Size:
+    type: BaseProperty
+    properties:
+      name: string
+      parent_id: number
+  SizeExpanded:
+    type: Size
+    properties:
+      parent?: Size
+      children?: Size[]
+      products:
+        type: PaginatedResponse
+        properties:
+          data: ProductExpanded[]
   Group:
     type: Property
   GroupExpanded:
@@ -444,6 +458,7 @@ types:
       user_id: integer
       brand_id: integer
       category_id: integer
+      size_id: integer
       color_ids: integer[]
       campaign_ids: integer[]
       condition_id: integer
@@ -454,6 +469,7 @@ types:
       user?: User
       brand?: Brand
       category?: Category
+      size?: Size
       colors?: Property[]
       campaign?: Property[]
       condition?: Property
@@ -768,6 +784,12 @@ resourceTypes:
   type: collection
   /{condition-slug}:
     type: singleItem
+/sizes:
+  type: collection
+  /{size-id}:
+    type: singleItem
+    get:
+      is: [ expanded, sortable, filterable, searchable ]
 /groups:
   type: collection
   /{group-slug}:

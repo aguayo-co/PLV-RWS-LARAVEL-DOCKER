@@ -35,8 +35,10 @@ class DatabaseSeeder extends Seeder
 
         factory(App\Brand::class, 5)->create();
         factory(App\Campaign::class, 5)->create();
-        factory(App\Category::class, 5)->create();
+        factory(App\Category::class, 3)->create();
         factory(App\Category::class, 5)->states(['subcategory'])->create();
+        factory(App\Size::class, 3)->create();
+        factory(App\Size::class, 5)->states(['child'])->create();
         factory(App\Color::class, 5)->create();
         factory(App\Condition::class, 3)->create();
         factory(App\Status::class, 2)->create();

@@ -6,6 +6,7 @@ use App\Category;
 use App\Color;
 use App\Condition;
 use App\Product;
+use App\Size;
 use App\Status;
 use App\User;
 use Faker\Generator as Faker;
@@ -28,6 +29,7 @@ $factory->define(Product::class, function (Faker $faker) {
         'user_id' => User::all()->random()->id,
         'brand_id' => Brand::all()->random()->id,
         'category_id' => Category::whereNotNull('parent_id')->get()->random()->id,
+        'size_id' => Size::whereNotNull('parent_id')->get()->random()->id,
         'condition_id' => Condition::all()->random()->id,
         'status_id' => Status::all()->random()->id,
         'status' => Product::STATUS_AVAILABLE,
