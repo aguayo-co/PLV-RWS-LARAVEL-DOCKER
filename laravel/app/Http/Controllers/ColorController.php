@@ -23,6 +23,7 @@ class ColorController extends AdminController
         return [
             'name' => $required . 'string|unique:colors,name' . $ignore,
             'slug' => 'string|unique:colors,slug' . $ignore,
+            'hex_code' => $required . 'string|regex:"^#(?:[0-9a-fA-F]{3}){1,2}$"|unique:colors,hex_code' . $ignore,
         ];
     }
 }

@@ -1,15 +1,22 @@
 <?php
 
-use Faker\Generator as Faker;
-use Illuminate\Http\UploadedFile;
-use App\User;
 use App\Brand;
+use App\Campaign;
 use App\Category;
 use App\Color;
 use App\Condition;
 use App\Status;
+use App\User;
+use Faker\Generator as Faker;
+use Illuminate\Http\UploadedFile;
 
 $factory->define(App\Product::class, function (Faker $faker) {
+    $colors = Color::setEagerLoads([])->get(['id'])->pluck('id')->all();
+    $colors_count = $faker->numberBetween(1, 2);
+
+    $campaigns = Campaign::setEagerLoads([])->get(['id'])->pluck('id')->all();
+    $campaigns_count = $faker->numberBetween(0, count($campaigns));
+
     return [
         'title' => $faker->sentence,
         'description' => $faker->paragraph,
@@ -24,6 +31,8 @@ $factory->define(App\Product::class, function (Faker $faker) {
         'status_id' => Status::all()->random()->id,
         'status' => Product::STATUS_AVAILABLE,
         'images' => [UploadedFile::fake()->image('image'), UploadedFile::fake()->image('image'),],
+        'color_ids' => $faker->randomElements($colors, $colors_count),
+        'campaign_ids' => $faker->randomElements($campaigns, $campaigns_count),
     ];
 });
 
