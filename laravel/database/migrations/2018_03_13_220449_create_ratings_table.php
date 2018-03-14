@@ -20,6 +20,7 @@ class CreateRatingsTable extends Migration
             $table->text('seller_comment')->nullable();
             $table->tinyInteger('buyer_rating')->nullable();
             $table->text('buyer_comment')->nullable();
+            $table->boolean('status');
             $table->timestamps();
             $table->primary('sale_id');
         });

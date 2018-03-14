@@ -3,9 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasStatuses;
 
 class Rating extends Model
 {
+    use HasStatuses;
+
+    const STATUS_UNPUBLISHED = 0;
+    const STATUS_PUBLISHED = 10;
+
     protected $primaryKey = 'sale_id';
     public $incrementing = false;
 

@@ -54,6 +54,7 @@ class RouteServiceProvider extends ServiceProvider
 
             $rating = new \App\Rating();
             $rating->sale_id = $saleId;
+            $rating->status = \App\Rating::STATUS_UNPUBLISHED;
             $rating->save();
             return $rating->fresh();
         });

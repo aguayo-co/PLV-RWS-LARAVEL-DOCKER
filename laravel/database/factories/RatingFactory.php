@@ -13,5 +13,6 @@ $factory->define(App\Rating::class, function (Faker $faker) {
         'seller_comment' => !is_null($seller_rating) ? $faker->sentence($faker->numberBetween(1, 25)) : null,
         'buyer_rating' => $buyer_rating,
         'buyer_comment' => !is_null($buyer_rating) ? $faker->sentence($faker->numberBetween(1, 25)) : null,
+        'status' => $faker->boolean(),
     ];
 });
