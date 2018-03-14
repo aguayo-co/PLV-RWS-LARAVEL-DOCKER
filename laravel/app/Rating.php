@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasStatuses;
+use Illuminate\Database\Eloquent\Model;
 
 class Rating extends Model
 {

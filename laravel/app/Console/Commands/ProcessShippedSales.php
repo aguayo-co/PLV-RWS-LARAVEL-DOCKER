@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Sale;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class ProcessShippedSales extends Command
 {
@@ -39,11 +40,16 @@ class ProcessShippedSales extends Command
     public function handle()
     {
         $shippedBefore = now()->subDays(config('prilov.sales.days_shipping_to_delivered'));
+
+        $status = Sale::STATUS_SHIPPED;
+        $ShippedJsonPath = "`status_history`->'$.\"{$status}\".\"date\".\"date\"'";
+        $shippedDate = DB::raw("CAST(JSON_UNQUOTE({$ShippedJsonPath}) as DATETIME)");
+
+        $sales = Sale::where('status', Sale::STATUS_SHIPPED)->where($shippedDate, '<', $shippedBefore)->get();
+
         // We want to fire events.
-        $sales = Sale::where('shipped', '<', $shippedBefore)->where('status', Sale::STATUS_SHIPPED)->get();
         foreach ($sales as $sale) {
             $sale->status = Sale::STATUS_DELIVERED;
-            $sale->delivered = now();
             $sale->save();
         }
     }
