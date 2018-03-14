@@ -10,7 +10,7 @@ class Rating extends Model
     use HasStatuses;
 
     const STATUS_UNPUBLISHED = 0;
-    const STATUS_PUBLISHED = 10;
+    const STATUS_PUBLISHED = 1;
 
     protected $primaryKey = 'sale_id';
     public $incrementing = false;

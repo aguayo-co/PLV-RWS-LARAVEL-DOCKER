@@ -17,7 +17,7 @@ class RatingController extends Controller
     {
         parent::__construct();
         $this->middleware(self::class . '::validateUserCanRate')->only(['rate']);
-        $this->middleware(self::class . '::validateSaleCanBeRated')->only(['rate']);
+        $this->middleware(self::class . '::validateCanBeRated')->only(['rate']);
     }
 
     protected static function boot()
@@ -44,12 +44,17 @@ class RatingController extends Controller
         }
 
         $seller = $rating->sale->user;
-        if ($request->only(['seller_rating', 'seller_comment']) && !$user->is($seller)) {
+        $buyer = $rating->sale->order->user;
+
+        if ($user->isNot($seller) && $user->isNot($buyer)) {
+            abort(Response::HTTP_FORBIDDEN, 'User not allowed to rate this Sale.');
+        }
+
+        if ($request->only(['seller_rating', 'seller_comment']) && $user->isNot($seller)) {
             abort(Response::HTTP_FORBIDDEN, 'Only seller or admin can set seller rating.');
         }
 
-        $buyer = $rating->sale->order->user;
-        if ($request->only(['buyer_rating', 'buyer_comment']) && !$user->is($buyer)) {
+        if ($request->only(['buyer_rating', 'buyer_comment']) && $user->isNot($buyer)) {
             abort(Response::HTTP_FORBIDDEN, 'Only buyer or admin can set buyer rating.');
         }
 
@@ -59,12 +64,16 @@ class RatingController extends Controller
     /**
      * Middleware that validates that a Sale can be rated.
      */
-    public static function validateSaleCanBeRated($request, $next)
+    public static function validateCanBeRated($request, $next)
     {
         $rating = $request->rating;
 
         if ($rating->sale->status < Sale::STATUS_PAYED) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale not ready to be rated.');
+        }
+
+        if ($rating->status === Rating::STATUS_PUBLISHED && !auth()->user()->hasRole('admin')) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Can not modify a published rating.');
         }
 
         return $next($request);
