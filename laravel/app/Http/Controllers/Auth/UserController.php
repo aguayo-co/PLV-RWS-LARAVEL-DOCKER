@@ -93,6 +93,10 @@ class UserController extends Controller
 
     protected function setVisibility(User $user)
     {
+        $loggedUser = auth()->user();
+        if ($user->is($loggedUser) || ($loggedUser && $loggedUser->hasRole('admin'))) {
+            $user = $user->makeVisible('email');
+        }
         return $user->load(['followers:id', 'following:id'])
             ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
     }
