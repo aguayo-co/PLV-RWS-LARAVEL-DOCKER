@@ -151,6 +151,6 @@ class LoginController extends Controller
     protected function setVisibility(User $user)
     {
         return $user->load(['followers:id', 'following:id'])
-            ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
+            ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count', 'email']);
     }
 }
