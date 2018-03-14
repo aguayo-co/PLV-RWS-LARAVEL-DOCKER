@@ -18,6 +18,11 @@ class DatabaseSeeder extends Seeder
         factory(App\Group::class, 5)->create();
         factory(App\ShippingMethod::class, 2)->create();
 
+        factory(App\User::class)->create(['email' => 'admin@prilov.dev']);
+        factory(App\User::class)->states(['profile'])->create(
+            ['email' => 'seller@prilov.dev', 'shipping_method_ids' => [1]]
+        );
+        factory(App\User::class)->create(['email' => 'normal@prilov.dev']);
         factory(App\User::class, 5)->create();
         factory(App\User::class, 5)->states(['profile'])->create();
 

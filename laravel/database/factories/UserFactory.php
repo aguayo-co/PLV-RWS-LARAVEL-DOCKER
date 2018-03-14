@@ -23,7 +23,6 @@ $factory->state(App\User::class, 'profile', function ($faker) {
     $shippingMethodsCount = $faker->numberBetween(0, count($shippingMethods));
 
     return [
-        'shipping_method_ids' => [ShippingMethod::all()->random()->id],
         'phone' => $faker->phoneNumber,
         'about' => $faker->paragraph,
         'cover' => UploadedFile::fake()->image('cover'),
