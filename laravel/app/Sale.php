@@ -37,6 +37,11 @@ class Sale extends Model
         return $this->belongsTo('App\User');
     }
 
+    public function order()
+    {
+        return $this->belongsTo('App\Order');
+    }
+
     public function products()
     {
         return $this->belongsToMany('App\Product');

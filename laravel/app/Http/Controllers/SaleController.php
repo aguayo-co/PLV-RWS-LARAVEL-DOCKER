@@ -6,7 +6,6 @@ use App\Sale;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 /**
@@ -21,6 +20,40 @@ use Illuminate\Validation\Rule;
 class SaleController extends Controller
 {
     protected $modelClass = Sale::class;
+
+    public static $allowedWhereIn = ['id', 'user_id'];
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('owner_or_admin')->only('show');
+    }
+
+    /**
+     * Return a Closure that modifies the index query.
+     * The closure receives the $query as a parameter.
+     *
+     * When user is not admin, limit to current user sales.
+     *
+     * @return Closure
+     */
+    protected function alterIndexQuery()
+    {
+        $user = auth()->user();
+        if ($user->hasRole('admin')) {
+            return;
+        }
+
+        return function ($query) use ($user) {
+            return $query->where('user_id', $user->id);
+        };
+    }
 
     /**
      * Return an array of validations rules to apply to the request data.
@@ -60,7 +93,7 @@ class SaleController extends Controller
             );
         }
 
-        if ($status == Sale::STATUS_CANCELED && !Auth::user()->hasRole('admin')) {
+        if ($status == Sale::STATUS_CANCELED && !auth()->user()->hasRole('admin')) {
             abort(
                 Response::HTTP_FORBIDDEN,
                 'Only an Admin can cancel a Sale.'

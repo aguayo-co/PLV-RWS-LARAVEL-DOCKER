@@ -99,15 +99,14 @@ class Controller extends BaseController
     /**
      * Return a Closure that modifies the index query.
      * The closure receives the $query as a parameter.
-     * Example:
-     *  return function ($query) {
-     *      return $query->where('column', 'value')->with(['association']);
-     *  };
      *
      * @return Closure
      */
     protected function alterIndexQuery()
     {
+        // return function ($query) {
+        //     return $query->where('column', 'value')->with(['association']);
+        // };
         return;
     }
 

@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 
 class OwnerOrAdmin
 {
@@ -17,7 +16,7 @@ class OwnerOrAdmin
      */
     public function handle($request, Closure $next)
     {
-        $user = Auth::user();
+        $user = auth()->user();
         if (!$user) {
             abort(Response::HTTP_FORBIDDEN, 'Must be someone.');
         }

@@ -25,6 +25,40 @@ class OrderController extends Controller
 
     protected $modelClass = Order::class;
 
+    public static $allowedWhereIn = ['id', 'user_id'];
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->middleware('owner_or_admin')->only('show');
+    }
+
+    /**
+     * Return a Closure that modifies the index query.
+     * The closure receives the $query as a parameter.
+     *
+     * When user is not admin, limit to current user orders.
+     *
+     * @return Closure
+     */
+    protected function alterIndexQuery()
+    {
+        $user = auth()->user();
+        if ($user->hasRole('admin')) {
+            return;
+        }
+
+        return function ($query) use ($user) {
+            return $query->where('user_id', $user->id);
+        };
+    }
+
     /**
      * Get a Sale model for the given seller and order.
      * Create a new one if one does not exist.

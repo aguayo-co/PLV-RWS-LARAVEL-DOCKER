@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Address;
 use App\Http\Middleware\OwnerOrAdmin;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -37,7 +36,7 @@ class OwnerOrAdminTest extends TestCase
 
     public function testAccessDeniedForOtherUser()
     {
-        Auth::setUser($this->users[0]);
+        auth()->setUser($this->users[0]);
 
         $this->route->parameters = [$this->users[1]];
 
@@ -48,7 +47,7 @@ class OwnerOrAdminTest extends TestCase
 
     public function testAccessDeniedForNotOwner()
     {
-        Auth::setUser($this->users[0]);
+        auth()->setUser($this->users[0]);
 
         $address = factory(Address::class)->make(['user_id' => $this->users[1]->id]);
 
@@ -61,7 +60,7 @@ class OwnerOrAdminTest extends TestCase
 
     public function testAccessAllowedForSameUser()
     {
-        Auth::setUser($this->users[0]);
+        auth()->setUser($this->users[0]);
 
         $this->route->parameters = [$this->users[0]];
         $response = $this->middleware->handle($this->request, $this->closure);
@@ -71,7 +70,7 @@ class OwnerOrAdminTest extends TestCase
 
     public function testAccessAllowedForOwner()
     {
-        Auth::setUser($this->users[0]);
+        auth()->setUser($this->users[0]);
 
         $address = factory(Address::class)->make(['user_id' => $this->users[0]->id]);
         $this->route->parameters = [$address];
@@ -82,7 +81,7 @@ class OwnerOrAdminTest extends TestCase
 
     public function testAccessAllowedForAdmin()
     {
-        Auth::setUser($this->users[0]);
+        auth()->setUser($this->users[0]);
         Role::create(['name' => 'admin']);
 
         $this->users[0]->assignRole('admin');

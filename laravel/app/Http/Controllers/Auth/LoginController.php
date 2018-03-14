@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use App\User;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -146,7 +145,7 @@ class LoginController extends Controller
      */
     protected function guard()
     {
-        return Auth::guard('web');
+        return auth()->guard('web');
     }
 
     protected function setVisibility(User $user)

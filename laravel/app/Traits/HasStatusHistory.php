@@ -2,8 +2,6 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Auth;
-
 trait HasStatusHistory
 {
     public function setStatusAttribute($value)
@@ -11,7 +9,7 @@ trait HasStatusHistory
         $this->attributes['status'] = max($this->status, $value);
         $statusHistory = $this->status_history ?: [];
         if (!array_get($statusHistory, $value)) {
-            $user = Auth::user();
+            $user = auth()->user();
             $statusHistory[$value] = [
                 'date' => now(),
                 'user_id' => $user ? $user->id : null,

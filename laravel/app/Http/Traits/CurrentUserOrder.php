@@ -3,7 +3,6 @@
 namespace App\Http\Traits;
 
 use App\Order;
-use Illuminate\Support\Facades\Auth;
 
 trait CurrentUserOrder
 {
@@ -12,7 +11,7 @@ trait CurrentUserOrder
      */
     protected function currentUserOrder()
     {
-        $user = Auth::user();
+        $user = auth()->user();
         $order = Order::where(['user_id' => $user->id, 'status' => Order::STATUS_SHOPPING_CART])->first();
         if (!$order) {
             $order = new Order();

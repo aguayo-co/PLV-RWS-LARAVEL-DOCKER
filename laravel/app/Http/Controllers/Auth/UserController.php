@@ -67,9 +67,10 @@ class UserController extends Controller
      */
     public function postUpdate(Request $request, Model $user)
     {
+        $apiToken = null;
         if ($request->password) {
             Token::destroy($user->tokens->pluck('id')->all());
-            $user->api_token = $user->createToken('PrilovChangePassword')->accessToken;
+            $apiToken = $user->createToken('PrilovChangePassword')->accessToken;
         }
 
         if ($request->following_add) {
@@ -85,8 +86,16 @@ class UserController extends Controller
         if ($request->favorites_remove) {
             $user->favorites()->detach($request->favorites_remove);
         }
-        $user = $this->setVisibility($user);
-        return parent::postUpdate($request, $user);
+        $user = parent::postUpdate($request, $this->setVisibility($user));
+
+        // Last, set api_token so it gets sent with the response.
+        // DO NOT do this before parent call, as it refreshes the model
+        // and it gets lost.
+        if ($apiToken) {
+            $user->api_token = $apiToken;
+        }
+
+        return $user;
     }
 
     public function postStore(Request $request, Model $user)

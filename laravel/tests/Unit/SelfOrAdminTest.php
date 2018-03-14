@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Address;
 use App\Http\Middleware\SelfOrAdmin;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Mockery;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -49,7 +48,7 @@ class SelfOrAdminTest extends TestCase
 
     public function testAccessDeniedForOtherUser()
     {
-        Auth::setUser($this->user);
+        auth()->setUser($this->user);
         $this->request->user_id = $this->user->id + 1;
 
         $this->expectException(HttpException::class);
@@ -59,7 +58,7 @@ class SelfOrAdminTest extends TestCase
 
     public function testAccessDeniedForUserChange()
     {
-        Auth::setUser($this->user);
+        auth()->setUser($this->user);
         $this->request->user_id = $this->user->id;
 
         $addressUser = factory(User::class)->create();
@@ -73,7 +72,7 @@ class SelfOrAdminTest extends TestCase
 
     public function testAccessAllowedForSameUser()
     {
-        Auth::setUser($this->user);
+        auth()->setUser($this->user);
         $this->request->user_id = $this->user->id;
 
         $this->route->parameters = [];
@@ -84,7 +83,7 @@ class SelfOrAdminTest extends TestCase
 
     public function testAccessAllowedForAdmin()
     {
-        Auth::setUser($this->user);
+        auth()->setUser($this->user);
         Role::create(['name' => 'admin']);
 
         $this->user->assignRole('admin');

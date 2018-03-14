@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Product;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -87,7 +86,7 @@ class ProductController extends Controller
     protected function alterFillData($data, Model $product = null)
     {
         if (!$product && !array_get($data, 'user_id')) {
-            $user = Auth::user();
+            $user = auth()->user();
             $data['user_id'] = $user->id;
         }
         return $data;
