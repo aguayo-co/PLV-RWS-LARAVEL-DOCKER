@@ -158,6 +158,7 @@ class User extends Authenticatable
         }
         $this->groups()->sync($groupIds);
         $this->load('groups');
+        $this->touch();
     }
 
     protected function getGroupIdsAttribute()
@@ -172,6 +173,7 @@ class User extends Authenticatable
         }
         $this->shippingMethods()->sync($shippingMethodIds);
         $this->load('shippingMethods');
+        $this->touch();
     }
 
     protected function getShippingMethodIdsAttribute()
@@ -186,6 +188,7 @@ class User extends Authenticatable
         }
         $this->favorites()->sync($favoritesIds);
         $this->load('favorites');
+        $this->touch();
     }
 
     protected function getFavoritesIdsAttribute()
