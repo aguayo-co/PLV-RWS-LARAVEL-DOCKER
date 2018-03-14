@@ -5,12 +5,13 @@ use App\Campaign;
 use App\Category;
 use App\Color;
 use App\Condition;
+use App\Product;
 use App\Status;
 use App\User;
 use Faker\Generator as Faker;
 use Illuminate\Http\UploadedFile;
 
-$factory->define(App\Product::class, function (Faker $faker) {
+$factory->define(Product::class, function (Faker $faker) {
     $colors = Color::setEagerLoads([])->get(['id'])->pluck('id')->all();
     $colors_count = $faker->numberBetween(1, 2);
 

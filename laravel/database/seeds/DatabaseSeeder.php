@@ -40,5 +40,7 @@ class DatabaseSeeder extends Seeder
         factory(App\Menu::class, 3)->create();
         factory(App\MenuItem::class, 3)->create();
         factory(App\MenuItem::class, 10)->states(['children'])->create();
+
+        Artisan::call('passport:client', ['--personal' => true, '-n' => true]);
     }
 }
