@@ -130,6 +130,11 @@ trait CanFilter
         $allowedWhereLike = $controllerClass::$allowedWhereLike;
 
         $filters = $request->query('filter') ?: [];
+
+        if (!is_array($filters)) {
+            return $query;
+        }
+
         foreach ($this->getWhereIn($filters, $allowedWhereIn) as $column => $in) {
             $query = $query->wherein($column, $in);
         }

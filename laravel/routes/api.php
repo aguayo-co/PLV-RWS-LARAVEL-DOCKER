@@ -27,24 +27,22 @@ Route::name('api.')->group(function () {
     });
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
-    Route::get('users/group/{group}', 'GroupController@show')->name('users.group.get')->where('group', SLUG_REGEX);
-
-
-    # Standard CRUD routes for admin managed elements.
-    create_crud_routes('Menu', SLUG_REGEX);
-    create_crud_routes('MenuItem', ID_REGEX);
-
-    create_crud_routes('ShippingMethod', SLUG_REGEX);
 
     create_crud_routes('Banner', SLUG_REGEX);
     create_crud_routes('Brand', SLUG_REGEX);
     create_crud_routes('Campaign', SLUG_REGEX);
     create_crud_routes('Category', SLUG_REGEX);
+    // An extra route for subcategories.
+    Route::get('categories/{category}/{subcategory}', 'CategoryController@showSubcategory')
+        ->name('subcategory.get')->where(['category' => SLUG_REGEX, 'subcategory' => SLUG_REGEX]);
     create_crud_routes('Color', SLUG_REGEX);
     create_crud_routes('Condition', SLUG_REGEX);
     create_crud_routes('Group', SLUG_REGEX);
-    create_crud_routes('Slider', SLUG_REGEX);
+    create_crud_routes('Menu', SLUG_REGEX);
+    create_crud_routes('MenuItem', ID_REGEX);
+    create_crud_routes('ShippingMethod', SLUG_REGEX);
     create_crud_routes('Size', ID_REGEX);
+    create_crud_routes('Slider', SLUG_REGEX);
     create_crud_routes('Status', SLUG_REGEX);
 
     create_protected_crud_routes('Order', ID_REGEX);
@@ -52,8 +50,7 @@ Route::name('api.')->group(function () {
 
     # Public Product routes
     Route::get('products', 'ProductController@index')->name('products');
-    Route::get('products/{product}/{slug?}', 'ProductController@show')
-        ->name('product.get')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
+    Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);
 
     # Public Sales' rating routes.
     Route::get('ratings', 'RatingController@index')->name('ratings');
@@ -71,10 +68,10 @@ Route::name('api.')->group(function () {
 
         # Routes for Product administration.
         Route::post('products', 'ProductController@store')->name('product.create');
-        Route::patch('products/{product}/{slug?}', 'ProductController@update')
-            ->name('product.update')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
-        Route::delete('products/{product}/{slug?}', 'ProductController@delete')
-            ->name('product.delete')->where(['product' => ID_REGEX, 'slug' => SLUG_REGEX]);
+        Route::patch('products/{product}', 'ProductController@update')
+            ->name('product.update')->where('product', ID_REGEX);
+        Route::delete('products/{product}', 'ProductController@delete')
+            ->name('product.delete')->where('product', ID_REGEX);
 
         # Routes for Sales' rating.
         Route::patch('ratings/{rating}', 'RatingController@rate')->name('rating.update')->where('rating', ID_REGEX);

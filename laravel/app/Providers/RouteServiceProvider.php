@@ -29,6 +29,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('brand', \App\Brand::class);
         Route::model('campaign', \App\Campaign::class);
         Route::model('category', \App\Category::class);
+        Route::model('subcategory', \App\Category::class);
         Route::model('color', \App\Color::class);
         Route::model('condition', \App\Condition::class);
         Route::model('group', \App\Group::class);

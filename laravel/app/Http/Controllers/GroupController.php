@@ -26,20 +26,4 @@ class GroupController extends AdminController
             'slug' => 'string|unique:groups,slug' . $ignore,
         ];
     }
-
-    public function show(Request $request, Model $group)
-    {
-        $group = parent::show($request, $group);
-
-        $users = $this->applyOrderBy(
-            $request,
-            $group->users(),
-            UserController::$allowedOrderBy,
-            UserController::$defaultOrderBy,
-            UserController::$orderByAliases
-        );
-        $group->users = $users->simplePaginate($request->items);
-
-        return $group;
-    }
 }

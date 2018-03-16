@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 class CategoryController extends AdminController
 {
     protected $modelClass = Category::class;
+    public static $allowedWhereIn = ['id', 'parent_id'];
     public static $allowedWhereLike = ['slug'];
 
     protected function alterValidateData($data, Model $category = null)
@@ -26,8 +27,17 @@ class CategoryController extends AdminController
         $required = !$category ? 'required|' : '';
         $ignore = $category ? ',' . $category->id : '';
         $rules = [
-            'name' => $required . 'string|unique:categories,name' . $ignore,
-            'slug' => 'string|unique:categories,slug' . $ignore,
+            'name' => [
+                trim($required, '|'),
+                'string',
+                // We want unique items per category or subcategory.
+                'unique_with:categories,parent_id' . $ignore,
+            ],
+            'slug' => [
+                'string',
+                // We want unique items per category or subcategory.
+                'unique_with:categories,parent_id' . $ignore,
+            ],
             'parent_id' => [
                 'nullable',
                 'integer',
@@ -58,14 +68,25 @@ class CategoryController extends AdminController
 
     protected function alterIndexQuery()
     {
-        return function ($query) {
-            return $query->whereNull('parent_id')->with(['children']);
+        return function ($query) use ($request) {
+            $query = $query->with(['children']);
+            // Unless we have a filter
+            if (!$request->query('filter')) {
+                $query = $query->whereNull('parent_id');
+            }
+            return $query;
         };
     }
 
     public function show(Request $request, Model $category)
     {
-        $category = parent::show($request, $category)->load(['children', 'parent']);
+        $category = parent::show($request, $category)->load(['children']);
         return $category;
+    }
+
+    public function showSubcategory(Request $request, Model $category, Model $subcategory)
+    {
+        $subcategory = parent::show($request, $subcategory)->load(['parent']);
+        return $subcategory;
     }
 }

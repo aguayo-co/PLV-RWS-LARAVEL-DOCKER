@@ -335,13 +335,6 @@ types:
       url: string
   Campaign:
     type: Property
-  CampaignExpanded:
-    type: Campaign
-    properties:
-      products:
-        type: PaginatedResponse
-        properties:
-          data: ProductExpanded[]
   Category:
     type: Property
     properties:
@@ -351,10 +344,6 @@ types:
     properties:
       parent?: Category
       children?: Category[]
-      products:
-        type: PaginatedResponse
-        properties:
-          data: ProductExpanded[]
   Size:
     type: BaseProperty
     properties:
@@ -365,19 +354,8 @@ types:
     properties:
       parent?: Size
       children?: Size[]
-      products:
-        type: PaginatedResponse
-        properties:
-          data: ProductExpanded[]
   Group:
     type: Property
-  GroupExpanded:
-    type: Group
-    properties:
-      users:
-        type: PaginatedResponse
-        properties:
-          data: UserExpanded[]
   Color:
     type: Property
     properties:
@@ -698,7 +676,7 @@ resourceTypes:
 
     ##### Filtrado
 
-    Aparte de los criterios filtrado, los productos se pueden filtrar por los siguientes criterios:
+    Aparte de los criterios de filtrado globales, los productos se pueden filtrar por los siguientes criterios:
 
     |filtro|tipo|
     |------|----|
@@ -743,7 +721,7 @@ resourceTypes:
   post:
     securedBy: [token: { scopes: [ owner ] }]
     is: [ expanded ]
-  /{product-id}/{product-slug}:
+  /{product-id}:
     type: singleItem
     get:
       is: [ expanded ]
@@ -768,14 +746,30 @@ resourceTypes:
   type: collection
   /{campaign-slug}:
     type: singleItem
-    get:
-      is: [ expanded, sortable, filterable, searchable ]
 /categories:
+  description: |
+    Cuando se consulta sin filtros, las categorías se devuelven en arbol. Las categorías padre en primer
+    nivel, con sus subcategrías en la propiedad `children`.
+
+    Cuando se aplican filtros, cualquier categoría que haga parte de los resultados se trae en primer nivel.
+    Si esta categoría tiene subcategorías, estos vendrán anidados en `children`.
+
+    ##### Filtrado
+
+    Aparte de los criterios de filtrado globales, las categorías se pueden filtrar por los siguientes criterios:
+
+    |filtro|tipo|
+    |------|----|
+    |parent_id|ContenidoEn|
   type: collection
   /{category-slug}:
     type: singleItem
     get:
-      is: [ expanded, sortable, filterable, searchable ]
+      is: [ expanded ]
+    /{subcategory-slug}:
+      type: singleItem
+      get:
+        is: [ expanded ]
 /colors:
   type: collection
   /{color-slug}:
@@ -786,16 +780,16 @@ resourceTypes:
     type: singleItem
 /sizes:
   type: collection
+  get:
+    is: [ expanded  ]
   /{size-id}:
     type: singleItem
     get:
-      is: [ expanded, sortable, filterable, searchable ]
+      is: [ expanded  ]
 /groups:
   type: collection
   /{group-slug}:
     type: singleItem
-    get:
-      is: [ expanded ]
 /sliders:
   description: |
     ##### Ordenamiento

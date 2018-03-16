@@ -40,4 +40,19 @@ class Category extends Model
         $this->attributes['name'] = $name;
         $this->attributes['slug'] = str_slug($name);
     }
+
+    /**
+     * Custom binding to load a category or a subcategory.
+     *
+     * Checks the request to determine if a subcategory is being loaded.
+     */
+    public function resolveRouteBinding($value)
+    {
+        $subcategorySlug = request()->subcategory;
+        if ($subcategorySlug === $value) {
+            return $this->where($this->getRouteKeyName(), $value)->
+                where('parent_id', request()->category->id)->first();
+        }
+        return parent::resolveRouteBinding($value);
+    }
 }
