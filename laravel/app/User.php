@@ -222,6 +222,23 @@ class User extends Authenticatable
     }
 
     #                                   #
+    # Begin CreditsTransaction methods. #
+    #                                   #
+    public function creditsTransactions()
+    {
+        return $this->hasMany('App\CreditsTransaction');
+    }
+
+    protected function getCreditsAttribute()
+    {
+        return $this->CreditsTransactions->sum('amount');
+    }
+    #                                 #
+    # End CreditsTransaction methods. #
+    #                                 #
+
+
+    #                                   #
     # Begin Following-Follower methods. #
     #                                   #
     protected function getFollowersCountAttribute()

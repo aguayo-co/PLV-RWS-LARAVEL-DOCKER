@@ -77,8 +77,8 @@ class ProductController extends Controller
             'slug' => 'string',
             'description' => $required . 'string',
             'dimensions' => $required . 'string',
-            'original_price' => $required . 'numeric|between:0,999999999.99',
-            'price' => $required . 'numeric|between:0,999999999.99',
+            'original_price' => $required . 'integer|between:0,9999999',
+            'price' => $required . 'integer|between:0,9999999',
             'commission' => $required . 'numeric|between:0,100',
             'brand_id' => $required . 'integer|exists:brands,id',
             # Sólo permite una categoría que tenga padre.

@@ -48,6 +48,8 @@ class DatabaseSeeder extends Seeder
         factory(App\MenuItem::class, 3)->create();
         factory(App\MenuItem::class, 10)->states(['children'])->create();
 
+        factory(App\CreditsTransaction::class, 30)->create();
+
         Artisan::call('passport:client', ['--personal' => true, '-n' => true]);
     }
 }
