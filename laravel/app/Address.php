@@ -22,4 +22,29 @@ class Address extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+
+    /**
+     * Custom binding to load a address.
+     *
+     * Check the user form the URL is the owner of the address.
+     */
+    public function resolveRouteBinding($value)
+    {
+        $user = request()->user;
+        if (!$user) {
+            return;
+        }
+
+        $address = parent::resolveRouteBinding($value);
+        if (!$address) {
+            return;
+        }
+
+        if ($user->id !== $address->user_id) {
+            return;
+        }
+
+        return $address;
+    }
 }

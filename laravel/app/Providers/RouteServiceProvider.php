@@ -25,6 +25,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         parent::boot();
 
+        Route::model('address', \App\Address::class);
         Route::model('banner', \App\Banner::class);
         Route::model('brand', \App\Brand::class);
         Route::model('campaign', \App\Campaign::class);

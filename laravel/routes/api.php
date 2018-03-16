@@ -61,10 +61,16 @@ Route::name('api.')->group(function () {
     Route::middleware('auth:api')->group(function () {
         # Routes for user account and profile administration.
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
-        Route::get('users/{user}/addresses', 'AddressController@show')
+        Route::get('users/{user}/addresses', 'AddressController@index')
             ->name('user.addresses.get')->where('user', ID_REGEX);
         Route::post('users/{user}/addresses', 'AddressController@store')
             ->name('user.address.create')->where('user', ID_REGEX);
+        Route::get('users/{user}/addresses/{address}', 'AddressController@show')
+            ->name('user.address.get')->where(['user' => ID_REGEX, 'address' => ID_REGEX]);
+        Route::patch('users/{user}/addresses/{address}', 'AddressController@update')
+            ->name('user.address.update')->where(['user' => ID_REGEX, 'address' => ID_REGEX]);
+        Route::delete('users/{user}/addresses/{address}', 'AddressController@ownerDelete')
+            ->name('user.address.delete')->where(['user' => ID_REGEX, 'address' => ID_REGEX]);
 
         # Routes for Product administration.
         Route::post('products', 'ProductController@store')->name('product.create');

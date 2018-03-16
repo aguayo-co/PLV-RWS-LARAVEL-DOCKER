@@ -33,7 +33,7 @@ class Controller extends BaseController
         /**
          * Only an admin or the owner can update models.
          */
-        $this->middleware('owner_or_admin')->only(['update', 'delete']);
+        $this->middleware('owner_or_admin')->only(['update', 'ownerDelete']);
 
         /**
          * Only admin can assign ownership to a different user.
@@ -247,5 +247,17 @@ class Controller extends BaseController
             abort(Response::HTTP_CONFLICT, 'Model has related data associated.');
         }
         return ['message' => 'Object deleted'];
+    }
+
+    /**
+     * Alias for delete method that does not require admin role.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function ownerDelete(Request $request, Model $model)
+    {
+        return $this->delete($request, $model);
     }
 }

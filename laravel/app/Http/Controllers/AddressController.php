@@ -16,12 +16,13 @@ class AddressController extends Controller
         $this->middleware('owner_or_admin');
     }
 
-    protected function validationRules(?Model $model)
+    protected function validationRules(?Model $address)
     {
+        $required = !$address ? 'required|' : '';
         return [
-            'address' => 'required|string',
-            'region' => 'required|string',
-            'zone' => 'required|string',
+            'address' => $required . 'string',
+            'region' => $required . 'string',
+            'zone' => $required . 'string',
         ];
     }
 
@@ -39,14 +40,60 @@ class AddressController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Return a Closure that modifies the index query.
+     * The closure receives the $query as a parameter.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Illuminate\Database\Eloquent\Model $user
-     * @return \Illuminate\Http\JsonResponse
+     * @return Closure
+     */
+    protected function alterIndexQuery()
+    {
+        return function ($query) {
+            $user = request()->user;
+            return $query->where('user_id', $user->id);
+        };
+    }
+
+    /**
+     * This route get two models, $user and $address.
+     * Only $user is passed as a parameter to the parent::ownerDelete,
+     * we need to retrieve the $address from the request and pass it
+     * to the parent.
      */
     public function show(Request $request, Model $user)
     {
-        return $user->addresses()->simplePaginate();
+        return $request->address;
+    }
+
+    /**
+     * This route get two models, $user and $address.
+     * Only $user is passed as a parameter to the parent::ownerDelete,
+     * we need to retrieve the $address from the request and pass it
+     * to the parent.
+     */
+    public function ownerDelete(Request $request, Model $user)
+    {
+        return parent::ownerDelete($request, $request->address);
+    }
+
+    /**
+     * This route get two models, $user and $address.
+     * Only $user is passed as a parameter to the parent::ownerDelete,
+     * we need to retrieve the $address from the request and pass it
+     * to the parent.
+     */
+    public function delete(Request $request, Model $user)
+    {
+        return parent::delete($request, $request->address);
+    }
+
+    /**
+     * This route get two models, $user and $address.
+     * Only $user is passed as a parameter to the parent::ownerDelete,
+     * we need to retrieve the $address from the request and pass it
+     * to the parent.
+     */
+    public function update(Request $request, Model $user)
+    {
+        return parent::update($request, $request->address);
     }
 }

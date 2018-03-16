@@ -574,8 +574,18 @@ resourceTypes:
       is: [ expanded ]
     /addresses:
       type: collection
+      get:
+        securedBy: [token: { scopes: [ owner, admin ] }]
       post:
         securedBy: [token: { scopes: [ owner ] }]
+      /{addresses-id}:
+        type: singleItem
+        get:
+          securedBy: [token: { scopes: [ owner, admin ] }]
+        patch:
+          securedBy: [token: { scopes: [ owner ] }]
+        delete:
+          securedBy: [token: { scopes: [ owner ] }]
 
   /login:
     post:
