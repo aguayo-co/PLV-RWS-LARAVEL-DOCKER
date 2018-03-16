@@ -305,17 +305,6 @@ types:
       id?: datetime
       created_at?: datetime
       updated_at?: datetime
-  PaginatedResponse:
-    type: object
-    properties:
-      current_page: integer
-      first_page_url: string
-      from: integer
-      next_page_url: string
-      path: string
-      per_page: integer
-      prev_page_url: string
-      to: integer
   Property:
     type: BaseObject
     properties:
@@ -491,7 +480,7 @@ types:
 resourceTypes:
   collection:
     get:
-      description: Get all the <<resourcePathName|!pluralize|!uppercamelcase>>
+      description: Get all the <<resourcePathName | !pluralize | !uppercamelcase>>
       is: [ paginated, sortable, filterable ]
     post:
       is: [ createItemPost ]
@@ -503,14 +492,14 @@ resourceTypes:
     patch:
       is: [ singleItemResponse, responseError ]
       securedBy: [token: { scopes: [ admin ] }]
-      description: Update the given <<resourcePathName|!singularize|!uppercamelcase>>
+      description: Update the given <<resourcePathName | !singularize | !uppercamelcase>>
       body:
         application/json:
-          type: <<resourcePathName|!singularize|!uppercamelcase>>
+          type: <<resourcePathName | !singularize | !uppercamelcase>>
     delete:
       is: [ responseError ]
       securedBy: [token: { scopes: [ admin ] }]
-      description: Delete the given <<resourcePathName|!singularize|!uppercamelcase>>
+      description: Delete the given <<resourcePathName | !singularize | !uppercamelcase>>
       responses:
         200:
           body:
@@ -821,7 +810,17 @@ traits:
       200:
         body:
           application/json:
-            type: <<resourcePathName|!singularize|!uppercamelcase>>[]
+            type: object
+            properties:
+              current_page: integer
+              first_page_url: string
+              from: integer
+              next_page_url: string
+              path: string
+              per_page: integer
+              prev_page_url: string
+              to: integer
+              data: <<resourcePathName | !singularize | !uppercamelcase>>[]
 
   sortable:
     queryParameters:
@@ -831,7 +830,10 @@ traits:
   filterable:
     queryParameters:
       filter?:
-        type: string[]
+        type: object
+        properties:
+          //:
+            type: string
         description: "Criteros de filtrado de los resultados."
   searchable:
     queryParameters:
@@ -860,35 +862,35 @@ traits:
               }
 
   singleItemResponse:
-    description: Retrieve the given <<resourcePathName|!singularize|!uppercamelcase>>
+    description: Retrieve the given <<resourcePathName | !singularize | !uppercamelcase>>
     responses:
       200:
         body:
           application/json:
-            type: <<resourcePathName|!singularize|!uppercamelcase>>
+            type: <<resourcePathName | !singularize | !uppercamelcase>>
       404:
-        description: "<<resourcePathName|!singularize|!uppercamelcase>> not found."
+        description: "<<resourcePathName | !singularize | !uppercamelcase>> not found."
 
   createItemPost:
-    description: Create a new <<resourcePathName|!singularize|!uppercamelcase>>
+    description: Create a new <<resourcePathName | !singularize | !uppercamelcase>>
     body:
       multipart/form-data:
-        type: <<resourcePathName|!singularize|!uppercamelcase>>
+        type: <<resourcePathName | !singularize | !uppercamelcase>>
       application/json:
-        type: <<resourcePathName|!singularize|!uppercamelcase>>
+        type: <<resourcePathName | !singularize | !uppercamelcase>>
     is: [ responseError ]
     responses:
       200:
         body:
           application/json:
-            type: <<resourcePathName|!singularize|!uppercamelcase>>
+            type: <<resourcePathName | !singularize | !uppercamelcase>>
 
   expanded:
     responses:
       200:
         body:
           application/json:
-            type: <<resourcePathName|!singularize|!uppercamelcase>>Expanded
+            type: <<resourcePathName | !singularize | !uppercamelcase>>Expanded
   logged:
     responses:
       200:
