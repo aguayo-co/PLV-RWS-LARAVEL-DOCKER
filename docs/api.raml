@@ -192,6 +192,7 @@ resourceTypes:
     type: singleItem
 
 /orders:
+  description: !include orders-description.md
   type: getCollection
   get:
     is: [needOwner, needAdmin]
@@ -201,6 +202,7 @@ resourceTypes:
       is: [needOwner, needAdmin]
 
 /shopping_cart:
+  description: !include shopping-cart-description.md
   get:
     description: Retrieve the current user Order. This is an alias for `GET: /orders/{order-id}`
     is: [ hasType: {type: OrderExpanded}, needOwner ]
@@ -212,6 +214,7 @@ resourceTypes:
         type: OrderRequest
 
 /sales:
+  description: !include sales-description.md
   type: getCollection
   get:
     is: [needOwner, needAdmin]
