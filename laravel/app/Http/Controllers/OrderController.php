@@ -188,10 +188,11 @@ class OrderController extends Controller
             'remove_product_ids.*' => 'integer|exists:products,id',
 
             'sales' => 'array',
-            'sales.*' => 'array',
-            'sales.*.id' => [
-                'integer',
-                Rule::in($order->sales->pluck('id')->all())
+            'sales.*' => [
+                'bail',
+                'array',
+                $this->getIdIsValidRule($order),
+                $this->getSaleIsValidRule($order),
             ],
 
             'sales.*.shipping_method_id' => [
@@ -210,14 +211,54 @@ class OrderController extends Controller
         ];
     }
 
+    protected function getIdFromAttribute($attribute)
+    {
+        $matches = [];
+        $matched = preg_match('/.*?\.([0-9]+)(\..*)?$/', $attribute, $matches);
+        return $matched ? $matches[1] : null;
+    }
+
+    protected function getSaleFromAttribute($attribute, $order)
+    {
+        return $order->sales->firstWhere('id', $this->getIdFromAttribute($attribute));
+    }
+
+    /**
+     * Rule that validates that the given sale is still in a ShoppingCart.
+     */
+    protected function getIdIsValidRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            $saleId = $this->getIdFromAttribute($attribute);
+            if (!$saleId) {
+                return $fail(__('validation.integer'));
+            }
+        };
+    }
+
+    /**
+     * Rule that validates that the given sale is still in a ShoppingCart.
+     */
+    protected function getSaleIsValidRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            $sale = $this->getSaleFromAttribute($attribute, $order);
+            if (!$sale) {
+                $validIds = implode(', ', $order->sales->pluck('id')->all());
+                return $fail(__('validation.in', ['values' => $validIds]));
+            }
+        };
+    }
+
     /**
      * Rule that validates that the given sale is still in a ShoppingCart.
      */
     protected function getSaleInShoppingCartRule($order)
     {
         return function ($attribute, $value, $fail) use ($order) {
-            $saleId = preg_replace('/.*\.([0-9]+)\..*/', '$1', $attribute);
-            $sale = $order->sales->firstWhere('id', $saleId);
+            $sale = $this->getSaleFromAttribute($attribute, $order);
+            // If no Sale found, skip.
+            // Sale validation done on a different Rule.
             if ($sale) {
                 if ($sale->status > Sale::STATUS_SHOPPING_CART) {
                     return $fail(__('No se puede modificar Orden que no está en ShoppingCart.'));
@@ -233,8 +274,9 @@ class OrderController extends Controller
     protected function getShippingMethodRule($order)
     {
         return function ($attribute, $value, $fail) use ($order) {
-            $saleId = preg_replace('/.*\.([0-9]+)\..*/', '$1', $attribute);
-            $sale = $order->sales->firstWhere('id', $saleId);
+            $sale = $this->getSaleFromAttribute($attribute, $order);
+            // If no Sale found, skip.
+            // Sale validation done on a different Rule.
             if ($sale) {
                 $shippingMethodIds = DB::table('shipping_method_user')->where('user_id', $sale->user_id)
                     ->select('shipping_method_id')->pluck('shipping_method_id');
@@ -261,22 +303,6 @@ class OrderController extends Controller
                     break;
             }
         };
-    }
-
-    /**
-     * Alter data to be passed to fill method.
-     *
-     * @param  array  $data
-     * @return array
-     */
-    protected function alterValidateData($data, Model $order = null)
-    {
-        if ($sales = array_get($data, 'sales')) {
-            foreach ($sales as $saleId => $values) {
-                $data['sales'][$saleId] = ['id' => $saleId] + $values;
-            }
-        }
-        return $data;
     }
 
     protected function alterFillData($data, Model $order = null)
