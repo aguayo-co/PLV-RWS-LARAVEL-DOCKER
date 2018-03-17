@@ -81,7 +81,7 @@ class PayU implements PaymentGateway
 
                 'buyerFullName' => $buyer->full_name,
                 'buyerEmail' => $buyer->email,
-                'gateway_url' => $this->getGatewayUrl(),
+                'gatewayUrl' => $this->getGatewayUrl(),
             ]
         ];
     }
