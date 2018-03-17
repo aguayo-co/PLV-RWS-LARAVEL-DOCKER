@@ -200,18 +200,40 @@ resourceTypes:
     type: singleItem
     get:
       is: [needOwner, needAdmin]
+    /payment:
+      get:
+        description: !include payment-description.md
+        is: [ hasType: {type: Payment}, needOwner, needAdmin ]
+        queryParameters:
+          gateway:
+            type: stryng
+            description: "La pasarela de pagos a usar."
 
 /shopping_cart:
   description: !include shopping-cart-description.md
   get:
-    description: Retrieve the current user Order. This is an alias for `GET: /orders/{order-id}`
+    description: |
+      Retrieve the current user Order.
+      This is an alias for `GET: /orders/{order-id}`
     is: [ hasType: {type: OrderExpanded}, needOwner ]
   patch:
     is: [ responseError, hasType: {type: OrderExpanded}, needOwner ]
-    description: Update the current user Order. This is an alias for `PATCH: /orders/{order-id}`
+    description: |
+      Update the current user Order.
+      This is an alias for `PATCH: /orders/{order-id}`
     body:
       application/json:
         type: OrderRequest
+  /payment:
+    get:
+      description: |
+        Retrieve the payment information for the current user Order.
+        This is an alias for `GET: /orders/{order-id}/payment`
+      is: [ hasType: {type: Payment}, needOwner ]
+      queryParameters:
+        gateway:
+          type: stryng
+          description: "La pasarela de pagos a usar."
 
 /sales:
   description: !include sales-description.md
