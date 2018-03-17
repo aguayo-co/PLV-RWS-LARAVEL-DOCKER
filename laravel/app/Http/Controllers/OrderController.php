@@ -117,6 +117,9 @@ class OrderController extends Controller
 
     /**
      * Process data for sales.
+     *
+     * @param  $order \App\Order The order the sales belong to
+     * @param  $sales array Data to be applied to sales, keyed by sale id.
      */
     protected function processSalesData($order, $sales)
     {
@@ -279,6 +282,7 @@ class OrderController extends Controller
     protected function alterFillData($data, Model $order = null)
     {
         // Never allow shipping_address to be used or passed.
+        // Instead calculate from address_id.
         array_forget($data, 'shipping_address');
         if ($addressId = array_get($data, 'address_id')) {
             $data['shipping_address'] = Address::where('id', $addressId)->first();

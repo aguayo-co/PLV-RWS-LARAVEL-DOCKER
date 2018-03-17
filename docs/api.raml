@@ -1,504 +1,33 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.7.6
+version: 0.8.0
 baseUri: https://prilov.aguayo.co/api
-documentation:
-- title: Introducción
-  content: |
-    Esta es una breve introducción sobre los conceptos generales que se trabajan en el api, y algunas
-    convenciones que se manejan en todas las peticiones.
+documentation: !include documentation.raml
 
-- title: Formato de datos
-  content: |
-    Este api trabaja con respuestas JSON. Las descripciones de los objetos tienen todos los campos
-    de los mismos, algunos de los cuales son de sólo lectura, pero no está especificado en cada elemento.
-
-    Los siguientes campos son siempre de sólo lectura:
-    - id
-    - created_at
-    - updated_at
-
-- title: Asociación de datos
-  content: |
-    Cuando un modelo tenga un campo que referencia a otro o a si mismo, este campo tendrá terminación *_id*.
-    En algunos de los casos, las respuestas incluirán un campo adicional expandido, así:
-    ```json
-    {
-      "id": 1,
-      "name": "I have an associated element",
-      "child_id": 2,
-      "child": {
-        "id": 2,
-        "name": "I have a parent."
-      }
-    }
-    ```
-
-    Cuando un modelo tenga un campo que referencia a otros modelos, este campo tendrá terminació *_ids*.
-    En algunos de los casos, las respuestas incluirán un campo adicional expandido, así:
-    ```json
-    {
-      "id": 1,
-      "name": "I have an associated products",
-      "product_ids": [2, 4],
-      "products": [
-        {
-          "id": 2,
-          "name": "I am a product."
-        },
-        {
-          "id": 4,
-          "name": "I also am a product."
-        }
-      ]
-    }
-    ```
-    Los campos múltiples pueden venir paginados, en cuyo caso la expansión tendrá los campos de paginación, y los
-    modelos asociados vendrán dentro de la propiedad `data`, tal cómo una colección paginada.
-
-- title: Peticiones
-  content: |
-    Las peticiones al API deben aceptar respuestas JSON. EN caso de no aceptarlas el API mostrará un error.
-    Para especificar que la petición acepta JSON, se debe enviar el encabezado:
-
-    ```
-    Accept: application/json
-    ```
-
-    #### Peticiones POST y PATCH:
-
-    Cuando la petición quiera modificar información en el servidor, puede enviar la información en formato JSON o
-    en multipart/form-data. Este último es necesairo para el envío de archivos. Esto se especifica con los
-    encabezados correspondientes:
-
-    ```
-    Content-Type: application/json
-    Content-Type: multipart/form-data
-    ```
-
-    En todo caso las respuestas serán JSON.
-    En las descripciones de los métodos no se especifica que acepten `multipart/form-data`, pero en todos en los que
-    se acepta `application/json`, es válido usar cualquierda de los dos.
-
-    ##### Peticiones PATCH:
-
-    Las peticiones PATCH no permiten el envío de datos usando `Content-Type: multipart/form-data`, por
-    lo que se debe enviar una petición POST, con un campo adicional `_method` que le informe al API que es una
-    petición PATCH:
-
-    ```
-    Content-Disposition: form-data; name="_method"
-    PATCH
-    ```
-
-    Si la petición se envía con datos JSON, entonces sí se puede efectuar con método PATCH.
-
-    Las peticiones PATCH sólo actualizan los campos que recibe.
-
-    - Si un campo no es enviado, este no se modifica en la base de datos.
-    - Si un campo va vacío, este se elimina de la base de datos.
-
-- title: Colecciones
-  content: |
-    Las peticiones que traigan colecciones de datos vendrán paginadas y tendrán la siguiente estructura:
-
-    ```json
-    {
-      "current_page": 3,
-      "data": [
-        objeto,
-        objeto,
-        objeto,
-        ...
-        objeto
-      ],
-      "first_page_url": "https://prilov.aguayo.co/api/colors?page=1",
-      "from": 31,
-      "next_page_url": "https://prilov.aguayo.co/api/colors?page=4",
-      "path": "https://prilov.aguayo.co/api/colors",
-      "per_page": 15,
-      "prev_page_url": "https://prilov.aguayo.co/api/colors?page=2",
-      "to": 45
-    }
-    ```
-
-    Estas peticiones reciben dos parámetros por URL que controlan la página y la cantidad de objetos por página:
-
-    - page
-    - items
-
-    Ejemplo:
-
-    ```
-    ?page=5&items25 # Trae la página 5, con 25 elementos en cada página.
-    ```
-
-- title: Ordenamiento
-  content: |
-    Algunas de las peticiones permiten ordenar los resultados por criterios enviados por URL.
-    Cuando una petición es ordenable, se debe pasar un parámetro `orderby` en la url con los valores
-    por los que se quiere ordenar separados por coma. Cuando un valor se quiere ordenar de forma descendente,
-    se debe anteponer el signo `-` al mismo.
-
-    Cualquier petición que sea ordenable tiene los siguientes parámetros disponibles:
-    - updated_at
-    - created_id
-    - id
-
-    Ejemplo:
-    ```
-    ?orderby=id # Ordena por ID de forma ascendente
-    ?orderby=-id # Ordena por ID de forma descendente
-    ?orderby=updated_at,id #Ordena primero por fecha de actualización, y después por ID.
-    ```
-
-    Algunas coleciones tendrán otras opciones de ordenamiento.
-
-- title: Filtrado
-  content: |
-    En general, cualquier petición que sea ordenable, es filtrable.
-    Existen 3 tipos de filtros:
-    - ContenidoEn
-    Este filtro recibe una lista de valores separados por comas, y se devuelven los resultados que tengan
-    cualquiera de estos. Por ejemplo productos que pertenecen a ciertas categorías.
-    - Entre
-    Este filtro recibe dos valores separados por comas y se devuelven los resultados que tengan valores contenidos
-    entre estos dos, incluyendo los dos valores. Por ejemplo productos que están entre dos precios.
-    - Como
-    Este filtro hace búsquedas de un patron de texto en una campo determinado, y devuelve los resultados
-    que contengan dicho patrón. Acepta dos comodines. `%` para múltiples caracteres. `_` para un caracter.
-
-    Los filtros se pasan por parametros de URL como arreglos de la siguiente forma:
-    ```
-    # genérico:
-    ?filter[{{ filtro }}]={{ valore1,valor2 }}
-
-    # resultados entre dos precios, tipo Entre.
-    ?filter[price]=1000,2500
-
-    # resultados con colores, tipo ContenidoEn.
-    ?filter[color_ids]=1,3,5
-
-    # los dos filtros al tiempo:
-    ?filter[color_ids]=1,3,5&filter[price]=1000,2500
-
-    # resultados cuyo slug termine con "magia".
-    # Importante tener en cuenta la codificacion de caracteres para URL.
-    ?filter[slug]=%25magia
-    ```
-
-    Todos las colecciones ordenables tiene por defecto los siguientes elementos filtrables:
-
-    |filtro|tipo|
-    |------|----|
-    |id|ContenidoEn|
-    |updated_at|Entre|
-    |created_at|Entre|
-
-    Las colecciones que tengan campo `slug` aceptan el siguiente filtro:
-
-    |filtro|tipo|
-    |------|----|
-    |slug|Como|
-
-- title: Búsquedas
-  content: |
-    Cuando una colección permita realizar búsquedas de texto, el criterio de búsqueda se debe pasar por URL con el
-    el parámetro `q`
-
-    Ejemplo:
-    ```
-    ?q=pantalon negro
-    ```
-
-    Las búsquedas de texto no son eficientes en MySQL, sobre todo cuando se combina con ordenado o filtrado.
-
-- title: Autenticación
-  content: |
-    Existen 2 tipos de usuarios en el portal:
-
-      - Autenticado
-      - No Autenticado
-
-    Un usuario se considera autenticado cuando envía una petición con un token Bearer como encabezado:
-
-    ```
-    Authorization: Bearer TOKEN
-    ```
-
-    Cada sesión de usuario tendrá un tóken diferente, de esta forma el usuario puede estar
-    autenticado en multiples dispositivos a la vez.
-
-    Cuando un usuario cambia de contraseña, todos los tokens serán invalidados.
-
-    Para obtener el token, se debe hacer una petición a la ruta de logueo con las credenciales de el usuario.
-    Si las credenciales son válidas el token es devuelto cómo parte del cuerpo del usuario validado. Ejemplo:
-
-    ```
-    {
-      "id": 8,
-      "api_token": "..."
-      ...
-    }
-    ```
-
-    Adicionalmente el token es enviado cuando un usuario:
-    - Se registra
-    - Cambia su contraseña
-    - Resetea su contraseña
-
-- title: Errores y validaciones
-  content: |
-    Cuando la petición no es exitosa por que la validación de datos no es correcta, las respuesta incluye
-    información sobre que datos no pasaron la validación, incluyendo cada campo que no fue exitoso. Ejemplo:
-
-    ```
-    {
-      "message": "The given data was invalid.",
-      "errors": {
-        "email": [
-          "El campo email no corresponde con una dirección de e-mail válida."
-        ],
-        "cover": [
-          "El campo cover debe ser una imagen."
-        ]
-      }
-    }
-    ```
-
-    Un caso especial es la validación de correo electrónico, que cuando ya existe uno registrado en el portal
-    el error se envía en el campo "exists".
-
-    ```
-    {
-      "message": "The given data was invalid.",
-      "exists": [
-        "Hay otro usuario registrado con el mismo correo."
-      ]
-    }
-    ```
-
-- title: Permisos y autorizaciones
-  content: |
-    Cada usuario podrá modificar los datos de los modelos de los que sea dueño.
-    Los usuarios pueden tener roles asignados que les permiten efectuar operaciones adicionales en el portal.
-
-    Los dos roles iniciales son:
-
-    - admin: permite crear y modificar cualquier objeto en el portal, y cambiar el dueño de los objetos.
-    - seller: permite crear productos.
-
-securitySchemes:
-  token:
-    type: Pass Through
-    description: "Authentication by header"
-    describedBy:
-      headers:
-        Authorization:
-          description: "Use the Bearer keyword. Example Authorization Bearer [API_key]"
-          type: string
-
-types:
-  BaseObject:
-    type: object
-    properties:
-      id?: datetime
-      created_at?: datetime
-      updated_at?: datetime
-  Property:
-    type: BaseObject
-    properties:
-      name: string
-      slug?: string
-  Banner:
-    type: Property
-    properties:
-      title: string
-      subtitle: string
-      image?: file
-      button_text?: string
-      url: string
-  Brand:
-    type: Property
-    properties:
-      url: string
-  Campaign:
-    type: Property
-  Category:
-    type: Property
-    properties:
-      parent_id: number
-  CategoryExpanded:
-    type: Category
-    properties:
-      parent?: Category
-      children?: Category[]
-  Size:
-    type: BaseProperty
-    properties:
-      name: string
-      parent_id: number
-  SizeExpanded:
-    type: Size
-    properties:
-      parent?: Size
-      children?: Size[]
-  Group:
-    type: Property
-  Color:
-    type: Property
-    properties:
-      hex_code: string
-  Condition:
-    type: Property
-  Status:
-    type: Property
-  Slider:
-    type: Property
-    properties:
-      priority: integer
-      main_text: string
-      small_text?: string
-      button_text?: string
-      orientation: string
-      font_color: string
-      image: file
-      image_mobile: file
-      url: string
-
-  Address:
-    type: BaseObject
-    properties:
-      user_id: integer
-      address: string
-      region: string
-      zone: string
-  User:
-    type: BaseObject
-    properties:
-      email: string
-      first_name: string
-      last_name: string
-      password: string
-      about?: string
-      phone?: string
-      cover?: file
-      picture?: file
-      favorite_address_id?: integer
-      group_ids?: integer[]
-      shipping_method_ids?: integer[]
-      followers_ids?: integer[]
-      following_ids?: integer[]
-      following_add?: integer[]
-      following_remove?: integer[]
-      favorites_add?: integer[]
-      favorites_remove?: integer[]
-  UserExpanded:
-    type: [User]
-    properties:
-      addresses?: Address[]
-      groups?: Group[]
-      shipping_methods?: ShippingMethod[]
-      roles?: string[]
-      followers_ids?: integer[]
-      following_ids?: integer[]
-      followers_count?: integer
-      following_count?: integer
-      favorites_ids?: integer[]
-
-  UserLogged:
-    type: UserExpanded
-    properties:
-      api_token: string
-  Product:
-    type: BaseObject
-    properties:
-      title: string
-      slug?: string
-      images: file[]
-      images_remove?: string[]
-      description: string
-      dimensions: string
-      originalPrice: number
-      price: number
-      commission: number
-      user_id: integer
-      brand_id: integer
-      category_id: integer
-      size_id: integer
-      color_ids: integer[]
-      campaign_ids: integer[]
-      condition_id: integer
-      status_id: integer
-  ProductExpanded:
-    type: Product
-    properties:
-      user?: User
-      brand?: Brand
-      category?: Category
-      size?: Size
-      colors?: Property[]
-      campaign?: Property[]
-      condition?: Property
-      size?: Property
-      status?: Property
-  Auth:
-    type: object
-    properties:
-      email: string
-      password: string
-  ShippingMethod:
-    type: Property
-    properties:
-      descriptionSeller: string
-      descriptionBuyer: string
-  DetailedAnswer:
-    type: object
-    properties:
-      message: string
-      errors?:
-        type: object
-        properties:
-          /^[a-z_]*$/: string[]
-  Menu:
-    type: BaseObject
-    properties:
-      name: string
-  MenuExpanded:
-    type: Menu
-    properties:
-      items?: MenuItem[]
-  MenuItem:
-    type: BaseObject
-    properties:
-      name: string
-      url?: string
-      parent_id?: number
-      menu_id?: number
-      icon?: string
+types: !include types.raml
 
 resourceTypes:
-  collection:
+  getCollection:
     get:
       description: Get all the <<resourcePathName | !pluralize | !uppercamelcase>>
       is: [ paginated, sortable, filterable ]
+
+  collection:
+    is: getCollection
     post:
-      is: [ createItemPost ]
-      securedBy: [token: { scopes: [ admin ] }]
+      is: [ createItemPost, needAdmin ]
 
   singleItem:
     get:
       is: [ singleItemResponse ]
     patch:
-      is: [ singleItemResponse, responseError ]
-      securedBy: [token: { scopes: [ admin ] }]
+      is: [ singleItemResponse, responseError, needAdmin ]
       description: Update the given <<resourcePathName | !singularize | !uppercamelcase>>
       body:
         application/json:
-          type: <<resourcePathName | !singularize | !uppercamelcase>>
+          type: <<resourcePathName | !singularize | !uppercamelcase>>Request
     delete:
-      is: [ responseError ]
-      securedBy: [token: { scopes: [ admin ] }]
+      is: [ responseError, needAdmin ]
       description: Delete the given <<resourcePathName | !singularize | !uppercamelcase>>
       responses:
         200:
@@ -511,85 +40,31 @@ resourceTypes:
                 }
 
 /users:
-  description: |
-    ##### Seguimiento de usuarios
-
-    Los campos `followers*` tienen información sobre los usuarios que siguen al consultado.
-    Los campos `following*` tienen información sobre los usuarios a los que el consultado sigue.
-
-    Sobre un usuario sólo se puede modificar la informción de a cuales usuarios sigue, no se puede
-    modificar información relacionada con quienes siguen a dicho usuario.
-
-    Para seguir usuarios, se debe enviar un arreglo con los ids de los usaurios a seguir en el campo
-    `following_add`. Para dejar de seguir usuarios, se debe enviar un arreglo con los ids de estos en
-    en el campo `following_remove`.
-
-    Ejemplo:
-
-    ```
-    # Seguidores actuales:
-    {
-      "following_ids": [1, 3, 5]
-    }
-    # Datos enviados en la petición:
-    {
-      "following_add": [4, 6],
-      "following_remove": [1]
-    }
-    # Seguidores finales:
-    {
-      "following_ids": [3, 4, 5, 6]
-    }
-    ```
-
-    ##### Productos favoritos
-
-    Los usuarios pueden tener productos marcados como favoritos. Para esto se usan los siguientes campos:
-
-    En las peticiones:
-    ```
-    # Agrega a favoritos los productos 4 y 6.
-    # Elimina de favoritos el producto 1.
-    {
-      "favorites_add": [4, 6],
-      "favorites_remove": [1]
-    }
-    ```
-    ```
-    En las respuestas:
-    # Favoritos actuales:
-    {
-      "favorites_ids": [4, 6]
-    }
-    ```
-
+  description: !include users-description.md
   post:
-    is: [ logged, createItemPost ]
+    is: [ withToken, createItemPost ]
   /{user-id}:
     type: singleItem
-    get:
-      is: [ expanded ]
     patch:
-      securedBy: [token: { scopes: [ owner ] }]
-      is: [ expanded ]
+      is: [ needOwner ]
     /addresses:
       type: collection
       get:
-        securedBy: [token: { scopes: [ owner, admin ] }]
+        is: [ needAdmin ]
       post:
-        securedBy: [token: { scopes: [ owner ] }]
+        is: [ needOwner ]
       /{addresses-id}:
         type: singleItem
         get:
-          securedBy: [token: { scopes: [ owner, admin ] }]
+          is: [ needAdmin, needOwner ]
         patch:
-          securedBy: [token: { scopes: [ owner ] }]
+          is: [ needOwner ]
         delete:
-          securedBy: [token: { scopes: [ owner ] }]
+          is: [ needOwner ]
 
   /login:
     post:
-      is: [ logged, responseError ]
+      is: [ withToken, responseError ]
       description: "Logs in an User"
       body:
         application/json:
@@ -631,9 +106,9 @@ resourceTypes:
       responses:
         200:
           description: "The provided password token is valid"
-  /users/password/reset/{email}:
+  /password/reset/{email}:
     post:
-      is: [ responseError ]
+      is: [ withToken, responseError ]
       description: "Resets the password for the given user."
       body:
         application/json:
@@ -647,86 +122,24 @@ resourceTypes:
 
 /menus:
   type: collection
-  get:
-    is: [ expanded ]
-  post:
-    is: [ expanded ]
   /{menu-slug}:
     type: singleItem
-    get:
-      is: [ expanded ]
-    patch:
-      is: [ expanded ]
 /menu_items:
   type: collection
   /{menu_item-id}:
     type: singleItem
 
 /products:
-  description: |
-    ##### Ordenamiento
-
-    Aparte de los criterios globales, los productos se pueden ordenar por los siguientes criterios:
-
-    |valor|parametro de url|ejemplo|
-    |-----|----------------|-------|
-    |precio|price|`?orderby=-price`|
-    |comisión|prilov|`?orderby=prilov`|
-
-    ##### Filtrado
-
-    Aparte de los criterios de filtrado globales, los productos se pueden filtrar por los siguientes criterios:
-
-    |filtro|tipo|
-    |------|----|
-    |price|Entre|
-    |color_ids|ContenidoEn|
-    |campaign_ids|ContenidoEn|
-    |brand_id|ContenidoEn|
-    |category_id|ContenidoEn|
-    |condition_id|ContenidoEn|
-    |status_id|ContenidoEn|
-
-    ##### Agregar imágenes
-
-    Las imágenes que se envíen en el campo `images`, serán aregadas al listado de imágenes que ya tenga
-    el producto. Para eliminar imágenes se debe enviar la información en un campo `images_remove`.
-
-    ##### Eliminación de imágenes
-
-    Para eliminar imágenes de los productos se debe pasar un arreglo con los nombres de las imagenes en le campo
-    **images_remove**. Cada nombre debe inluir la extension, si el archivo tiene una, pero no la ruta al mismo.
-
-    ###### Ejemplo:
-
-    Para eliminar estas dos imágenes:
-
-    - `https://prilov.aguayo.co/storage/products/images/1/qwe1234567890`
-    - `https://prilov.aguayo.co/storage/products/images/1/asd0987654321.gif`
-
-    Se debe pasar:
-
-    ````
-    {
-      "images_remove": [
-        "qwe1234567890",
-        "asd0987654321.gif"
-      ]
-    }
-    ```
+  description: !include products-description.md
   type: collection
   get:
-    is: [ expanded, searchable ]
+    is: [ searchable ]
   post:
-    securedBy: [token: { scopes: [ owner ] }]
-    is: [ expanded ]
+    is: [ needOwner ]
   /{product-id}:
     type: singleItem
-    get:
-      is: [ expanded ]
     patch:
-      securedBy: [token: { scopes: [ owner ] }]
-      is: [ expanded ]
+      is: [ needOwner ]
 
 /shipping_methods:
   type: collection
@@ -746,29 +159,12 @@ resourceTypes:
   /{campaign-slug}:
     type: singleItem
 /categories:
-  description: |
-    Cuando se consulta sin filtros, las categorías se devuelven en arbol. Las categorías padre en primer
-    nivel, con sus subcategrías en la propiedad `children`.
-
-    Cuando se aplican filtros, cualquier categoría que haga parte de los resultados se trae en primer nivel.
-    Si esta categoría tiene subcategorías, estos vendrán anidados en `children`.
-
-    ##### Filtrado
-
-    Aparte de los criterios de filtrado globales, las categorías se pueden filtrar por los siguientes criterios:
-
-    |filtro|tipo|
-    |------|----|
-    |parent_id|ContenidoEn|
+  description: !include categories-description.md
   type: collection
   /{category-slug}:
     type: singleItem
-    get:
-      is: [ expanded ]
     /{subcategory-slug}:
       type: singleItem
-      get:
-        is: [ expanded ]
 /colors:
   type: collection
   /{color-slug}:
@@ -779,26 +175,14 @@ resourceTypes:
     type: singleItem
 /sizes:
   type: collection
-  get:
-    is: [ expanded  ]
   /{size-id}:
     type: singleItem
-    get:
-      is: [ expanded  ]
 /groups:
   type: collection
   /{group-slug}:
     type: singleItem
 /sliders:
-  description: |
-    ##### Ordenamiento
-
-    Aparte de los criterios globales, los sliders se pueden ordenar por los siguientes criterios:
-
-    |valor|parametro de url|ejemplo|
-    |-----|----------------|-------|
-    |prioridad|priority|`?orderby=-priority`|
-
+  description: !include sliders-description.md
   type: collection
   /{sliders-slug}:
     type: singleItem
@@ -807,7 +191,46 @@ resourceTypes:
   /{status-slug}:
     type: singleItem
 
+/orders:
+  type: getCollection
+  get:
+    is: [needOwner, needAdmin]
+  /{order-id}:
+    type: singleItem
+    get:
+      is: [needOwner, needAdmin]
+
+/shopping_cart:
+  get:
+    description: Retrieve the current user Order. This is an alias for `GET: /orders/{order-id}`
+    is: [ hasType: {type: OrderExpanded}, needOwner ]
+  patch:
+    is: [ responseError, hasType: {type: OrderExpanded}, needOwner ]
+    description: Update the current user Order. This is an alias for `PATCH: /orders/{order-id}`
+    body:
+      application/json:
+        type: OrderRequest
+
+/sales:
+  type: getCollection
+  get:
+    is: [needOwner, needAdmin]
+  /{sale-id}:
+    type: singleItem
+    get:
+      is: [needOwner, needAdmin]
+
+
+##############################################
+##  Trait definitions                       ##
+##############################################
+
 traits:
+  needOwner:
+    securedBy: [token: { scopes: [ owner ] }]
+  needAdmin:
+    securedBy: [token: { scopes: [ admin ] }]
+
   paginated:
     queryParameters:
       items?:
@@ -830,7 +253,7 @@ traits:
               per_page: integer
               prev_page_url: string
               to: integer
-              data: <<resourcePathName | !singularize | !uppercamelcase>>[]
+              data: <<resourcePathName | !singularize | !uppercamelcase>>Expanded[]
 
   sortable:
     queryParameters:
@@ -873,11 +296,7 @@ traits:
 
   singleItemResponse:
     description: Retrieve the given <<resourcePathName | !singularize | !uppercamelcase>>
-    responses:
-      200:
-        body:
-          application/json:
-            type: <<resourcePathName | !singularize | !uppercamelcase>>
+    is: [ hasType: {type: <<resourcePathName | !singularize | !uppercamelcase>>Expanded} ]
       404:
         description: "<<resourcePathName | !singularize | !uppercamelcase>> not found."
 
@@ -885,25 +304,32 @@ traits:
     description: Create a new <<resourcePathName | !singularize | !uppercamelcase>>
     body:
       multipart/form-data:
-        type: <<resourcePathName | !singularize | !uppercamelcase>>
+        type: <<resourcePathName | !singularize | !uppercamelcase>>Request
       application/json:
-        type: <<resourcePathName | !singularize | !uppercamelcase>>
-    is: [ responseError ]
-    responses:
-      200:
-        body:
-          application/json:
-            type: <<resourcePathName | !singularize | !uppercamelcase>>
+        type: <<resourcePathName | !singularize | !uppercamelcase>>Request
+    is: [ responseError, hasType: {type: <<resourcePathName | !singularize | !uppercamelcase>>Expanded} ]
 
-  expanded:
+  withToken:
+    is: [hasType: {type: UserWithToken}]
+
+  hasType:
     responses:
       200:
         body:
           application/json:
-            type: <<resourcePathName | !singularize | !uppercamelcase>>Expanded
-  logged:
-    responses:
-      200:
-        body:
-          application/json:
-            type: UserLogged
+            type: <<type>>
+
+
+##############################################
+##  Security Schemes definitions            ##
+##############################################
+
+securitySchemes:
+  token:
+    type: Pass Through
+    description: "Authentication by header"
+    describedBy:
+      headers:
+        Authorization:
+          description: "Use the Bearer keyword. Example Authorization Bearer [API_key]"
+          type: string

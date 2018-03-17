@@ -23,22 +23,13 @@ class SaleController extends Controller
 
     public static $allowedWhereIn = ['id', 'user_id'];
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
-
         $this->middleware('owner_or_admin')->only('show');
     }
 
     /**
-     * Return a Closure that modifies the index query.
-     * The closure receives the $query as a parameter.
-     *
      * When user is not admin, limit to current user sales.
      *
      * @return Closure
@@ -56,18 +47,16 @@ class SaleController extends Controller
     }
 
     /**
-     * Return an array of validations rules to apply to the request data.
-     *
      * All posible rules for all posible states are set here.
      * These rules validate that the data is correct, not whether it
      * can be used on the current Sale given its status.
-     * That mus be handled elsewhere.
      *
      * @return array
      */
     protected function validationRules(?Model $sale)
     {
         return [
+            'shipment_details' => 'array',
             'status' => [
                 'integer',
                 Rule::in([Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED, Sale::STATUS_CANCELED]),
@@ -75,6 +64,9 @@ class SaleController extends Controller
         ];
     }
 
+    /**
+     * Apart from data validation, validate requested status change.
+     */
     protected function validate(array $data, Model $sale = null)
     {
         parent::validate($data, $sale);

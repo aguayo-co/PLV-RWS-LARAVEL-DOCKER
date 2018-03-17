@@ -6,4 +6,4 @@ RUN npm install -g raml2html nodemon
 
 VOLUME /srv/docs
 
-CMD nodemon -e raml --exec "raml2html -i api.raml -o api.html"
+CMD nodemon -e raml,md --exec "raml2html -i api.raml -o api.html"
