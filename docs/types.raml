@@ -44,7 +44,7 @@ Menu:
 MenuExpanded:
   type: Menu
   properties:
-    items?: MenuItem[]
+    items: MenuItem[]
 
 MenuItemRequest:
   properties:
@@ -88,7 +88,7 @@ SliderExpanded:
 BrandRequest:
   type: Property
   properties:
-    url: string
+    url?: string
 Brand:
   type: [BrandRequest, PropertyBaseObject]
 BrandExpanded:
@@ -104,7 +104,7 @@ CampaignExpanded:
 CategoryRequest:
   type: Property
   properties:
-    parent_id: number
+    parent_id?: number
 Category:
   type: [CategoryRequest, PropertyBaseObject]
 CategoryExpanded:
@@ -132,7 +132,7 @@ ConditionExpanded:
 SizeRequest:
   properties:
     name: string
-    parent_id: number
+    parent_id?: number
 Size:
   type: [SizeRequest, BaseObject]
 SizeExpanded:
@@ -161,7 +161,7 @@ ProductBase:
     category_id: integer
     size_id: integer
     color_ids: integer[]
-    campaign_ids: integer[]
+    campaign_ids?: integer[]
     condition_id: integer
     status: integer
 ProductRequest:
@@ -177,14 +177,14 @@ Product:
 ProductExpanded:
   type: Product
   properties:
-    user?: User
-    brand?: Brand
-    category?: Category
-    size?: Size
-    colors?: Color[]
-    campaign?: Campaign[]
-    condition?: Condition
-    size?: Size
+    user: User
+    brand: Brand
+    category: Category
+    size: Size
+    colors: Color[]
+    campaign: Campaign[]
+    condition: Condition
+    size: Size
 
 ##############################################
 ##  User related                            ##
@@ -221,7 +221,7 @@ UserBase:
 UserRequest:
   type: UserBase
   properties:
-    password: string
+    password?: string
     cover?: file
     picture?: file
     following_add?: integer[]
@@ -233,14 +233,14 @@ User:
   properties:
     cover?: string
     picture?: string
-    followers_ids?: integer[]
-    following_ids?: integer[]
+    followers_id?: integer[]
+    following_ids: integer[]
 UserExpanded:
   type: User
   properties:
-    addresses?: Address[]
-    groups?: Group[]
-    shipping_methods?: ShippingMethod[]
+    addresses: Address[]
+    groups: Group[]
+    shipping_methods: ShippingMethod[]
     roles: string[]
     followers_ids: integer[]
     following_ids: integer[]
@@ -257,10 +257,10 @@ Auth:
     email: string
     password: string
 
+
 ##############################################
 ##  Orders and Sales related                ##
 ##############################################
-
 
 OrderRequest:
   properties:
@@ -288,15 +288,15 @@ OrderExpanded:
 
 SaleRequest:
   properties:
-    status: integer
-    shipment_details: object
+    status?: integer
+    shipment_details?: object
 Sale:
   type: BaseObject
   properties:
     order_id: integer
     user_id: integer
-    shipping_method_id: integer
-    shipment_details: object
+    shipping_method_id?: integer
+    shipment_details?: object
     status: integer
     status_history: object
 SaleExpanded:
