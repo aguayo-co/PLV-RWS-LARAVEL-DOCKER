@@ -7,18 +7,17 @@ Un pago puede tener los siguientes estados:
 El pago tiene la siguiente información:
 
 - uniqid: Identificador único aleatorio.
-- request: Información sobre la solicitud de pago.
-- attempts: Información sobre los posibles intentos de pago hechos. Esta información proviene de
-la pasarela de pagos. Es un arreglo en el que se almacenan cada una de las notificaciones hechas
-por la pasarela.
+- request: Objeto con información sobre la solicitud de pago.
+- attempts: Arreglo con información sobre los posibles intentos de pago hechos. Esta información proviene de
+la pasarela de pagos. Se almacenan cada una de las notificaciones hechas por la pasarela.
 
 Para enviar un usuario al proceso de pago, se debe solicitar un nuevo pago especificando que pasarela
-usar, enviando la información por parámetros en la URL (`?gateway=pasarela_seleccionada`). Dependiendo de la pasarela, podría ser necesario enviar información adicional con la solicitud.
+usar por parámetros de URL (`?gateway=pasarela_seleccionada`). Dependiendo de la pasarela, podría ser necesario enviar información adicional con la solicitud.
 
 La respuesta incluirá, en la propiedad `request_data`, la información mínima necesaria para enviar al usuario a la pasarela de pagos.
 
 Una vez un pago es generado, la orden pasa deja de estar en carro de compras, los productos se marcan
-como no disponibles. y no se puede generar un nuevo pago para la misma.
+como no disponibles, y no se puede generar un nuevo pago para la misma.
 
 Las pasarelas disponibles y la información adicional necesaria para cada una se indican a continuación:
 
