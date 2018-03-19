@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
+use App\Notifications\Messages\UserMailMessage;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,11 +27,16 @@ class AppServiceProvider extends ServiceProvider
 
         # Change the default rendering method for ResetPassword.
         ResetPasswordNotification::$toMailCallback = function ($notifiable, $token) {
-            return (new MailMessage)->view(
+            return (new UserMailMessage($notifiable))->view(
                 'email.token',
                 ['token' => $token]
             );
         };
+
+        # Each template can know the view that was called.
+        View::composer('*', function ($view) {
+            $view->with('view_name', $view->getName());
+        });
 
         Validator::extend('empty_with', 'App\Validators\EmptyWithValidator@validateEmptyWith');
         Validator::replacer('empty_with', 'App\Validators\EmptyWithValidator@replaceEmptyWith');

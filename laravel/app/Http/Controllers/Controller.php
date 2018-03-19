@@ -88,7 +88,7 @@ class Controller extends BaseController
             }
         }
 
-        return Validator::make(
+        Validator::make(
             $data,
             $rules,
             $this->validationMessages()

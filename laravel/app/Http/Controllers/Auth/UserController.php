@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Model;
+use App\Notifications\AccountClosed;
+use App\Notifications\EmailChanged;
+use App\Notifications\Welcome;
+use App\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laravel\Passport\Token;
-use App\User;
 
 class UserController extends Controller
 {
@@ -86,7 +89,10 @@ class UserController extends Controller
         if ($request->favorites_remove) {
             $user->favorites()->detach($request->favorites_remove);
         }
-        $user = parent::postUpdate($request, $this->setVisibility($user));
+        if (array_get($user->getChanges(), 'email')) {
+            $user->notify(new EmailChanged);
+        }
+        $user = $this->setVisibility(parent::postUpdate($request, $user));
 
         // Last, set api_token so it gets sent with the response.
         // DO NOT do this before parent call, as it refreshes the model
@@ -102,6 +108,7 @@ class UserController extends Controller
     {
         event(new Registered($user));
         $user = parent::postStore($request, $user);
+        $user->notify(new Welcome);
         $user->api_token = $user->createToken('PrilovRegister')->accessToken;
         return $this->setVisibility($user);
     }
@@ -119,5 +126,12 @@ class UserController extends Controller
         }
         return $user->load(['followers:id', 'following:id'])
             ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
+    }
+
+    public function delete(Request $request, Model $user)
+    {
+        $deleted = parent::delete($request, $user);
+        $user->notify(new AccountClosed);
+        return $deleted;
     }
 }

@@ -57,7 +57,7 @@ class Order extends Model
      */
     public function getTotalAttribute()
     {
-        return $this->products->where('status', Product::STATUS_AVAILABLE)->sum('price');
+        return $this->products->where('saleable', true)->sum('price');
     }
 
     public function setShippingAddressAttribute($value)

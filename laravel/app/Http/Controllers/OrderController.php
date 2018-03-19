@@ -82,7 +82,8 @@ class OrderController extends Controller
      */
     protected function getProductsByUser($productIds)
     {
-        return Product::whereIn('id', $productIds)->where('status', Product::STATUS_AVAILABLE)
+        return Product::whereIn('id', $productIds)
+            ->whereBetween('status', [Product::STATUS_APPROVED, Product::STATUS_AVAILABLE])
             ->get()->groupBy('user_id');
     }
 
@@ -180,7 +181,7 @@ class OrderController extends Controller
             'add_product_ids.*' => [
                 'integer',
                 Rule::exists('products', 'id')->where(function ($query) {
-                    $query->where('status', Product::STATUS_AVAILABLE);
+                    $query->whereBetween('status', [Product::STATUS_APPROVED, Product::STATUS_AVAILABLE]);
                 }),
             ],
 

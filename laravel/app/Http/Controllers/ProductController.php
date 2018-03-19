@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Product;
+use App\Notifications\NewProduct;
+use App\Notifications\ProductApproved;
+use App\Notifications\ProductHidden;
+use App\Notifications\ProductRejected;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
@@ -103,6 +108,7 @@ class ProductController extends Controller
             'campaign_ids.*' => 'integer|exists:campaigns,id',
             'condition_id' => $required . 'integer|exists:conditions,id',
             'status_id' => $required . 'integer|exists:statuses,id',
+            'status' => ['integer', Rule::in(Product::getStatuses())],
             'images' => $required . 'array',
             'images.*' => 'image',
             'delete_images' => 'array',
@@ -116,12 +122,49 @@ class ProductController extends Controller
         return ['size_id.exists' => __('validation.not_in')];
     }
 
+    protected function validate(array $data, Model $product = null)
+    {
+        parent::validate($data, $product);
+
+        $status = array_get($data, 'status');
+        if ($status) {
+            $this->validateStatus($product, $status);
+        }
+    }
+
+    protected function validateStatus($product, $status)
+    {
+        $user = auth()->user();
+        if ($user->hasRole('admin')) {
+            return;
+        }
+
+        if (!in_array($status, [Product::STATUS_AVAILABLE, Product::STATUS_UNAVAILABLE])) {
+            abort(
+                Response::HTTP_FORBIDDEN,
+                'Only an admin can set the given status.'
+            );
+        }
+
+        if (!$product || !$product->approved) {
+            abort(
+                Response::HTTP_FORBIDDEN,
+                'Only admin can change status to an unapproved product.'
+            );
+        }
+    }
+
     protected function alterFillData($data, Model $product = null)
     {
         if (!$product && !array_get($data, 'user_id')) {
             $user = auth()->user();
             $data['user_id'] = $user->id;
         }
+
+        if (!$product) {
+            $data['status'] = Product::STATUS_UNPUBLISHED;
+        }
+
         return $data;
     }
 
@@ -136,7 +179,35 @@ class ProductController extends Controller
         }
 
         return function ($query) {
-            return $query->where('status', '>', Product::STATUS_UNPUBLISHED);
+            return $query->where('status', '>=', Product::STATUS_APPROVED);
         };
+    }
+
+    public function postStore(Request $request, Model $product)
+    {
+        $product = parent::postStore($request, $product);
+        $product->user->notify(new NewProduct(['product' => $product]));
+        return $product;
+    }
+
+    public function postUpdate(Request $request, Model $product)
+    {
+        $statusChanged = array_get($product->getChanges(), 'status');
+        $product = parent::postUpdate($request, $product);
+
+        switch ($statusChanged) {
+            case Product::STATUS_AVAILABLE:
+                $product->user->notify(new ProductApproved(['product' => $product]));
+                break;
+
+            case Product::STATUS_HIDDEN:
+                $product->user->notify(new ProductHidden(['product' => $product]));
+                break;
+
+            case Product::STATUS_REJECTED:
+                $product->user->notify(new ProductRejected(['product' => $product]));
+        }
+
+        return $product;
     }
 }

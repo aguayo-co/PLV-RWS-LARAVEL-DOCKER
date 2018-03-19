@@ -71,6 +71,8 @@ Route::name('api.')->group(function () {
             ->name('user.address.update')->where(['user' => ID_REGEX, 'address' => ID_REGEX]);
         Route::delete('users/{user}/addresses/{address}', 'AddressController@ownerDelete')
             ->name('user.address.delete')->where(['user' => ID_REGEX, 'address' => ID_REGEX]);
+        Route::delete('users/{user}', 'Auth\UserController@delete')
+            ->name('user.delete')->where('user', ID_REGEX);
 
         # Routes for Product administration.
         Route::post('products', 'ProductController@store')->name('product.create');

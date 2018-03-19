@@ -60,11 +60,11 @@ class PaymentController extends Controller
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');
         }
 
-        if (!$order->products->where('status', Product::STATUS_AVAILABLE)->count()) {
+        if (!$order->products->where('saleable', true)->count()) {
             abort(Response::HTTP_FAILED_DEPENDENCY, 'No products in shopping cart.');
         }
 
-        if ($order->products->where('status', '<>', Product::STATUS_AVAILABLE)->count()) {
+        if ($order->products->where('saleable', false)->count()) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some products are not available anymore.');
         }
 

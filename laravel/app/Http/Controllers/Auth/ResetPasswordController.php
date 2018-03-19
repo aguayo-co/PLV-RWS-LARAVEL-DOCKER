@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\PasswordChanged;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -74,6 +75,7 @@ class ResetPasswordController extends Controller
         $user->api_token = $user->createToken('PrilovResetPassword')->accessToken;
         Token::destroy($user->tokens->pluck('id')->all());
         event(new PasswordReset($user));
+        $user->notify(new PasswordChanged);
     }
 
     /**

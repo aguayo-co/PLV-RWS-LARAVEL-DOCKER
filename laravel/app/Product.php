@@ -13,7 +13,10 @@ class Product extends Model
     use HasStatuses;
 
     const STATUS_UNPUBLISHED = 0;
-    const STATUS_AVAILABLE = 10;
+    const STATUS_REJECTED = 1;
+    const STATUS_HIDDEN = 2;
+    const STATUS_APPROVED = 10;
+    const STATUS_AVAILABLE = 19;
     const STATUS_UNAVAILABLE = 20;
     const STATUS_SOLD = 30;
 
@@ -36,14 +39,24 @@ class Product extends Model
         'category_id',
         'size_id',
         'condition_id',
-        'status_id',
+        'status',
         'images',
         'delete_images',
         'color_ids',
         'campaign_ids',
     ];
-    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'size.parent', 'condition', 'status', 'user'];
+    protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'size.parent', 'condition', 'user'];
     protected $appends = ['images', 'color_ids', 'campaign_ids'];
+
+    protected function getApprovedAttribute()
+    {
+        return Product::STATUS_APPROVED <= $this->status && $this->status < Product::STATUS_SOLD;
+    }
+
+    protected function getSaleableAttribute()
+    {
+        return Product::STATUS_APPROVED <= $this->status && $this->status <= Product::STATUS_AVAILABLE;
+    }
 
     /**
      * Get the user that owns the address.
@@ -153,11 +166,6 @@ class Product extends Model
     public function condition()
     {
         return $this->belongsTo('App\Condition');
-    }
-
-    public function status()
-    {
-        return $this->belongsTo('App\Status');
     }
 
     public function sales()
