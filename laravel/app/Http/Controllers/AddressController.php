@@ -61,7 +61,7 @@ class AddressController extends Controller
      */
     public function show(Request $request, Model $user)
     {
-        return $request->address;
+        return parent::show($request, $request->route()->parameters['address']);
     }
 
     /**
@@ -72,7 +72,7 @@ class AddressController extends Controller
      */
     public function ownerDelete(Request $request, Model $user)
     {
-        return parent::ownerDelete($request, $request->address);
+        return parent::ownerDelete($request, $request->route()->parameters['address']);
     }
 
     /**
@@ -83,7 +83,7 @@ class AddressController extends Controller
      */
     public function delete(Request $request, Model $user)
     {
-        return parent::delete($request, $request->address);
+        return parent::delete($request, $request->route()->parameters['address']);
     }
 
     /**
@@ -94,6 +94,6 @@ class AddressController extends Controller
      */
     public function update(Request $request, Model $user)
     {
-        return parent::update($request, $request->address);
+        return parent::update($request, $request->route()->parameters['address']);
     }
 }

@@ -32,7 +32,7 @@ class PaymentController extends Controller
     public static function validateUserIsOwner($request, $next)
     {
         $user = auth()->user();
-        $order = $request->order;
+        $order = $request->route()->parameters['order'];
 
         if ($user->is($order->user)) {
             return $next($request);
@@ -109,7 +109,7 @@ class PaymentController extends Controller
         $this->validateOrderCanCheckout($order);
 
         // Get the gateway to use.
-        $gateway = new Gateway($request->gateway);
+        $gateway = new Gateway($request->query('gateway'));
         // Create a Payment model with the selected gateway.
         $payment = $this->getPayment($gateway, $order);
         // Save the Gateway's request data in the Payment model.

@@ -46,7 +46,7 @@ class ProductController extends Controller
      */
     public static function validateIsPublished($request, $next)
     {
-        $product = $request->product;
+        $product = $request->route()->parameters['product'];
         if ($product->status !== Product::STATUS_UNPUBLISHED) {
             return $next($request);
         }

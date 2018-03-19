@@ -37,7 +37,7 @@ class RatingController extends Controller
     public static function validateUserCanRate($request, $next)
     {
         $user = auth()->user();
-        $rating = $request->rating;
+        $rating = $request->route()->parameters['rating'];
 
         if ($user->hasRole('admin')) {
             return $next($request);
@@ -66,7 +66,7 @@ class RatingController extends Controller
      */
     public static function validateCanBeRated($request, $next)
     {
-        $rating = $request->rating;
+        $rating = $request->route()->parameters['rating'];
 
         if ($rating->sale->status < Sale::STATUS_PAYED) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale not ready to be rated.');

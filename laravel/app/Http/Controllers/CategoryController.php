@@ -68,10 +68,10 @@ class CategoryController extends AdminController
 
     protected function alterIndexQuery()
     {
-        return function ($query) use ($request) {
+        return function ($query) {
             $query = $query->with(['children']);
             // Unless we have a filter
-            if (!$request->query('filter')) {
+            if (!request()->query('filter')) {
                 $query = $query->whereNull('parent_id');
             }
             return $query;
