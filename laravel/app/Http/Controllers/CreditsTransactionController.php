@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\CreditsTransaction;
+use App\Order;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class CreditsTransactionController extends Controller
 {
@@ -15,7 +17,7 @@ class CreditsTransactionController extends Controller
     {
         parent::__construct();
         $this->middleware('owner_or_admin')->only('show');
-        $this->middleware(self::class . '::validateUserCanModifyTransaction')->only(['delete, update']);
+        $this->middleware(self::class . '::validateUserCanModifyTransaction')->only(['delete', 'update']);
     }
 
     /**
@@ -39,7 +41,6 @@ class CreditsTransactionController extends Controller
 
         return $next($request);
     }
-
 
     /**
      * When user is not admin, limit to current user sales.
