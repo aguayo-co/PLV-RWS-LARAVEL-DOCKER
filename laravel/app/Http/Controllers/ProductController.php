@@ -177,10 +177,12 @@ class ProductController extends Controller
         }
 
         return function ($query) use ($user) {
-            $query = $query->where('status', '>=', Product::STATUS_APPROVED);
-            if ($user) {
-                $query = $query->orWhere('user_id', $user->id);
-            }
+            $query = $query->where(function ($query) use ($user) {
+                $query = $query->where('status', '>=', Product::STATUS_APPROVED);
+                if ($user) {
+                    $query = $query->orWhere('user_id', $user->id);
+                }
+            });
             return $query;
         };
     }
