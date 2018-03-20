@@ -21,7 +21,7 @@ class CreditsTransactionController extends Controller
     }
 
     /**
-     * Middleware that validates permissions to set ratings.
+     * Middleware that validates permissions to change CreditsTransaction.
      */
     public static function validateUserCanModifyTransaction($request, $next)
     {
@@ -75,7 +75,13 @@ class CreditsTransactionController extends Controller
         $required = !$transaction ? 'required|' : '';
         $userId = $this->getValidationUserId($data, $transaction);
         return [
-            'user_id' => 'integer|exists:users,id',
+            'user_id' => [
+                'integer',
+                'exists:users,id',
+                // Once a transaction has been created, suer can't be changed,
+                // not even by admins. A new one has to be created instead.
+                $transaction ? Rule::in([$transaction->user_id]) : null,
+            ],
             'amount' => [
                 trim($required, '|'),
                 'integer',
