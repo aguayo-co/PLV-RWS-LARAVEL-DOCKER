@@ -18,7 +18,7 @@ class SaleReturn extends Model
     const STATUS_COMPLETED = 90;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = ['shipment_details', 'status'];
+    protected $fillable = ['status'];
 
     public function products()
     {
