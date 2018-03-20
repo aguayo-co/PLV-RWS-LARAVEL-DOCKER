@@ -18,7 +18,7 @@ class MenuItemController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $menuItem)
+    protected function validationRules(array $data, ?Model $menuItem)
     {
         $required = !$menuItem ? 'required|' : '';
         $requiredMenuId = !$menuItem ? 'required_without:parent_id|' : '';

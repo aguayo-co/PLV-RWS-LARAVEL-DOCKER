@@ -19,7 +19,7 @@ class SliderController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $slider)
+    protected function validationRules(array $data, ?Model $slider)
     {
         $required = !$slider ? 'required|' : '';
         $ignore = $slider ? ',' . $slider->id : '';

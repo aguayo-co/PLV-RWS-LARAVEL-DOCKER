@@ -40,7 +40,7 @@ class Payment extends Model
 
     public function getTotalAttribute()
     {
-        return $this->order->total;
+        return $this->order->due;
     }
 
     public function setRequestAttribute($value)

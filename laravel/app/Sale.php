@@ -27,7 +27,7 @@ class Sale extends Model
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['shipment_details', 'status'];
-    protected $with = ['products', 'shippingMethod'];
+    protected $with = ['products', 'shippingMethod', 'creditsTransactions'];
 
     /**
      * Get the user that sells this.
@@ -46,6 +46,12 @@ class Sale extends Model
     {
         return $this->belongsToMany('App\Product');
     }
+
+    public function creditsTransactions()
+    {
+        return $this->hasMany('App\CreditsTransaction');
+    }
+
 
     public function shippingMethod()
     {

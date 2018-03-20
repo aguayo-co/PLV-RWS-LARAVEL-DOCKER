@@ -72,7 +72,7 @@ class ProductController extends Controller
         return $data;
     }
 
-    protected function validationRules(?Model $product)
+    protected function validationRules(array $data, ?Model $product)
     {
         $required = !$product ? 'required|' : '';
         return [

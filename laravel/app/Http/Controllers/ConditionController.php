@@ -16,7 +16,7 @@ class ConditionController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $condition)
+    protected function validationRules(array $data, ?Model $condition)
     {
         $required = !$condition ? 'required|' : '';
         $ignore = $condition ? ',' . $condition->id : '';

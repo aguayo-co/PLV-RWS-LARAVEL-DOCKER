@@ -17,8 +17,8 @@ class Order extends Model
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['shipping_address'];
-    protected $with = ['sales'];
-    protected $appends = ['total'];
+    protected $with = ['sales', 'creditsTransactions'];
+    protected $appends = ['total', 'due'];
 
     /**
      * Get the user that buys this.
@@ -44,6 +44,11 @@ class Order extends Model
         return $this->hasMany('App\Sale');
     }
 
+    public function creditsTransactions()
+    {
+        return $this->hasMany('App\CreditsTransaction');
+    }
+
     /**
      * Get the order products.
      */
@@ -53,11 +58,22 @@ class Order extends Model
     }
 
     /**
-     * Get the order payments.
+     * The total value of the order.
      */
     public function getTotalAttribute()
     {
         return $this->products->where('saleable', true)->sum('price');
+    }
+
+    /**
+     * The value the user needs to pay after applying the credits
+     * the users decided to use.
+     */
+    public function getDueAttribute()
+    {
+        $total = $this->products->where('saleable', true)->sum('price');
+        $credited = $this->creditsTransactions->sum('amount');
+        return $total + $credited;
     }
 
     public function setShippingAddressAttribute($value)

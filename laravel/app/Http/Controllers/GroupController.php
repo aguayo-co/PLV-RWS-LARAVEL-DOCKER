@@ -17,7 +17,7 @@ class GroupController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $group)
+    protected function validationRules(array $data, ?Model $group)
     {
         $required = !$group ? 'required|' : '';
         $ignore = $group ? ',' . $group->id : '';

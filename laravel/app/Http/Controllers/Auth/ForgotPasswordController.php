@@ -21,7 +21,7 @@ class ForgotPasswordController extends Controller
     |
     */
 
-    protected function validationRules(?Model $model)
+    protected function validationRules(array $data, ?Model $model)
     {
         $rules = ['email' => 'required|email'];
         if ($model) {

@@ -26,7 +26,7 @@ class UserController extends Controller
         return $data;
     }
 
-    protected function validationRules(?Model $user)
+    protected function validationRules(array $data, ?Model $user)
     {
         $required = !$user ? 'required|' : '';
         $ignore = $user ? ',' . $user->id : '';

@@ -51,7 +51,7 @@ class Controller extends BaseController
      *
      * @return array
      */
-    protected function validationRules(?Model $model)
+    protected function validationRules(array $data, ?Model $model)
     {
         throw new Exception('Not implemented');
     }
@@ -78,7 +78,7 @@ class Controller extends BaseController
     protected function validate(array $data, Model $model = null)
     {
         # This is a hack to ensure we don't pass a string we can't put in the DB.
-        if (!$rules = $this->validationRules($model)) {
+        if (!$rules = $this->validationRules($data, $model)) {
             return;
         }
 

@@ -17,7 +17,7 @@ class MenuController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $menu)
+    protected function validationRules(array $data, ?Model $menu)
     {
         $required = !$menu ? 'required|' : '';
         $ignore = $menu ? ',' . $menu->id : '';

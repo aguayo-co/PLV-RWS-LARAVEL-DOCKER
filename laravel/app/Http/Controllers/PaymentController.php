@@ -46,7 +46,7 @@ class PaymentController extends Controller
      *
      * @return array
      */
-    protected function validationRules(?Model $order)
+    protected function validationRules(array $data, ?Model $order)
     {
         return [];
     }

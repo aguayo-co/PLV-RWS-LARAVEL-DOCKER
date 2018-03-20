@@ -22,7 +22,7 @@ class LoginController extends Controller
 
     use ThrottlesLogins;
 
-    protected function validationRules(?Model $model)
+    protected function validationRules(array $data, ?Model $model)
     {
         return [
             $this->username() => 'required|string',

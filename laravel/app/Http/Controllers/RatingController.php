@@ -84,7 +84,7 @@ class RatingController extends Controller
         return $data;
     }
 
-    protected function validationRules(?Model $rating)
+    protected function validationRules(array $data, ?Model $rating)
     {
         return [
             'seller_rating' => 'required_with:seller_comment|integer|between:-1,1',

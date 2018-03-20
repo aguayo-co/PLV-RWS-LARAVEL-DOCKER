@@ -16,7 +16,7 @@ class BrandController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $brand)
+    protected function validationRules(array $data, ?Model $brand)
     {
         $required = !$brand ? 'required|' : '';
         $ignore = $brand ? ',' . $brand->id : '';

@@ -273,10 +273,12 @@ Order:
     status: integer
     status_history: object
     total: integer
+    due: integer
     shipping_address: string
 OrderExpanded:
   type: Order
   properties:
+    credits_transactions: CreditsTransaction[]
     sales: Sale[]
 
 SaleRequest:
@@ -295,6 +297,7 @@ Sale:
 SaleExpanded:
   type: Sale
   properties:
+    credits_transactions: CreditsTransaction[]
     products: Product[]
     shipping_method: ShippingMethod
 
@@ -308,6 +311,18 @@ Payment:
     request: object
     attempts: object
     request_data: object
+
+CreditsTransactionRequest:
+  properties:
+    user_id: integer
+    amount: integer
+    sale_id?: integer
+    order_id?: integer
+    extra: object
+CreditsTransaction:
+  type: [CreditsTransactionRequest, BaseObject]
+CreditsTransactionExpanded:
+  type: [CreditsTransaction]
 
 ShippingMethodRequest:
   type: Property

@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.8.0
+version: 0.8.1
 baseUri: https://prilov.aguayo.co/api
 documentation: !include documentation.raml
 
@@ -13,7 +13,9 @@ resourceTypes:
       is: [ paginated, sortable, filterable ]
 
   collection:
-    is: getCollection
+    get:
+      description: Get all the <<resourcePathName | !pluralize | !uppercamelcase>>
+      is: [ paginated, sortable, filterable ]
     post:
       is: [ createItemPost, needAdmin ]
 
@@ -234,6 +236,15 @@ resourceTypes:
 /sales:
   description: !include sales-description.md
   type: getCollection
+  get:
+    is: [needOwner, needAdmin]
+  /{sale-id}:
+    type: singleItem
+    get:
+      is: [needOwner, needAdmin]
+
+/credits_transactions:
+  type: collection
   get:
     is: [needOwner, needAdmin]
   /{sale-id}:

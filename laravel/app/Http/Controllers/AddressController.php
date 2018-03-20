@@ -16,7 +16,7 @@ class AddressController extends Controller
         $this->middleware('owner_or_admin');
     }
 
-    protected function validationRules(?Model $address)
+    protected function validationRules(array $data, ?Model $address)
     {
         $required = !$address ? 'required|' : '';
         return [

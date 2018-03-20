@@ -53,7 +53,7 @@ class SaleController extends Controller
      *
      * @return array
      */
-    protected function validationRules(?Model $sale)
+    protected function validationRules(array $data, ?Model $sale)
     {
         return [
             'shipment_details' => 'array',

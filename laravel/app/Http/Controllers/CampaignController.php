@@ -17,7 +17,7 @@ class CampaignController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $campaign)
+    protected function validationRules(array $data, ?Model $campaign)
     {
         $required = !$campaign ? 'required|' : '';
         $ignore = $campaign ? ',' . $campaign->id : '';

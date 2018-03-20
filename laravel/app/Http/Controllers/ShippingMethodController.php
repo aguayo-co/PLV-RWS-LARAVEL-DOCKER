@@ -17,7 +17,7 @@ class ShippingMethodController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $shippingMethod)
+    protected function validationRules(array $data, ?Model $shippingMethod)
     {
         $required = !$shippingMethod ? 'required|' : '';
         $ignore = $shippingMethod ? ',' . $shippingMethod->id : '';

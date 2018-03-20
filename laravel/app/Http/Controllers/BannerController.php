@@ -17,7 +17,7 @@ class BannerController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $banner)
+    protected function validationRules(array $data, ?Model $banner)
     {
         $required = !$banner ? 'required|' : '';
         $ignore = $banner ? ',' . $banner->id : '';

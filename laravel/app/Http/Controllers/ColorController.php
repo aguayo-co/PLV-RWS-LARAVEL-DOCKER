@@ -16,7 +16,7 @@ class ColorController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $color)
+    protected function validationRules(array $data, ?Model $color)
     {
         $required = !$color ? 'required|' : '';
         $ignore = $color ? ',' . $color->id : '';

@@ -22,7 +22,7 @@ class CategoryController extends AdminController
         return $data;
     }
 
-    protected function validationRules(?Model $category)
+    protected function validationRules(array $data, ?Model $category)
     {
         $required = !$category ? 'required|' : '';
         $ignore = $category ? ',' . $category->id : '';

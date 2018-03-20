@@ -18,7 +18,7 @@ class SizeController extends Controller
         return $data;
     }
 
-    protected function validationRules(?Model $size)
+    protected function validationRules(array $data, ?Model $size)
     {
         $required = !$size ? 'required|' : '';
         $ignore = $size ? ',' . $size->id : '';
