@@ -11,8 +11,9 @@ use App\Product;
 use App\ShippingMethod;
 use App\Size;
 use App\User;
-use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
@@ -114,6 +115,34 @@ class ProductTest extends TestCase
         $url = route('api.product.update', $product);
 
         $response = $this->actingAs($this->seller)->json('PATCH', $url, ['status' => Product::STATUS_HIDDEN]);
-        $response->assertStatus(403);
+        $response->assertStatus(403)
+            ->assertSee('Only an admin can set the given status.');
+    }
+
+    public function testNewProductIsUnpublished()
+    {
+        $url = route('api.product.create');
+
+        $productData = factory(Product::class)->raw();
+        unset($productData['status']);
+        unset($productData['user_id']);
+
+        $response = $this->actingAs($this->seller)
+            ->withHeaders(['accept' => 'application/json'])->post($url, $productData);
+        $response->assertStatus(200)->assertJson(['status' => Product::STATUS_UNPUBLISHED]);
+    }
+
+    public function testNewProductStatusIsProtected()
+    {
+        $url = route('api.product.create');
+
+        $productData = factory(Product::class)->raw();
+        $productData['status'] = Product::STATUS_AVAILABLE;
+        unset($productData['user_id']);
+
+        $response = $this->actingAs($this->seller)
+            ->withHeaders(['accept' => 'application/json'])->post($url, $productData);
+        $response->assertStatus(403)
+            ->assertSee('Only admin can change status to an unapproved product.');
     }
 }

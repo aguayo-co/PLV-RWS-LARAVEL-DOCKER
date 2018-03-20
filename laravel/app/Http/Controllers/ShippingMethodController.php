@@ -24,8 +24,8 @@ class ShippingMethodController extends AdminController
         return [
             'name' => $required . 'string|unique:shipping_methods,name' . $ignore,
             'slug' => 'string|unique:shipping_methods,slug' . $ignore,
-            'description_seller' => $required . 'string',
-            'description_buyer' => $required . 'string',
+            'description_seller' => $required . 'string|max:10000',
+            'description_buyer' => $required . 'string|max:10000',
         ];
     }
 }

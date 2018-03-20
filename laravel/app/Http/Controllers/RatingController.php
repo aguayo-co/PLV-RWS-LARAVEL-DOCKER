@@ -88,9 +88,9 @@ class RatingController extends Controller
     {
         return [
             'seller_rating' => 'required_with:seller_comment|integer|between:-1,1',
-            'seller_comment' => 'required_with:seller_rating',
+            'seller_comment' => 'required_with:seller_rating|string|max:10000',
             'buyer_rating' => 'required_with:buyer_comment|integer|between:-1,1',
-            'buyer_comment' => 'required_with:buyer_rating',
+            'buyer_comment' => 'required_with:buyer_rating|string|max:10000',
         ];
     }
 

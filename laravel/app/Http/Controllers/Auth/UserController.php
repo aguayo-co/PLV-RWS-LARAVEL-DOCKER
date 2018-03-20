@@ -38,7 +38,7 @@ class UserController extends Controller
             'first_name' => $required . 'string',
             'last_name' => $required . 'string',
             'phone' => 'string',
-            'about' => 'string',
+            'about' => 'string|max:10000',
             'picture' => 'image',
             'cover' => 'image',
             'vacation_mode' => 'boolean',

@@ -36,7 +36,7 @@ $factory->define(Product::class, function (Faker $faker) {
             Product::STATUS_UNPUBLISHED,
             Product::STATUS_UNAVAILABLE
         ]),
-        'images' => [UploadedFile::fake()->image('image'), UploadedFile::fake()->image('image'),],
+        'images' => [UploadedFile::fake()->image('image_1.jpg'), UploadedFile::fake()->image('image_2.jpg'),],
         'color_ids' => $faker->randomElements($colors, $colors_count),
         'campaign_ids' => $faker->randomElements($campaigns, $campaigns_count),
     ];
