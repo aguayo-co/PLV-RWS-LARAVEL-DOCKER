@@ -78,7 +78,7 @@ class CreditsTransactionController extends Controller
             'user_id' => [
                 'integer',
                 'exists:users,id',
-                // Once a transaction has been created, suer can't be changed,
+                // Once a transaction has been created, user can't be changed,
                 // not even by admins. A new one has to be created instead.
                 $transaction ? Rule::in([$transaction->user_id]) : null,
             ],

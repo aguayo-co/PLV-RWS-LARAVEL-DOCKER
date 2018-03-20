@@ -9,7 +9,7 @@ class Payment extends Model
 {
     use HasStatuses;
 
-    const STATUS_PENDING = 00;
+    const STATUS_PENDING = 0;
     const STATUS_SUCCESS = 10;
     const STATUS_ERROR = 99;
 

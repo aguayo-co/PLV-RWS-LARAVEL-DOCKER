@@ -56,6 +56,11 @@ class Sale extends Model
         return $this->belongsToMany('App\Product')->withPivot('sale_return_id');
     }
 
+    public function getProductsIdsAttribute()
+    {
+        return $this->products->pluck('id');
+    }
+
     /**
      * Get the sale products that were marked for return.
      */

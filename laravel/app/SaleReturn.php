@@ -14,15 +14,14 @@ class SaleReturn extends Model
     use HasStatuses;
     use HasStatusHistory;
 
-    const STATUS_PENDING = 00;
+    const STATUS_PENDING = 0;
     const STATUS_SHIPPED = 40;
     const STATUS_DELIVERED = 41;
     const STATUS_RECEIVED = 49;
     const STATUS_COMPLETED = 90;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = ['status', 'product_ids'];
-    protected $appends = ['product_ids'];
+    protected $fillable = ['status', 'products_ids'];
 
     protected $dispatchesEvents = [
         'saved' => SaleReturnSaved::class,
@@ -48,18 +47,28 @@ class SaleReturn extends Model
         return collect([$this->sale->user, $this->sale->order->user]);
     }
 
-    protected function getProductIdsAttribute()
+    protected function getProductsIdsAttribute()
     {
-        return $this->sale->returned_product_ids;
+        return $this->sale ? $this->sale->returned_products_ids : [];
     }
 
-    protected function setProductIdsAttribute(array $productIds)
+    protected function setProductsIdsAttribute(array $data)
     {
-        if ($this->saveLater('product_ids', $productIds)) {
+        if ($this->saveLater('products_ids', $data)) {
             return;
         }
-        $this->colors()->sync($productIds);
-        $this->load('products');
+
+        $productsIdsSync = [];
+        $sale = Sale::find($data['sale_id']);
+        foreach ($sale->products_ids as $productId) {
+            if (in_array($productId, $data['products_ids'])) {
+                $productsIdsSync[$productId] = ['sale_return_id' => $this->id];
+                continue;
+            }
+            $productsIdsSync[$productId] = ['sale_return_id' => null];
+        }
+
+        $sale->products()->sync($productsIdsSync);
         $this->touch();
     }
 }

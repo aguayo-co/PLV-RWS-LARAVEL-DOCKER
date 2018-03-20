@@ -15,7 +15,7 @@ class AlterProductSalePivotTable extends Migration
     {
         Schema::table('product_sale', function (Blueprint $table) {
             $table->integer('sale_return_id')->unsigned()->index()->nullable();
-            $table->foreign('sale_return_id')->references('id')->on('sale_returns')->onDelete('cascade');
+            $table->foreign('sale_return_id')->references('id')->on('sale_returns')->onDelete('set null');
             $table->unique(['product_id', 'sale_return_id']);
         });
     }
