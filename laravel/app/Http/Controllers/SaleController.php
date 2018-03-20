@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Sale;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
@@ -55,49 +54,53 @@ class SaleController extends Controller
      */
     protected function validationRules(array $data, ?Model $sale)
     {
+        $validStatuses = [Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED, Sale::STATUS_CANCELED];
         return [
-            'shipment_details' => 'array',
+            'shipment_details' => [
+                'array',
+                $this->getCanSetShippingDetailsRule($sale),
+            ],
             'status' => [
+                'bail',
                 'integer',
-                Rule::in([Sale::STATUS_SHIPPED, Sale::STATUS_DELIVERED, Sale::STATUS_CANCELED]),
+                Rule::in($validStatuses),
+                $this->getStatusRule($sale),
+                // Do not go back in status.
+                'min:' . $sale->status,
             ],
         ];
     }
 
     /**
-     * Apart from data validation, validate requested status change.
+     * Rule that validates that a Sale status is valid.
      */
-    protected function validate(array $data, Model $sale = null)
+    protected function getStatusRule($sale)
     {
-        parent::validate($data, $sale);
-        $status = (int)array_get($data, 'status');
-        if ($status === Sale::STATUS_SHIPPED && $sale->status < Sale::STATUS_PAYED) {
-            abort(
-                Response::HTTP_UNPROCESSABLE_ENTITY,
-                'Can not be set as shipped when Sale not PAYED.'
-            );
-        }
-
-        if ($status === Sale::STATUS_DELIVERED && $sale->status < Sale::STATUS_PAYED) {
-            abort(
-                Response::HTTP_UNPROCESSABLE_ENTITY,
-                'Can not be set as delivered when Sale not PAYED.'
-            );
-        }
-
-        if ($status === Sale::STATUS_CANCELED && !auth()->user()->hasRole('admin')) {
-            abort(
-                Response::HTTP_FORBIDDEN,
-                'Only an Admin can cancel a Sale.'
-            );
-        }
+        return function ($attribute, $value, $fail) use ($sale) {
+            if ((int)$value === Sale::STATUS_CANCELED && !auth()->user()->hasRole('admin')) {
+                return $fail(__('Only an Admin can cancel a Sale.'));
+            }
+            // Order needs to be payed.
+            if ($sale->status < Sale::STATUS_PAYED) {
+                return $fail(__('La orden no ha sido pagada.'));
+            }
+        };
     }
 
-    public function update(Request $request, Model $sale)
+    /**
+     * Rule that validates that a Sale status is valid.
+     */
+    protected function getCanSetShippingDetailsRule($sale)
     {
-        if ($sale->status < Sale::STATUS_PAYED) {
-            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Sale can not be changed until it has been PAYED.');
-        }
-        return parent::update($request, $sale);
+        return function ($attribute, $value, $fail) use ($sale) {
+            // Order needs to be payed.
+            if ($sale->status < Sale::STATUS_PAYED) {
+                return $fail(__('La orden no ha sido pagada.'));
+            }
+            // Order shipped already.
+            if (Sale::STATUS_RECEIVED < $sale->status) {
+                return $fail(__('Información ya no se puede modificar.'));
+            }
+        };
     }
 }

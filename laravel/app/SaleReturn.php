@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Events\SaleReturnSaved;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasStatuses;
 use App\Traits\HasStatusHistory;
@@ -19,6 +20,10 @@ class SaleReturn extends Model
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['status'];
+
+    protected $dispatchesEvents = [
+        'saved' => SaleReturnSaved::class,
+    ];
 
     public function products()
     {

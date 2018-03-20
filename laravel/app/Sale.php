@@ -2,9 +2,10 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Events\SaleSaved;
 use App\Traits\HasStatuses;
 use App\Traits\HasStatusHistory;
+use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
@@ -28,7 +29,11 @@ class Sale extends Model
 
     protected $fillable = ['shipment_details', 'status'];
     protected $with = ['products', 'shippingMethod', 'creditsTransactions', 'returns'];
-    protected $appends = ['returned_products_ids'];
+    protected $appends = ['returned_products_ids', 'total', 'commission'];
+
+    protected $dispatchesEvents = [
+        'saved' => SaleSaved::class,
+    ];
 
     /**
      * Get the user that sells this.
@@ -63,6 +68,40 @@ class Sale extends Model
     {
         return $this->returned_products->pluck('id');
     }
+
+    /**
+     * The total value of the sale.
+     */
+    public function getTotalAttribute()
+    {
+        return $this->products->sum('price');
+    }
+
+    /**
+     * The total value of the returned products.
+     */
+    public function getReturnedTotalAttribute()
+    {
+        return $this->products->whereIn('id', $this->returnedProductsIds)->sum('price');
+    }
+
+    /**
+     * The total value of the order.
+     */
+    public function getCommissionAttribute()
+    {
+        return $this->products->sum(function ($product) {
+            return (int)($product->price * $product->commission / 100);
+        });
+    }
+
+    public function getReturnedCommissionAttribute()
+    {
+        return $this->products->whereIn('id', $this->returnedProductsIds)->sum(function ($product) {
+            return (int)($product->price * $product->commission / 100);
+        });
+    }
+
 
     public function returns()
     {

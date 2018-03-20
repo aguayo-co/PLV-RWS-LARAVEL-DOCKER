@@ -83,6 +83,6 @@ class OrderTest extends TestCase
 
         $response = $this->actingAs($this->user)->json('PATCH', $url, $requestData);
         $response->assertStatus(422)
-            ->assertJsonFragment(['No puede marcar una compra cómo recibida antes de estar pagada.']);
+            ->assertJsonFragment(['La orden no ha sido pagada.']);
     }
 }

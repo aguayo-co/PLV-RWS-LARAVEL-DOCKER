@@ -70,7 +70,7 @@ class Order extends Model
      */
     public function getTotalAttribute()
     {
-        return $this->products->where('saleable', true)->sum('price');
+        return $this->products->sum('price');
     }
 
     /**
@@ -79,7 +79,7 @@ class Order extends Model
      */
     public function getDueAttribute()
     {
-        $total = $this->products->where('saleable', true)->sum('price');
+        $total = $this->products->sum('price');
         $credited = $this->creditsTransactions->sum('amount');
         return $total + $credited;
     }

@@ -192,7 +192,7 @@ class OrderController extends Controller
             'sales.*.status' => [
                 'bail',
                 'integer',
-                Rule::in([Sale::STATUS_RECEIVED]),
+                Rule::in([Sale::STATUS_RECEIVED, Sale::STATUS_COMPLETED]),
                 $this->getStatusRule($order),
             ],
         ];
@@ -282,12 +282,13 @@ class OrderController extends Controller
         return function ($attribute, $value, $fail) use ($order) {
             $saleId = preg_replace('/.*\.([0-9]+)\..*/', '$1', $attribute);
             $sale = $order->sales->firstWhere('id', $saleId);
-            switch ($value) {
-                case Sale::STATUS_RECEIVED:
-                    if ($sale->status < Sale::STATUS_PAYED) {
-                        return $fail(__('No puede marcar una compra cómo recibida antes de estar pagada.'));
-                    }
-                    break;
+            // Order needs to be payed.
+            if ($sale->status < Sale::STATUS_PAYED) {
+                return $fail(__('La orden no ha sido pagada.'));
+            }
+            // Do not go back in status.
+            if ($value <= $sale->status) {
+                return $fail(__('validation.min.numeric', ['min' => $sale->status + 1]));
             }
         };
     }

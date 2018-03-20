@@ -44,9 +44,10 @@ Route::name('api.')->group(function () {
     create_crud_routes('Size', ID_REGEX);
     create_crud_routes('Slider', SLUG_REGEX);
 
+    create_protected_rud_routes('Order', ID_REGEX);
+    create_protected_rud_routes('Sale', ID_REGEX);
+
     create_protected_crud_routes('CreditsTransaction', ID_REGEX);
-    create_protected_crud_routes('Order', ID_REGEX);
-    create_protected_crud_routes('Sale', ID_REGEX);
     create_protected_crud_routes('SaleReturn', ID_REGEX);
 
     # Public Product routes

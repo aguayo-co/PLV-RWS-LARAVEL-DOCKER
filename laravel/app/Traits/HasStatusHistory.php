@@ -6,7 +6,6 @@ trait HasStatusHistory
 {
     public function setStatusAttribute($value)
     {
-        $this->attributes['status'] = max($this->status, $value);
         $statusHistory = $this->status_history ?: [];
         if (!array_get($statusHistory, $value)) {
             $user = auth()->user();
@@ -16,6 +15,7 @@ trait HasStatusHistory
             ];
         }
         $this->attributes['status_history'] = json_encode($statusHistory);
+        $this->attributes['status'] = $value;
     }
 
     public function getStatusHistoryAttribute($value)
