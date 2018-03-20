@@ -20,7 +20,7 @@ $factory->define(App\User::class, function (Faker $faker) {
 
 $factory->state(App\User::class, 'profile', function ($faker) {
     $shippingMethods = ShippingMethod::setEagerLoads([])->get(['id'])->pluck('id')->all();
-    $shippingMethodsCount = $faker->numberBetween(0, count($shippingMethods));
+    $shippingMethodsCount = $faker->numberBetween(1, count($shippingMethods));
 
     return [
         'phone' => $faker->phoneNumber,
@@ -33,7 +33,7 @@ $factory->state(App\User::class, 'profile', function ($faker) {
 
 $factory->state(App\User::class, 'profile_with_real_images', function ($faker) {
     $shippingMethods = ShippingMethod::setEagerLoads([])->get(['id'])->pluck('id')->all();
-    $shippingMethodsCount = $faker->numberBetween(0, count($shippingMethods));
+    $shippingMethodsCount = $faker->numberBetween(1, count($shippingMethods));
 
     return [
         'phone' => $faker->phoneNumber,

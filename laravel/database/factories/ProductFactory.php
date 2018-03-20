@@ -7,7 +7,6 @@ use App\Color;
 use App\Condition;
 use App\Product;
 use App\Size;
-use App\Status;
 use App\User;
 use Faker\Generator as Faker;
 use Illuminate\Http\UploadedFile;
@@ -31,7 +30,6 @@ $factory->define(Product::class, function (Faker $faker) {
         'category_id' => Category::whereNotNull('parent_id')->get()->random()->id,
         'size_id' => Size::whereNotNull('parent_id')->get()->random()->id,
         'condition_id' => Condition::all()->random()->id,
-        'status_id' => Status::all()->random()->id,
         'status' => $faker->randomElement([
             Product::STATUS_APPROVED,
             Product::STATUS_AVAILABLE,

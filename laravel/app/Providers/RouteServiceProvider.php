@@ -42,7 +42,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('shipping_method', \App\ShippingMethod::class);
         Route::model('size', \App\Size::class);
         Route::model('slider', \App\Slider::class);
-        Route::model('status', \App\Status::class);
         Route::model('user', \App\User::class);
 
         // A Rating does not exist on first access.

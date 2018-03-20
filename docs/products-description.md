@@ -19,7 +19,7 @@ Aparte de los criterios de filtrado globales, los productos se pueden filtrar po
 |brand_id|ContenidoEn|
 |category_id|ContenidoEn|
 |condition_id|ContenidoEn|
-|status_id|ContenidoEn|
+|status|ContenidoEn|
 
 ##### Agregar imágenes
 

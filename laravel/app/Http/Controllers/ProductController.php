@@ -25,7 +25,6 @@ class ProductController extends Controller
         'category_id',
         'size_id',
         'condition_id',
-        'status_id',
         'status',
     ];
     public static $allowedWhereHas = ['color_ids' => 'colors', 'campaign_ids' => 'campaigns'];
@@ -52,7 +51,7 @@ class ProductController extends Controller
     public static function validateIsPublished($request, $next)
     {
         $product = $request->route()->parameters['product'];
-        if ($product->status !== Product::STATUS_UNPUBLISHED) {
+        if ($product->status >= Product::STATUS_APPROVED) {
             return $next($request);
         }
 
@@ -107,7 +106,6 @@ class ProductController extends Controller
             'campaign_ids' => 'array',
             'campaign_ids.*' => 'integer|exists:campaigns,id',
             'condition_id' => $required . 'integer|exists:conditions,id',
-            'status_id' => $required . 'integer|exists:statuses,id',
             'status' => ['integer', Rule::in(Product::getStatuses())],
             'images' => $required . 'array',
             'images.*' => 'image',
@@ -178,8 +176,12 @@ class ProductController extends Controller
             return;
         }
 
-        return function ($query) {
-            return $query->where('status', '>=', Product::STATUS_APPROVED);
+        return function ($query) use ($user) {
+            $query = $query->where('status', '>=', Product::STATUS_APPROVED);
+            if ($user) {
+                $query = $query->orWhere('user_id', $user->id);
+            }
+            return $query;
         };
     }
 
