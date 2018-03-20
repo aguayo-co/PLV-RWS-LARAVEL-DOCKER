@@ -58,6 +58,14 @@ class Order extends Model
     }
 
     /**
+     * Get the order products that were marked for return.
+     */
+    public function getReturnedProductsAttribute()
+    {
+        return $this->sales->pluck('returned_products')->flatten();
+    }
+
+    /**
      * The total value of the order.
      */
     public function getTotalAttribute()

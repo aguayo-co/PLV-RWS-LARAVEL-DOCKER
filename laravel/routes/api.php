@@ -47,6 +47,7 @@ Route::name('api.')->group(function () {
     create_protected_crud_routes('CreditsTransaction', ID_REGEX);
     create_protected_crud_routes('Order', ID_REGEX);
     create_protected_crud_routes('Sale', ID_REGEX);
+    create_protected_crud_routes('SaleReturn', ID_REGEX);
 
     # Public Product routes
     Route::get('products', 'ProductController@index')->name('products');

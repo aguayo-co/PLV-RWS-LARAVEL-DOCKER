@@ -27,7 +27,8 @@ class Sale extends Model
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['shipment_details', 'status'];
-    protected $with = ['products', 'shippingMethod', 'creditsTransactions'];
+    protected $with = ['products', 'shippingMethod', 'creditsTransactions', 'returns'];
+    protected $appends = ['returned_products_ids'];
 
     /**
      * Get the user that sells this.
@@ -42,9 +43,30 @@ class Sale extends Model
         return $this->belongsTo('App\Order');
     }
 
+    /**
+     * Get the sale products.
+     */
     public function products()
     {
-        return $this->belongsToMany('App\Product');
+        return $this->belongsToMany('App\Product')->withPivot('sale_return_id');
+    }
+
+    /**
+     * Get the sale products that were marked for return.
+     */
+    public function getReturnedProductsAttribute()
+    {
+        return $this->products->whereNotIn('pivot.sale_return_id', [null]);
+    }
+
+    public function getReturnedProductsIdsAttribute()
+    {
+        return $this->returned_products->pluck('id');
+    }
+
+    public function returns()
+    {
+        return $this->belongsToMany('App\SaleReturn', 'product_sale');
     }
 
     public function creditsTransactions()

@@ -25,7 +25,8 @@ class Payment extends Model
             // Will be used with the `id` field to make a unique combination.
             // This is needed to reduce the possibility of duplicate transaction
             // ids for the payment gateways.
-            // Duplicate transaction ids might be common in test mode.
+            // Duplicate transaction ids might be common in test mode where tables
+            // are reset and an `id` gets reused.
             $payment->uniqid = uniqid();
         });
     }
