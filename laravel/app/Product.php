@@ -69,7 +69,7 @@ class Product extends Model
 
     protected function getColorIdsAttribute()
     {
-        return $this->colors->pluck('id')->all();
+        return $this->colors->pluck('id');
     }
 
     protected function setColorIdsAttribute(array $colorIds)
@@ -84,7 +84,7 @@ class Product extends Model
 
     protected function getCampaignIdsAttribute()
     {
-        return $this->campaigns->pluck('id')->all();
+        return $this->campaigns->pluck('id');
     }
 
     protected function setCampaignIdsAttribute(array $campaignIds)

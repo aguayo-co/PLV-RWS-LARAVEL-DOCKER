@@ -70,7 +70,7 @@ class ProcessSaleCredits
 
     protected function givePartialCreditsToSeller(Sale $sale)
     {
-        $returnedProductsIds = $sale->returnedProductsIds->all();
+        $returnedProductsIds = $sale->returnedProductsIds->implode(', ');
         $reason = 'Order was completed with products ":products" returned.';
         $amount = $sale->total - $sale->commission - $sale->returned_total;
 
@@ -78,7 +78,7 @@ class ProcessSaleCredits
             'user_id' => $sale->user_id,
             'amount' => $amount,
             'sale_id' => $sale->id,
-            'extra' => ['reason' => __($reason, ['products' => implode(', ', $returnedProductsIds)])]
+            'extra' => ['reason' => __($reason, ['products' => $returnedProductsIds])]
         ]);
     }
 }

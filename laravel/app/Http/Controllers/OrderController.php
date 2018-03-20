@@ -231,7 +231,7 @@ class OrderController extends Controller
         return function ($attribute, $value, $fail) use ($order) {
             $sale = $this->getSaleFromAttribute($attribute, $order);
             if (!$sale) {
-                $validIds = implode(', ', $order->sales->pluck('id')->all());
+                $validIds = $order->sales->pluck('id')->implode(', ');
                 return $fail(__('validation.in', ['values' => $validIds]));
             }
         };

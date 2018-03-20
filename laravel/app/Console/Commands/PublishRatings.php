@@ -14,7 +14,7 @@ class PublishRatings extends Command
      *
      * @var string
      */
-    protected $signature = 'sales:publish-ratings';
+    protected $signature = 'ratings:publish';
 
     /**
      * The console command description.

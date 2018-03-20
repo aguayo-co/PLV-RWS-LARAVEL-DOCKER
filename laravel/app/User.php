@@ -96,7 +96,7 @@ class User extends Authenticatable
 
         switch (false) {
             case $this->about:
-            case $this->shipping_method_ids:
+            case $this->shipping_method_ids->isNotEmpty():
             case $this->cover:
             case $this->phone:
             case $this->picture:
@@ -163,7 +163,7 @@ class User extends Authenticatable
 
     protected function getGroupIdsAttribute()
     {
-        return $this->groups->pluck('id')->all();
+        return $this->groups->pluck('id');
     }
 
     protected function setShippingMethodIdsAttribute(array $shippingMethodIds)
@@ -178,7 +178,7 @@ class User extends Authenticatable
 
     protected function getShippingMethodIdsAttribute()
     {
-        return $this->shippingMethods->pluck('id')->all();
+        return $this->shippingMethods->pluck('id');
     }
 
     protected function setFavoritesIdsAttribute(array $favoritesIds)
@@ -193,7 +193,7 @@ class User extends Authenticatable
 
     protected function getFavoritesIdsAttribute()
     {
-        return $this->favorites->pluck('id')->all();
+        return $this->favorites->pluck('id');
     }
 
     protected function getCoverAttribute()

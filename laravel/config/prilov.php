@@ -6,4 +6,7 @@ return [
         'days_delivered_to_completed' => 2,
         'days_to_publish_ratings' => 5,
     ],
+    'sale_returns' => [
+        'days_created_to_canceled' => 2,
+    ],
 ];
