@@ -15,7 +15,31 @@ class CreditsTransactionController extends Controller
     {
         parent::__construct();
         $this->middleware('owner_or_admin')->only('show');
+        $this->middleware(self::class . '::validateUserCanModifyTransaction')->only(['delete, update']);
     }
+
+    /**
+     * Middleware that validates permissions to set ratings.
+     */
+    public static function validateUserCanModifyTransaction($request, $next)
+    {
+        $user = auth()->user();
+
+        if ($user->hasRole('admin')) {
+            return $next($request);
+        }
+
+        $transaction = $request->route()->parameters['credits_transaction'];
+
+        $order = $transaction->order;
+
+        if ($order && Order::STATUS_SHOPPING_CART < $order->status) {
+            abort(Response::HTTP_FORBIDDEN, 'User not allowed to modify transaction for order not in SHopping Cart.');
+        }
+
+        return $next($request);
+    }
+
 
     /**
      * When user is not admin, limit to current user sales.
@@ -55,7 +79,7 @@ class CreditsTransactionController extends Controller
                 trim($required, '|'),
                 'integer',
                 'between:-9999999,9999999',
-                $this->getCanCreateInflowValidationRule(),
+                $this->getIsOutflowValidationRule(),
             ],
             'sale_id' => [
                 'nullable',
@@ -81,7 +105,7 @@ class CreditsTransactionController extends Controller
      * Rule that validates that a user can only use credits, and only
      * admin can add credits.
      */
-    public static function getCanCreateInflowValidationRule()
+    public static function getIsOutflowValidationRule()
     {
         return function ($attribute, $value, $fail) {
             if (auth()->user()->hasRole('admin')) {
@@ -98,6 +122,17 @@ class CreditsTransactionController extends Controller
         if (!$transaction && !array_get($data, 'user_id')) {
             $data['user_id'] = auth()->user()->id;
         }
+
+        $orderId = array_get($data, 'order_id');
+        $saleId = array_get($data, 'sale_id');
+
+        if ($saleId) {
+            $data['order_id'] = null;
+        }
+        if ($orderId) {
+            $data['sale_id'] = null;
+        }
+
         return $data;
     }
 }
