@@ -133,6 +133,25 @@ class PaymentController extends Controller
     }
 
     /**
+     * Mark Order and its Sales as Payed.
+     */
+    public function approveOrder($order)
+    {
+        // We want to fire events.
+        foreach ($order->sales as $sale) {
+            $sale->status = Sale::STATUS_PAYED;
+            $sale->save();
+        }
+        foreach ($order->products as $product) {
+            $product->status = Product::STATUS_SOLD;
+            $product->save();
+        }
+
+        $order->status = Order::STATUS_PAYED;
+        $order->save();
+    }
+
+    /**
      * Process a callback from the gateway.
      */
     public function gatewayCallback(Request $request, $gateway)

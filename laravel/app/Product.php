@@ -19,6 +19,7 @@ class Product extends Model
     const STATUS_AVAILABLE = 19;
     const STATUS_UNAVAILABLE = 20;
     const STATUS_SOLD = 30;
+    const STATUS_SOLD_RETURNED = 31;
 
     protected const IMAGES_BASE_PATH = 'public/product/images/';
 

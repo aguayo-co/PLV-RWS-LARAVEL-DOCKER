@@ -138,20 +138,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Mark Order and its Sales as Payed.
-     */
-    public function approveOrder($order)
-    {
-        // We want to fire events.
-        foreach ($order->sales->whereIn('id', $order->sales->pluck('id')) as $sale) {
-            $sale->status = Sale::STATUS_PAYED;
-            $sale->save();
-        }
-        $order->status = Order::STATUS_PAYED;
-        $order->save();
-    }
-
-    /**
      * Set validation messages for ValidationRules.
      */
     protected function validationMessages()
