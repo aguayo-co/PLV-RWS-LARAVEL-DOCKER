@@ -242,6 +242,11 @@ resourceTypes:
         properties:
           status: bool
           reference: string
+    responses:
+      200:
+        description: "Request proccessed correctly."
+      4XX:
+        description: "Invalid request."
 
 /api/sales:
   description: !include sales-description.md
