@@ -25,8 +25,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('sales:delivered-to-completed')->hourlyAt(10);
+        $schedule->command('sale-returns:old-to-canceled')->hourlyAt(20);
+        $schedule->command('payments:pending-to-canceled')->hourlyAt(30);
         $schedule->command('sales:shipped-to-delivered')->hourlyAt(40);
-        $schedule->command('sale-returns:old-to-canceled')->hourlyAt(25);
         $schedule->command('ratings:publish')->twiceDaily(6, 18);
     }
 

@@ -124,7 +124,7 @@ class PaymentController extends Controller
                 $sale->save();
             }
             foreach ($order->products as $product) {
-                $product->status = Product::STATUS_UNAVAILABLE;
+                $product->status = Product::STATUS_PAYMENT;
                 $product->save();
             }
         });

@@ -9,4 +9,7 @@ return [
     'sale_returns' => [
         'days_created_to_canceled' => 2,
     ],
+    'payments' => [
+        'minutes_until_canceled' => 45,
+    ],
 ];

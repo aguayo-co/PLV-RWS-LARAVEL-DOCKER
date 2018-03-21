@@ -10,8 +10,10 @@ class Payment extends Model
     use HasStatuses;
 
     const STATUS_PENDING = 0;
+    const STATUS_PROCESSING = 1;
     const STATUS_SUCCESS = 10;
-    const STATUS_ERROR = 99;
+    const STATUS_ERROR = 98;
+    const STATUS_CANCELED = 99;
 
     protected $fillable = ['order_id', 'status'];
     protected $hidden = ['request'];
@@ -56,7 +58,7 @@ class Payment extends Model
 
     public function getRequestDataAttribute($value)
     {
-        return $this->request->public_data;
+        return data_get($this, 'request.public_data');
     }
 
     public function setAttemptsAttribute($value)

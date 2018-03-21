@@ -17,7 +17,7 @@ class Order extends Model
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['shipping_address'];
-    protected $with = ['sales', 'creditsTransactions'];
+    protected $with = ['sales', 'creditsTransactions', 'payments'];
     protected $appends = ['total', 'due'];
 
     /**

@@ -49,7 +49,7 @@ class Gateway
         $array = explode('-', $reference);
         $payment_id = trim(end($array));
         $payment = Payment::where('id', $payment_id)->first();
-        if ($payment) {
+        if ($payment && $reference === $this->getReference($payment)) {
             return $payment;
         }
         abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Payment reference not found.');

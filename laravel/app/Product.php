@@ -18,8 +18,9 @@ class Product extends Model
     const STATUS_APPROVED = 10;
     const STATUS_AVAILABLE = 19;
     const STATUS_UNAVAILABLE = 20;
-    const STATUS_SOLD = 30;
-    const STATUS_SOLD_RETURNED = 31;
+    const STATUS_PAYMENT = 30;
+    const STATUS_SOLD = 31;
+    const STATUS_SOLD_RETURNED = 32;
 
     protected const IMAGES_BASE_PATH = 'public/product/images/';
 
@@ -49,9 +50,9 @@ class Product extends Model
     protected $with = ['brand', 'campaigns', 'colors', 'category.parent', 'size.parent', 'condition', 'user'];
     protected $appends = ['images', 'color_ids', 'campaign_ids'];
 
-    protected function getApprovedAttribute()
+    protected function getEditableAttribute()
     {
-        return Product::STATUS_APPROVED <= $this->status && $this->status < Product::STATUS_SOLD;
+        return Product::STATUS_APPROVED <= $this->status && $this->status < Product::STATUS_PAYMENT;
     }
 
     protected function getSaleableAttribute()

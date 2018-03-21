@@ -1,7 +1,7 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.8.1
-baseUri: https://prilov.aguayo.co/api
+version: 0.8.2
+baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
 types: !include types.raml
@@ -41,7 +41,7 @@ resourceTypes:
                   "message": "Object deleted"
                 }
 
-/users:
+/api/users:
   description: !include users-description.md
   post:
     is: [ withToken, createItemPost ]
@@ -122,16 +122,16 @@ resourceTypes:
         200:
           description: "Password changed succesfully."
 
-/menus:
+/api/menus:
   type: collection
   /{menu-slug}:
     type: singleItem
-/menu_items:
+/api/menu_items:
   type: collection
   /{menu_item-id}:
     type: singleItem
 
-/products:
+/api/products:
   description: !include products-description.md
   type: collection
   get:
@@ -143,53 +143,53 @@ resourceTypes:
     patch:
       is: [ needOwner ]
 
-/shipping_methods:
+/api/shipping_methods:
   type: collection
   /{shipping_method-slug}:
     type: singleItem
 
-/banners:
+/api/banners:
   type: collection
   /{banner-slug}:
     type: singleItem
-/brands:
+/api/brands:
   type: collection
   /{brand-slug}:
     type: singleItem
-/campaigns:
+/api/campaigns:
   type: collection
   /{campaign-slug}:
     type: singleItem
-/categories:
+/api/categories:
   description: !include categories-description.md
   type: collection
   /{category-slug}:
     type: singleItem
     /{subcategory-slug}:
       type: singleItem
-/colors:
+/api/colors:
   type: collection
   /{color-slug}:
     type: singleItem
-/conditions:
+/api/conditions:
   type: collection
   /{condition-slug}:
     type: singleItem
-/sizes:
+/api/sizes:
   type: collection
   /{size-id}:
     type: singleItem
-/groups:
+/api/groups:
   type: collection
   /{group-slug}:
     type: singleItem
-/sliders:
+/api/sliders:
   description: !include sliders-description.md
   type: collection
   /{sliders-slug}:
     type: singleItem
 
-/orders:
+/api/orders:
   description: !include orders-description.md
   type: getCollection
   get:
@@ -207,7 +207,7 @@ resourceTypes:
             type: stryng
             description: "La pasarela de pagos a usar."
 
-/shopping_cart:
+/api/shopping_cart:
   description: !include shopping-cart-description.md
   get:
     description: |
@@ -233,7 +233,17 @@ resourceTypes:
           type: stryng
           description: "La pasarela de pagos a usar."
 
-/sales:
+/callback/gateway/transfer:
+  description: !include callback-description.md
+  post:
+    is: [needAdmin]
+    body:
+      application/json:
+        properties:
+          status: bool
+          reference: string
+
+/api/sales:
   description: !include sales-description.md
   type: getCollection
   get:
@@ -243,7 +253,7 @@ resourceTypes:
     get:
       is: [needOwner, needAdmin]
 
-/credits_transactions:
+/api/credits_transactions:
   type: collection
   get:
     is: [needOwner, needAdmin]

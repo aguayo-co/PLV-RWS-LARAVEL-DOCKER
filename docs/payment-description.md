@@ -42,3 +42,18 @@ Las pasarelas disponibles y la información adicional necesaria para cada una se
 Aparte de `gatewayUrl`, la información sobre las variables se encuentra en la
 [documentación](http://developers.payulatam.com/es/web_checkout/variables.html)
 de PayU.
+
+
+##### Transferencia Bancaria
+
+- **Nombre**: transfer (`?gateway=transfer`)
+- **request_data**:
+    - reference
+    - amount
+
+Este Gateway debe usarse cuando los pagos los van a hacer de forma manual las usuarias, y estos
+van a ser validados por los administradores de Prilov, nuevamente, de forma manual.
+
+Estos pagos quedan permanentemente en pendiente hasta que un administrador los apruebe o los rechace.
+
+La ruta para aprobar o rechazar estos pagos es `/callback/gateway/transfer`.

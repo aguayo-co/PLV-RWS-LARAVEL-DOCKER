@@ -144,10 +144,10 @@ class ProductController extends Controller
             );
         }
 
-        if (!$product || !$product->approved) {
+        if (!$product || !$product->editable) {
             abort(
                 Response::HTTP_FORBIDDEN,
-                'Only admin can change status to an unapproved product.'
+                'Only admin can change status.'
             );
         }
     }
