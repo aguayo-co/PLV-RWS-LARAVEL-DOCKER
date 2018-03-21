@@ -13,6 +13,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
@@ -209,7 +210,9 @@ class Controller extends BaseController
     {
         $data = $request->all();
         $this->validate($this->alterValidateData($data));
-        $model = call_user_func($this->modelClass . '::create', $this->alterFillData($data));
+        $model = DB::transaction(function () use ($data) {
+            return call_user_func($this->modelClass . '::create', $this->alterFillData($data));
+        });
         $model = $this->postStore($request, $model);
         return $model;
     }
@@ -226,7 +229,11 @@ class Controller extends BaseController
         $data = $request->all();
         if ($data) {
             $this->validate($this->alterValidateData($data, $model), $model);
-            $model->fill($this->alterFillData($data, $model))->save();
+            $model = DB::transaction(function () use ($data, $model) {
+                // Force timestamp to be updated.
+                $model->fill($this->alterFillData($data, $model))->touch();
+                return $model;
+            });
         }
         $model = $this->postUpdate($request, $model);
         return $model;

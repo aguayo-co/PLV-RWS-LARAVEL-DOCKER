@@ -18,6 +18,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\SaleReturnSaved' => [
             'App\Listeners\ProcessSaleReturnCredits',
+            'App\Listeners\ProcessSaleStatusFromReturn',
         ],
     ];
 

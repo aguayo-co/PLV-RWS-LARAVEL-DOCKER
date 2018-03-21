@@ -52,6 +52,13 @@ class SaleReturn extends Model
         return $this->sale ? $this->sale->returned_products_ids : [];
     }
 
+    /**
+     * Associate the products to be returned with this SaleReturn.
+     * It is done on the same table as products get associated to sales.
+     * A third column tells was if it is being returned or not.
+     *
+     * @param  array $data An array with two keys: sale_id and products_ids.
+     */
     protected function setProductsIdsAttribute(array $data)
     {
         if ($this->saveLater('products_ids', $data)) {
@@ -60,6 +67,7 @@ class SaleReturn extends Model
 
         $productsIdsSync = [];
         $sale = Sale::find($data['sale_id']);
+
         foreach ($sale->products_ids as $productId) {
             if (in_array($productId, $data['products_ids'])) {
                 $productsIdsSync[$productId] = ['sale_return_id' => $this->id];
@@ -69,6 +77,6 @@ class SaleReturn extends Model
         }
 
         $sale->products()->sync($productsIdsSync);
-        $this->touch();
+        $sale->load('products');
     }
 }

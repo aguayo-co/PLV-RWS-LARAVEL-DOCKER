@@ -79,7 +79,6 @@ class Product extends Model
         }
         $this->colors()->sync($colorIds);
         $this->load('colors');
-        $this->touch();
     }
 
     protected function getCampaignIdsAttribute()
@@ -94,7 +93,6 @@ class Product extends Model
         }
         $this->campaigns()->sync($campaignIds);
         $this->load('campaigns');
-        $this->touch();
     }
 
     protected function getImagePathAttribute()
