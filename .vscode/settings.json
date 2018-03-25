@@ -1,0 +1,32 @@
+{
+    "phpmd.rules": "/Users/federico/Development/config-files/php/laravel.phpmd.xml",
+    "cSpell.words": [
+        "api",
+        "by",
+        "cl",
+        "clp",
+        "completable",
+        "couponable",
+        "couponables",
+        "create",
+        "doesnt",
+        "favorited",
+        "fulltext",
+        "get",
+        "have",
+        "imate",
+        "key",
+        "laravel",
+        "login",
+        "payu",
+        "prilov",
+        "protected",
+        "routes",
+        "rud",
+        "rule",
+        "sale",
+        "spatie",
+        "type",
+        "where"
+    ]
+}
