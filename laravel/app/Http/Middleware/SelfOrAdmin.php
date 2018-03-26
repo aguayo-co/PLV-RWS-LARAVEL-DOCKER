@@ -31,7 +31,7 @@ class SelfOrAdmin
         }
 
         $object = array_get(array_values($request->route()->parameters), 0);
-        if ($object && $object->user_id != $request->user_id && !$user->hasRole('admin')) {
+        if ($object && $object->user_id && $object->user_id != $request->user_id && !$user->hasRole('admin')) {
             abort(Response::HTTP_FORBIDDEN, 'Only admin can change the user_id.');
         }
 
