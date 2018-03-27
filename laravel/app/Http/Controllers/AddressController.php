@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Address;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use App\Geoname;
 
 class AddressController extends Controller
 {
@@ -13,7 +14,7 @@ class AddressController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('owner_or_admin');
+        $this->middleware('owner_or_admin')->except('regions');
     }
 
     protected function validationRules(array $data, ?Model $address)
@@ -95,5 +96,29 @@ class AddressController extends Controller
     public function update(Request $request, Model $user)
     {
         return parent::update($request, $request->route()->parameters['address']);
+    }
+
+    public function regions(Request $request)
+    {
+        $admin1 = Geoname::where('country_code', 'CL')->where('feature_code', 'ADM1')
+            ->select('admin1_code', 'name', 'geonameid')->get();
+        $admin2 = Geoname::where('country_code', 'CL')->where('feature_code', 'ADM2')
+            ->whereIn('admin1_code', $admin1->pluck('admin1_code')->all())
+            ->select('admin1_code', 'admin2_code', 'name', 'geonameid')->get();
+        $admin3 = Geoname::where('country_code', 'CL')->where('feature_code', 'ADM3')
+            ->whereIn('admin2_code', $admin2->pluck('admin2_code')->all())
+            ->select('admin1_code', 'admin2_code', 'admin3_code', 'name', 'geonameid')->get();
+
+        $groupedAdmin3 = $admin3->groupBy('admin2_code');
+        foreach ($admin2 as &$adm2) {
+            $adm2->children = $groupedAdmin3[$adm2->admin2_code]->keyBy('name');
+        }
+
+        $groupedAdmin2 = $admin2->groupBy('admin1_code');
+        foreach ($admin1 as &$adm1) {
+            $adm1->children = $groupedAdmin2[$adm1->admin1_code]->keyBy('name');
+        }
+
+        return $admin1->keyBy('name');
     }
 }

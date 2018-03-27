@@ -62,7 +62,7 @@ class SelfOrAdminTest extends TestCase
         $this->request->user_id = $this->user->id;
 
         $addressUser = factory(User::class)->create();
-        $address = factory(Address::class)->make(['user_id' => $addressUser->id]);
+        $address = factory(Address::class)->create(['user_id' => $addressUser->id]);
         $this->route->parameters = [$address];
 
         $this->expectException(HttpException::class);

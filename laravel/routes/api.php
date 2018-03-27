@@ -28,6 +28,8 @@ Route::name('api.')->group(function () {
 
     Route::get('users/{user}', 'Auth\UserController@show')->name('user.get')->where('user', ID_REGEX);
 
+    Route::get('regions', 'AddressController@regions')->name('regions');
+
     create_crud_routes('Banner', SLUG_REGEX);
     create_crud_routes('Brand', SLUG_REGEX);
     create_crud_routes('Campaign', SLUG_REGEX);
