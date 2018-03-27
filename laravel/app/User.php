@@ -38,6 +38,7 @@ class User extends Authenticatable
         'vacation_mode',
         'group_ids',
         'shipping_method_ids',
+        'favorite_address_id',
     ];
 
     /**

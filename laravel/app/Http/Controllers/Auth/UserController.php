@@ -11,6 +11,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Laravel\Passport\Token;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -42,6 +43,13 @@ class UserController extends Controller
             'picture' => 'image',
             'cover' => 'image',
             'vacation_mode' => 'boolean',
+            'favorite_address_id' => [
+                trim($required, '|'),
+                'integer',
+                Rule::exists('addresses', 'id')->where(function ($query) use ($user) {
+                    $query->where('user_id', $user ? $user->id : null);
+                }),
+            ],
             'group_ids' => 'array',
             'group_ids.*' => 'integer|exists:groups,id',
             'shipping_method_ids' => 'array',
