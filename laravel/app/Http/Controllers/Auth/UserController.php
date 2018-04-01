@@ -44,7 +44,6 @@ class UserController extends Controller
             'cover' => 'image',
             'vacation_mode' => 'boolean',
             'favorite_address_id' => [
-                trim($required, '|'),
                 'integer',
                 Rule::exists('addresses', 'id')->where(function ($query) use ($user) {
                     $query->where('user_id', $user ? $user->id : null);
