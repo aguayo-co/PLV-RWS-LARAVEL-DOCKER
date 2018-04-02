@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Address;
+use App\Http\Controllers\Order\OrderControllerRules;
 use App\Http\Traits\CurrentUserOrder;
 use App\Order;
 use App\Product;
 use App\Sale;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 /**
@@ -22,6 +22,7 @@ use Illuminate\Validation\Rule;
 class OrderController extends Controller
 {
     use CurrentUserOrder;
+    use OrderControllerRules;
 
     protected $modelClass = Order::class;
 
@@ -195,103 +196,10 @@ class OrderController extends Controller
                 Rule::in([Sale::STATUS_RECEIVED, Sale::STATUS_COMPLETED]),
                 $this->getStatusRule($order),
             ],
+
         ];
     }
 
-    protected function getIdFromAttribute($attribute)
-    {
-        $matches = [];
-        $matched = preg_match('/.*?\.([0-9]+)(\..*)?$/', $attribute, $matches);
-        return $matched ? $matches[1] : null;
-    }
-
-    protected function getSaleFromAttribute($attribute, $order)
-    {
-        return $order->sales->firstWhere('id', $this->getIdFromAttribute($attribute));
-    }
-
-    /**
-     * Rule that validates that the given sale is still in a ShoppingCart.
-     */
-    protected function getIdIsValidRule($order)
-    {
-        return function ($attribute, $value, $fail) use ($order) {
-            $saleId = $this->getIdFromAttribute($attribute);
-            if (!$saleId) {
-                return $fail(__('validation.integer'));
-            }
-        };
-    }
-
-    /**
-     * Rule that validates that the given sale is still in a ShoppingCart.
-     */
-    protected function getSaleIsValidRule($order)
-    {
-        return function ($attribute, $value, $fail) use ($order) {
-            $sale = $this->getSaleFromAttribute($attribute, $order);
-            if (!$sale) {
-                $validIds = $order->sales->pluck('id')->implode(', ');
-                return $fail(__('validation.in', ['values' => $validIds]));
-            }
-        };
-    }
-
-    /**
-     * Rule that validates that the given sale is still in a ShoppingCart.
-     */
-    protected function getSaleInShoppingCartRule($order)
-    {
-        return function ($attribute, $value, $fail) use ($order) {
-            $sale = $this->getSaleFromAttribute($attribute, $order);
-            // If no Sale found, skip.
-            // Sale validation done on a different Rule.
-            if ($sale) {
-                if ($sale->status > Sale::STATUS_SHOPPING_CART) {
-                    return $fail(__('No se puede modificar Orden que no está en ShoppingCart.'));
-                }
-            }
-        };
-    }
-
-    /**
-     * Rule that validates that the given shipping method is
-     * allowed by the owner of the sale item to which it is being assigned.
-     */
-    protected function getShippingMethodRule($order)
-    {
-        return function ($attribute, $value, $fail) use ($order) {
-            $sale = $this->getSaleFromAttribute($attribute, $order);
-            // If no Sale found, skip.
-            // Sale validation done on a different Rule.
-            if ($sale) {
-                $shippingMethodIds = DB::table('shipping_method_user')->where('user_id', $sale->user_id)
-                    ->select('shipping_method_id')->pluck('shipping_method_id');
-                if (!$shippingMethodIds->contains($value)) {
-                    return $fail(__('validation.in', ['values' => $shippingMethodIds->implode(', ')]));
-                }
-            }
-        };
-    }
-
-    /**
-     * Rule that validates that a Sale status is valid.
-     */
-    protected function getStatusRule($order)
-    {
-        return function ($attribute, $value, $fail) use ($order) {
-            $saleId = preg_replace('/.*\.([0-9]+)\..*/', '$1', $attribute);
-            $sale = $order->sales->firstWhere('id', $saleId);
-            // Order needs to be payed.
-            if ($sale->status < Sale::STATUS_PAYED) {
-                return $fail(__('La orden no ha sido pagada.'));
-            }
-            // Do not go back in status.
-            if ($value <= $sale->status) {
-                return $fail(__('validation.min.numeric', ['min' => $sale->status + 1]));
-            }
-        };
-    }
 
     protected function alterFillData($data, Model $order = null)
     {
