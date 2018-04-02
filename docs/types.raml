@@ -255,11 +255,35 @@ Auth:
 ##  Orders and Sales related                ##
 ##############################################
 
+CouponRequest:
+  properties:
+    status: integer
+    description: string
+    code: string
+    valid_from?: datetime
+    valid_to?: datetime
+    minimum_price?: integer
+    minimum_commission?: integer
+    first_purchase_only?: bool
+    discount_value?: integer
+    discount_type?: string
+    brands_ids: integer[]
+    campaigns_ids: integer[]
+Coupon:
+  type: [CouponRequest, BaseObject]
+  properties:
+CouponExpanded:
+  type: Coupon
+  properties:
+    brands: Brand[]
+    campaigns: Campaign[]
+
 OrderRequest:
   properties:
     address_id?: integer
     add_product_ids?: integer[]
     remove_product_ids?: integer[]
+    coupon_code?: string
     sales?:
       properties:
         /^[0-9]*$/:
@@ -275,11 +299,13 @@ Order:
     total: integer
     due: integer
     shipping_address: string
+    coupon_id?: string
 OrderExpanded:
   type: Order
   properties:
-    credits_transactions: CreditsTransaction[]
+    credits_transactions?: CreditsTransaction[]
     sales: Sale[]
+    coupon?: Coupon
 
 SaleRequest:
   properties:

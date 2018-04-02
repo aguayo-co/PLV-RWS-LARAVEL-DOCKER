@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.8.2
+version: 0.8.3
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -188,6 +188,15 @@ resourceTypes:
   type: collection
   /{sliders-slug}:
     type: singleItem
+
+/api/coupons:
+  type: collection
+  get:
+    is: [needAdmin]
+  /{coupon-id}:
+    type: singleItem
+    get:
+      is: [needAdmin]
 
 /api/orders:
   description: !include orders-description.md
