@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Address;
+use App\Coupon;
 use App\Http\Controllers\Order\OrderControllerRules;
 use App\Http\Traits\CurrentUserOrder;
 use App\Order;
@@ -197,6 +198,12 @@ class OrderController extends Controller
                 $this->getStatusRule($order),
             ],
 
+            'coupon_code' => [
+                'bail',
+                'nullable',
+                'string',
+                'exists:coupons,code',
+            ] + $this->getCouponRules($order)
         ];
     }
 
@@ -204,13 +211,22 @@ class OrderController extends Controller
     protected function alterFillData($data, Model $order = null)
     {
         // Never allow shipping_address to be used or passed.
-        // Instead calculate from address_id.
         array_forget($data, 'shipping_address');
+        // Instead calculate from address_id.
         if ($addressId = array_get($data, 'address_id')) {
             $data['shipping_address'] = Address::where('id', $addressId)->first();
         }
+
         // Remove 'sales' from $data since it is not fillable.
-        $data = array_except($data, ['sales']);
+        array_forget($data, 'sales');
+
+        // Calculate coupon_id form coupon_code.
+        if (array_has($data, 'coupon_code')) {
+            $couponCode = array_get($data, 'coupon_code');
+            $data['coupon_id'] = $couponCode ? Coupon::where('code', $couponCode)->select('id')->first()->id : null;
+        }
+        array_forget($data, 'coupon_code');
+
         return $data;
     }
 

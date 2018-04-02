@@ -142,6 +142,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Group');
     }
 
+    public function orders()
+    {
+        return $this->hasMany('App\Order');
+    }
+
     public function shippingMethods()
     {
         return $this->belongsToMany('App\ShippingMethod');

@@ -20,6 +20,8 @@ class CreateOrdersTable extends Migration
             $table->json('shipping_address')->nullable();
             $table->tinyInteger('status')->unsigned();
             $table->json('status_history');
+            $table->integer('coupon_id')->unsigned()->nullable();
+            $table->foreign('coupon_id')->references('id')->on('coupons');
             $table->timestamps();
         });
     }

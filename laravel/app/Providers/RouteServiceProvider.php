@@ -33,6 +33,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('subcategory', \App\Category::class);
         Route::model('color', \App\Color::class);
         Route::model('condition', \App\Condition::class);
+        Route::model('coupon', \App\Coupon::class);
         Route::model('credits_transaction', \App\CreditsTransaction::class);
         Route::model('group', \App\Group::class);
         Route::model('menu_item', \App\MenuItem::class);

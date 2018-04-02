@@ -14,7 +14,7 @@ class CreateGeonamesTable extends Migration
     public function up()
     {
         Schema::create('geonames', function (Blueprint $table) {
-            $table->integer('geonameid')->unsigned();
+            $table->integer('geonameid')->unsigned()->primary();
             $table->string('name');
             $table->string('feature_code');
             $table->string('country_code');

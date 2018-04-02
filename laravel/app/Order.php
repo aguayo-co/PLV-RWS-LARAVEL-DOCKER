@@ -16,9 +16,10 @@ class Order extends Model
     const STATUS_PAYED = 30;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = ['shipping_address'];
-    protected $with = ['sales', 'creditsTransactions', 'payments'];
-    protected $appends = ['total', 'due'];
+    protected $fillable = ['shipping_address', 'coupon_id'];
+    protected $with = ['sales', 'creditsTransactions', 'payments', 'coupon'];
+    protected $hidden = ['coupon'];
+    protected $appends = ['total', 'due', 'coupon_code'];
 
     /**
      * Get the user that buys this.
@@ -26,6 +27,11 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo('App\User');
+    }
+
+    public function coupon()
+    {
+        return $this->belongsTo('App\Coupon');
     }
 
     /**
@@ -75,13 +81,18 @@ class Order extends Model
 
     /**
      * The value the user needs to pay after applying the credits
-     * the users decided to use.
+     * and the coupons the user used.
      */
     public function getDueAttribute()
     {
         $total = $this->products->sum('price');
         $credited = $this->creditsTransactions->sum('amount');
         return $total + $credited;
+    }
+
+    public function getCouponCodeAttribute()
+    {
+        return $this->coupon ? $this->coupon->code : null;
     }
 
     public function setShippingAddressAttribute($value)

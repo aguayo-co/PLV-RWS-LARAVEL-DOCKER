@@ -49,6 +49,7 @@ Route::name('api.')->group(function () {
     create_protected_rud_routes('Order', ID_REGEX);
     create_protected_rud_routes('Sale', ID_REGEX);
 
+    create_protected_crud_routes('Coupon', ID_REGEX);
     create_protected_crud_routes('CreditsTransaction', ID_REGEX);
     create_protected_crud_routes('SaleReturn', ID_REGEX);
 
