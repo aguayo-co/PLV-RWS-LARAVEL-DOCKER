@@ -25,6 +25,7 @@ class ProductController extends Controller
         'category_id',
         'size_id',
         'condition_id',
+        'user_id',
         'status',
     ];
     public static $allowedWhereHas = ['color_ids' => 'colors', 'campaign_ids' => 'campaigns'];
