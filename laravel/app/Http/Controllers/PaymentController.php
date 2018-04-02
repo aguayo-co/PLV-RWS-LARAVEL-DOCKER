@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Gateways\Gateway;
+use App\Http\Controllers\Order\CouponRules;
 use App\Http\Traits\CurrentUserOrder;
 use App\Order;
 use App\Payment;
@@ -12,9 +13,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
+    use CouponRules;
     use CurrentUserOrder;
 
     protected $modelClass = Payment::class;
@@ -56,6 +59,12 @@ class PaymentController extends Controller
      */
     protected function validateOrderCanCheckout($order)
     {
+        Validator::make(
+            ['coupon_code' => $order->coupon_code],
+            ['coupon_code' => $this->getCouponRules($order)]
+        )->validate();
+
+        abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');
         if ($order->status !== Order::STATUS_SHOPPING_CART) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');
         }

@@ -28,6 +28,8 @@ class Coupon extends Model
         'brands_ids',
         'campaigns_ids',
     ];
+    protected $with = ['brands', 'campaigns'];
+    protected $appends = ['brands_ids', 'campaigns_ids'];
 
     public function brands()
     {

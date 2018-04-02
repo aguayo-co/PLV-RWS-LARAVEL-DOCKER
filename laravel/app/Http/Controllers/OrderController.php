@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Address;
 use App\Coupon;
+use App\Http\Controllers\Order\CouponRules;
 use App\Http\Controllers\Order\OrderControllerRules;
 use App\Http\Traits\CurrentUserOrder;
 use App\Order;
@@ -22,6 +23,7 @@ use Illuminate\Validation\Rule;
  */
 class OrderController extends Controller
 {
+    use CouponRules;
     use CurrentUserOrder;
     use OrderControllerRules;
 

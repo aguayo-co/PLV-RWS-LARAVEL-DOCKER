@@ -86,8 +86,61 @@ class Order extends Model
     public function getDueAttribute()
     {
         $total = $this->products->sum('price');
-        $credited = $this->creditsTransactions->sum('amount');
-        return $total + $credited;
+        $credited = -$this->creditsTransactions->sum('amount');
+        $discount = $this->coupon_discount;
+        return $total - $credited - $discount;
+    }
+
+    /**
+     * Calculate and return the value of the discount
+     * for the coupon added to the order.
+     */
+    public function getCouponDiscountAttribute()
+    {
+        $coupon = $this->coupon;
+        $discountedProducts = $this->getDiscountedProducts();
+
+        $discountValue = $coupon->discount_value;
+        $productsTotal = $discountedProducts->sum('price');
+
+        if ($coupon->discount_type === '%') {
+            $discountValue = $productsTotal * $coupon->discount_value / 100;
+        }
+
+        return min($discountValue, $productsTotal);
+    }
+
+    /**
+     * Return the products from the order that meet the coupon criteria.
+     */
+    protected function getDiscountedProducts()
+    {
+        $products = $this->products;
+        $coupon = $this->coupon;
+
+        if ($coupon->brands_ids->isNotEmpty()) {
+            $products = $products->whereIn('brand_id', $coupon->brands_ids->all());
+        }
+
+        if ($coupon->campaigns_ids->isNotEmpty()) {
+            $products = $products->filter(function ($product) use ($coupon) {
+                return $product->campaign_ids->intersect($coupon->campaigns_ids)->isNotEmpty();
+            });
+        }
+
+        if ($minimumCommission = $coupon->minimum_commission) {
+            $products = $products->filter(function ($product) use ($minimumCommission) {
+                return $minimumCommission <= $product->commission;
+            });
+        }
+
+        if ($minimumPrice = $coupon->minimum_price) {
+            $products = $products->filter(function ($product) use ($minimumPrice) {
+                return $minimumPrice <= $product->price;
+            });
+        }
+
+        return $products;
     }
 
     public function getCouponCodeAttribute()
@@ -95,6 +148,10 @@ class Order extends Model
         return $this->coupon ? $this->coupon->code : null;
     }
 
+    /**
+     * Shipping address information comes as an object or array,
+     * encode to json and store everything.
+     */
     public function setShippingAddressAttribute($value)
     {
         $this->attributes['shipping_address'] = json_encode($value);
