@@ -64,7 +64,6 @@ class PaymentController extends Controller
             ['coupon_code' => $this->getCouponRules($order)]
         )->validate();
 
-        abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');
         if ($order->status !== Order::STATUS_SHOPPING_CART) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');
         }
