@@ -98,7 +98,6 @@ class User extends Authenticatable
         switch (false) {
             case $this->about:
             case $this->shipping_method_ids->isNotEmpty():
-            case $this->cover:
             case $this->phone:
             case $this->picture:
                 $this->removeRole($role);

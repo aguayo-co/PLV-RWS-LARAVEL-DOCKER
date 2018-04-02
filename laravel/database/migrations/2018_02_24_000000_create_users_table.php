@@ -21,8 +21,6 @@ class CreateUsersTable extends Migration
             $table->string('last_name');
             $table->string('phone')->nullable();
             $table->text('about')->nullable();
-            $table->integer('favorite_address_id')->unsigned()->nullable();
-            $table->foreign('favorite_address_id')->references('id')->on('addresses');
             $table->boolean('vacation_mode')->default(false);
             $table->timestamps();
         });
