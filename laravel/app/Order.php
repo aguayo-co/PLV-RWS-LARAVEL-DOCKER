@@ -97,6 +97,10 @@ class Order extends Model
     public function getCouponDiscountAttribute()
     {
         $coupon = $this->coupon;
+        if (!$coupon) {
+            return 0;
+        }
+
         $discountedProducts = $this->getDiscountedProducts();
 
         $discountValue = $coupon->discount_value;
@@ -116,6 +120,10 @@ class Order extends Model
     {
         $products = $this->products;
         $coupon = $this->coupon;
+
+        if (!$coupon) {
+            return $products;
+        }
 
         if ($coupon->brands_ids->isNotEmpty()) {
             $products = $products->whereIn('brand_id', $coupon->brands_ids->all());

@@ -59,10 +59,12 @@ class PaymentController extends Controller
      */
     protected function validateOrderCanCheckout($order)
     {
-        Validator::make(
-            ['coupon_code' => $order->coupon_code],
-            ['coupon_code' => $this->getCouponRules($order)]
-        )->validate();
+        if ($order->coupon) {
+            Validator::make(
+                ['coupon_code' => $order->coupon->code],
+                ['coupon_code' => $this->getCouponRules($order)]
+            )->validate();
+        }
 
         if ($order->status !== Order::STATUS_SHOPPING_CART) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order is not in Shopping Cart.');

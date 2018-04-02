@@ -49,6 +49,9 @@ class DatabaseSeeder extends Seeder
 
         factory(App\CreditsTransaction::class, 30)->create();
 
+        factory(App\Coupon::class, 5)->states(['random'])->create();
+        factory(App\Coupon::class, 5)->states(['%', 'random'])->create();
+
         Artisan::call('passport:client', ['--personal' => true, '-n' => true]);
     }
 }

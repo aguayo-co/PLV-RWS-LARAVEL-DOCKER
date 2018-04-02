@@ -7,14 +7,15 @@ use App\Campaign;
 use App\Category;
 use App\Color;
 use App\Condition;
+use App\Coupon;
 use App\Order;
 use App\Product;
 use App\Sale;
 use App\ShippingMethod;
 use App\Size;
 use App\User;
-use Tests\TestCase;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class PaymentTest extends TestCase
 {
@@ -56,7 +57,7 @@ class PaymentTest extends TestCase
         return Sale::where('id', $saleId)->first();
     }
 
-    public function testPaymentNeedsOrderInSHoppingCart()
+    public function testPaymentNeedsOrderInShoppingCart()
     {
         $sale = $this->getSale();
         $sale->order->status = Order::STATUS_PAYMENT;
@@ -113,5 +114,44 @@ class PaymentTest extends TestCase
         $response = $this->actingAs($this->user)->json('GET', $url);
         $response->assertStatus(422)
             ->assertJsonFragment(['Order needs shipping address.']);
+    }
+
+    public function testCouponStatusIsValidated()
+    {
+        $sale = $this->getSale();
+        $coupon = factory(Coupon::class)->create(['status' => Coupon::STATUS_DISABLED]);
+        $sale->order->coupon_id = $coupon->id;
+        $sale->order->save();
+
+        $url = route('api.orders.payment.create', $sale->order);
+        $response = $this->actingAs($this->user)->json('GET', $url);
+        $response->assertStatus(422)
+            ->assertJsonFragment(['Cupón no habilitado.']);
+    }
+
+    public function testCouponValidFromIsValidated()
+    {
+        $sale = $this->getSale();
+        $coupon = factory(Coupon::class)->create(['valid_from' => now()->addDays(1)]);
+        $sale->order->coupon_id = $coupon->id;
+        $sale->order->save();
+
+        $url = route('api.orders.payment.create', $sale->order);
+        $response = $this->actingAs($this->user)->json('GET', $url);
+        $response->assertStatus(422)
+            ->assertJsonFragment(['Cupón no ha iniciado.']);
+    }
+
+    public function testCouponValidToIsValidated()
+    {
+        $sale = $this->getSale();
+        $coupon = factory(Coupon::class)->create(['valid_to' => now()->subDays(1)]);
+        $sale->order->coupon_id = $coupon->id;
+        $sale->order->save();
+
+        $url = route('api.orders.payment.create', $sale->order);
+        $response = $this->actingAs($this->user)->json('GET', $url);
+        $response->assertStatus(422)
+            ->assertJsonFragment(['Cupón vencido.']);
     }
 }

@@ -12,8 +12,8 @@ use App\Sale;
 use App\ShippingMethod;
 use App\Size;
 use App\User;
-use Tests\TestCase;
 use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class OrderTest extends TestCase
 {
@@ -39,14 +39,14 @@ class OrderTest extends TestCase
         $this->user = factory(User::class)->create()->fresh();
     }
 
-    protected function getProduct($status)
+    protected function createProduct($status)
     {
         return factory(Product::class)->create(['status' => $status, 'user_id' => $this->seller->id]);
     }
 
     public function testShoppingCartNeedsSaleableProducts()
     {
-        $product = $this->getProduct(Product::STATUS_UNAVAILABLE);
+        $product = $this->createProduct(Product::STATUS_UNAVAILABLE);
 
         $url = route('api.shopping_cart.update');
 
@@ -56,7 +56,7 @@ class OrderTest extends TestCase
 
     public function testShoppingReceivesProducts()
     {
-        $product = $this->getProduct(Product::STATUS_APPROVED);
+        $product = $this->createProduct(Product::STATUS_APPROVED);
 
         $url = route('api.shopping_cart.update');
 
@@ -67,7 +67,7 @@ class OrderTest extends TestCase
 
     public function testMarkingSaleAsReceivedIsValidated()
     {
-        $product = $this->getProduct(Product::STATUS_APPROVED);
+        $product = $this->createProduct(Product::STATUS_APPROVED);
         $url = route('api.shopping_cart.update');
         $responseData = $this->actingAs($this->user)
             ->json('PATCH', $url, ['add_product_ids' => [$product->id]])->decodeResponseJson();
