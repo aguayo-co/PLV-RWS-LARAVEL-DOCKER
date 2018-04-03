@@ -43,6 +43,13 @@ resourceTypes:
 
 /api/users:
   description: !include users-description.md
+  type: getCollection
+  get:
+    is: [ needAdmin ]
+    queryParameters:
+      email:
+        type: string
+        description: "Correo para revisar si existe. Con este parámetro la ruta es pública."
   post:
     is: [ withToken, createItemPost ]
   /{user-id}:
@@ -213,7 +220,7 @@ resourceTypes:
         is: [ hasType: {type: Payment}, needOwner, needAdmin ]
         queryParameters:
           gateway:
-            type: stryng
+            type: string
             description: "La pasarela de pagos a usar."
 
 /api/shopping_cart:
@@ -239,7 +246,7 @@ resourceTypes:
       is: [ hasType: {type: Payment}, needOwner ]
       queryParameters:
         gateway:
-          type: stryng
+          type: string
           description: "La pasarela de pagos a usar."
 
 /callback/gateway/transfer:

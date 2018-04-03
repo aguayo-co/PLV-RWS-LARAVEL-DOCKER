@@ -53,6 +53,9 @@ Route::name('api.')->group(function () {
     create_protected_crud_routes('CreditsTransaction', ID_REGEX);
     create_protected_crud_routes('SaleReturn', ID_REGEX);
 
+    # Public User routes
+    Route::get('users', 'Auth\UserController@index')->name('users');
+
     # Public Product routes
     Route::get('products', 'ProductController@index')->name('products');
     Route::get('products/{product}', 'ProductController@show')->name('product.get')->where('product', ID_REGEX);

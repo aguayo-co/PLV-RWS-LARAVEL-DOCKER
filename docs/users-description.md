@@ -28,6 +28,24 @@ Ejemplo:
 }
 ```
 
+##### Filtrado
+
+Aparte de los criterios de filtrado globales, los usuarios se pueden filtrar por los siguientes criterios:
+
+|filtro|tipo|
+|------|----|
+|email|ContenidoEn|
+|group_ids|ContenidoEn|
+
+##### Revisión de existencia de cuenta por email
+
+Para revisar si un correo se encuentra registrado en el portal, se puede enviar una consulta a `/api/users`
+con el parámetro email a buscar: `/api/users?email=correo@buscado.com`. Esta consulta no retorna contenido,
+sólo 200 o 404 según sea el caso.
+
+Sólo en este caso la ruta es pública, para consultar listados de usuarios, se requiere permiso `admin`.
+
+
 ##### Productos favoritos
 
 Los usuarios pueden tener productos marcados como favoritos. Para esto se usan los siguientes campos:

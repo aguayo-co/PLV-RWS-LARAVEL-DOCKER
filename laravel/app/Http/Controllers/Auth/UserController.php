@@ -9,13 +9,18 @@ use App\Notifications\Welcome;
 use App\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Laravel\Passport\Token;
 use Illuminate\Validation\Rule;
+use Laravel\Passport\Token;
+use Spatie\Permission\Exceptions\UnauthorizedException;
 
 class UserController extends Controller
 {
     protected $modelClass = User::class;
+
+    public static $allowedWhereIn = ['id', 'email'];
+    public static $allowedWhereHas = ['group_ids' => 'groups'];
 
     protected function alterValidateData($data, Model $user = null)
     {
@@ -125,13 +130,16 @@ class UserController extends Controller
         return $this->setVisibility(parent::show($request, $user));
     }
 
-    protected function setVisibility(User $user)
+    protected function setVisibility($data)
     {
         $loggedUser = auth()->user();
-        if ($user->is($loggedUser) || ($loggedUser && $loggedUser->hasRole('admin'))) {
-            $user = $user->makeVisible('email');
+        switch (true) {
+            // Show email for admins and for same user.
+            case $data instanceof Model && $data->is($loggedUser):
+            case $loggedUser && $loggedUser->hasRole('admin'):
+                $data = $data->makeVisible('email');
         }
-        return $user->load(['followers:id', 'following:id'])
+        return $data->load(['followers:id', 'following:id'])
             ->makeVisible(['followers_ids', 'following_ids', 'following_count', 'followers_count']);
     }
 
@@ -140,5 +148,33 @@ class UserController extends Controller
         $deleted = parent::delete($request, $user);
         $user->notify(new AccountClosed);
         return $deleted;
+    }
+
+    /**
+     * Apply visibility settings to Index query.
+     */
+    public function index(Request $request)
+    {
+        // Quick email existence validation.
+        if ($email = $request->query('email')) {
+            if (User::where('email', $email)->count()) {
+                return;
+            }
+            throw (new ModelNotFoundException)->setModel(User::class);
+        }
+
+        if (auth()->guest()) {
+            throw UnauthorizedException::notLoggedIn();
+        }
+
+        if (!auth()->user()->hasRole('admin')) {
+            throw UnauthorizedException::forRoles(['admin']);
+        }
+
+        $pagination = parent::index($request);
+        $users = $pagination->getCollection();
+        $users = $this->setVisibility($users);
+        $pagination->setCollection($users);
+        return $pagination;
     }
 }
