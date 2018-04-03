@@ -18,7 +18,7 @@ class Order extends Model
 
     protected $fillable = ['shipping_address', 'coupon_id'];
     protected $with = ['sales', 'creditsTransactions', 'payments', 'coupon'];
-    protected $appends = ['total', 'due'];
+    protected $appends = ['total', 'due', 'coupon_discount'];
 
     /**
      * Get the user that buys this.

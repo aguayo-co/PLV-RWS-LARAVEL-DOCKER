@@ -264,7 +264,7 @@ CouponRequest:
     valid_to?: datetime
     minimum_price?: integer
     minimum_commission?: integer
-    first_purchase_only?: bool
+    first_purchase_only?: boolean
     discount_value?: integer
     discount_type?: string
     brands_ids: integer[]
@@ -298,6 +298,7 @@ Order:
     status_history: object
     total: integer
     due: integer
+    coupon_discount: integer
     shipping_address: string
     coupon_id?: string
 OrderExpanded:
