@@ -23,6 +23,7 @@ class AddressController extends Controller
         return [
             'address' => $required . 'string',
             'region' => $required . 'string',
+            'city' => $required . 'string',
             'zone' => $required . 'string',
         ];
     }

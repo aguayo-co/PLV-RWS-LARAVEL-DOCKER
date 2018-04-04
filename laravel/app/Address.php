@@ -12,7 +12,7 @@ class Address extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'address', 'region', 'zone',
+        'user_id', 'address', 'region', 'city', 'zone',
     ];
 
     /**
