@@ -34,6 +34,6 @@ class CreditsTransaction extends Model
 
     public function getExtraAttribute($value)
     {
-        return json_decode($value);
+        return json_decode($value, true);
     }
 }

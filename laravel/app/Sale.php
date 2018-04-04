@@ -131,6 +131,6 @@ class Sale extends Model
 
     public function getShipmentDetailsAttribute($value)
     {
-        return json_decode($value);
+        return json_decode($value, true);
     }
 }

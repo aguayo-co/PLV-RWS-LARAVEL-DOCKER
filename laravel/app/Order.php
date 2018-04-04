@@ -16,7 +16,7 @@ class Order extends Model
     const STATUS_PAYED = 30;
     const STATUS_CANCELED = 99;
 
-    protected $fillable = ['shipping_address', 'coupon_id'];
+    protected $fillable = ['shipping_information', 'coupon_id'];
     protected $with = ['sales', 'creditsTransactions', 'payments', 'coupon'];
     protected $appends = ['total', 'due', 'coupon_discount'];
 
@@ -156,16 +156,16 @@ class Order extends Model
     }
 
     /**
-     * Shipping address information comes as an object or array,
+     * Shipping information comes as an object or array,
      * encode to json and store everything.
      */
-    public function setShippingAddressAttribute($value)
+    public function setShippingInformationAttribute($value)
     {
-        $this->attributes['shipping_address'] = json_encode($value);
+        $this->attributes['shipping_information'] = json_encode($value);
     }
 
-    public function getShippingAddressAttribute($value)
+    public function getShippingInformationAttribute($value)
     {
-        return json_decode($value);
+        return json_decode($value, true);
     }
 }

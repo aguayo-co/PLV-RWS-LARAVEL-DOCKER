@@ -53,7 +53,7 @@ class Payment extends Model
 
     public function getRequestAttribute($value)
     {
-        return json_decode($value);
+        return json_decode($value, true);
     }
 
     public function getRequestDataAttribute($value)
@@ -68,6 +68,6 @@ class Payment extends Model
 
     public function getAttemptsAttribute($value)
     {
-        return json_decode($value);
+        return json_decode($value, true);
     }
 }

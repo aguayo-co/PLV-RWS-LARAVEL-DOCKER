@@ -166,6 +166,7 @@ class OrderController extends Controller
                     $query->where('user_id', $order->user_id);
                 }),
             ],
+            'phone' => 'string',
 
             'add_product_ids' => 'array',
             'add_product_ids.*' => [
@@ -212,11 +213,21 @@ class OrderController extends Controller
 
     protected function alterFillData($data, Model $order = null)
     {
-        // Never allow shipping_address to be used or passed.
-        array_forget($data, 'shipping_address');
-        // Instead calculate from address_id.
+        // Never allow shipping_information to be used or passed.
+        array_forget($data, 'shipping_information');
+
+        $shippingInformation = data_get($order, 'shipping_information', []);
+
+        // Calculate address from address_id.
         if ($addressId = array_get($data, 'address_id')) {
-            $data['shipping_address'] = Address::where('id', $addressId)->first();
+            $shippingInformation['address'] = Address::where('id', $addressId)->first()->toArray();
+            $data['shipping_information'] = $shippingInformation;
+        }
+
+        // Set phone to shipping information.
+        if ($phone = array_get($data, 'phone')) {
+            $shippingInformation['phone'] = $phone;
+            $data['shipping_information'] = $shippingInformation;
         }
 
         // Remove 'sales' from $data since it is not fillable.
