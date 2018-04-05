@@ -209,12 +209,12 @@ class OrderController extends Controller
                 $this->getStatusRule($order),
             ],
 
-            'coupon_code' => [
+            'coupon_code' => array_merge([
                 'bail',
                 'nullable',
                 'string',
                 'exists:coupons,code',
-            ] + $this->getCouponRules($order)
+            ], $this->getCouponRules($order))
         ];
     }
 
