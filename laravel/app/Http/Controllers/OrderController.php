@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Address;
 use App\Coupon;
+use App\CreditsTransaction;
 use App\Http\Controllers\Order\CouponRules;
 use App\Http\Controllers\Order\OrderControllerRules;
 use App\Http\Traits\CurrentUserOrder;
@@ -159,6 +160,7 @@ class OrderController extends Controller
      */
     protected function validationRules(array $data, ?Model $order)
     {
+        $availableCredits = $order ? $order->user->credits + $order->used_credits : 0;
         return [
             'address_id' => [
                 'integer',
@@ -178,6 +180,8 @@ class OrderController extends Controller
 
             'remove_product_ids' => 'array',
             'remove_product_ids.*' => 'integer|exists:products,id',
+
+            'used_credits' => 'integer|between:0,' . $availableCredits,
 
             'sales' => 'array',
             'sales.*' => [
@@ -232,6 +236,8 @@ class OrderController extends Controller
 
         // Remove 'sales' from $data since it is not fillable.
         array_forget($data, 'sales');
+        // Remove 'used_credits' from $data since it calculated, and not store din Order.
+        array_forget($data, 'used_credits');
 
         // Calculate coupon_id form coupon_code.
         if (array_has($data, 'coupon_code')) {
@@ -276,6 +282,22 @@ class OrderController extends Controller
 
         if ($sales = $request->sales) {
             $this->processSalesData($order, $sales);
+        }
+
+        $usedCredits = $request->used_credits;
+        if ($usedCredits > 0) {
+            CreditsTransaction::updateOrCreate(
+                ['order_id' => $order->id, 'user_id' => $order->user->id, 'extra->origin' => 'order'],
+                ['amount' => -$usedCredits, 'extra' => ['origin' => 'order']]
+            );
+        }
+        if ($usedCredits === 0) {
+            $transaction = CreditsTransaction::where(
+                ['order_id' => $order->id, 'user_id' => $order->user->id, 'extra->origin' => 'order']
+            )->first();
+            if ($transaction) {
+                $transaction->delete();
+            }
         }
 
         return parent::postUpdate($request, $order);

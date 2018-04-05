@@ -18,7 +18,7 @@ class Order extends Model
 
     protected $fillable = ['shipping_information', 'coupon_id'];
     protected $with = ['sales', 'creditsTransactions', 'payments', 'coupon'];
-    protected $appends = ['total', 'due', 'coupon_discount'];
+    protected $appends = ['total', 'due', 'coupon_discount', 'used_credits'];
 
     /**
      * Get the user that buys this.
@@ -54,6 +54,11 @@ class Order extends Model
         return $this->hasMany('App\CreditsTransaction');
     }
 
+    public function getUsedCreditsAttribute()
+    {
+        return -$this->creditsTransactions->sum('amount');
+    }
+
     /**
      * Get the order products.
      */
@@ -85,7 +90,7 @@ class Order extends Model
     public function getDueAttribute()
     {
         $total = $this->products->sum('price');
-        $credited = -$this->creditsTransactions->sum('amount');
+        $credited = $this->used_credits;
         $discount = $this->coupon_discount;
         return $total - $credited - $discount;
     }
