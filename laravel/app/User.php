@@ -2,16 +2,15 @@
 
 namespace App;
 
+use App\Traits\HasSingleFile;
+use App\Traits\SaveLater;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
-use App\Traits\SaveLater;
-use App\Traits\HasSingleFile;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -49,6 +48,7 @@ class User extends Authenticatable
     protected $hidden = [
         'email',
         'password',
+        'products',
         # By default, hide everything that is self referenced.
         # If not, this might lead to recursion.
         # Important to ->load(['followers:id', 'following:id']) on collections
@@ -67,6 +67,10 @@ class User extends Authenticatable
         'shipping_method_ids',
         'favorites_ids',
         'group_ids',
+        'credits',
+        'purchased_products_count',
+        'published_products_count',
+        'sold_products_count',
         # These should be hidden to avoid circular references.
         'following_ids',
         'followers_ids',
@@ -128,9 +132,6 @@ class User extends Authenticatable
         $this->attributes['password'] = Hash::make($password);
     }
 
-    /**
-     * Get the addresses for the user.
-     */
     public function addresses()
     {
         return $this->hasMany('App\Address');
@@ -144,6 +145,11 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany('App\Order');
+    }
+
+    public function products()
+    {
+        return $this->hasMany('App\Product');
     }
 
     public function shippingMethods()
@@ -184,20 +190,6 @@ class User extends Authenticatable
         return $this->shippingMethods->pluck('id');
     }
 
-    protected function setFavoritesIdsAttribute(array $favoritesIds)
-    {
-        if ($this->saveLater('favorites_ids', $favoritesIds)) {
-            return;
-        }
-        $this->favorites()->sync($favoritesIds);
-        $this->load('favorites');
-    }
-
-    protected function getFavoritesIdsAttribute()
-    {
-        return $this->favorites->pluck('id');
-    }
-
     protected function getCoverAttribute()
     {
         return $this->getFileUrl('cover');
@@ -223,6 +215,50 @@ class User extends Authenticatable
         return "{$this->first_name} {$this->last_name}";
     }
 
+    #                                     #
+    # Begin Products Information methods. #
+    #                                     #
+    protected function setFavoritesIdsAttribute(array $favoritesIds)
+    {
+        if ($this->saveLater('favorites_ids', $favoritesIds)) {
+            return;
+        }
+        $this->favorites()->sync($favoritesIds);
+        $this->load('favorites');
+    }
+
+    protected function getFavoritesIdsAttribute()
+    {
+        return $this->favorites->pluck('id');
+    }
+
+    protected function getPurchasedProductsCountAttribute()
+    {
+        $user = $this;
+        return Product::where('status', '>=', Product::STATUS_PAYMENT)
+            ->where('status', '<=', Product::STATUS_SOLD_RETURNED)
+            ->whereHas('sales.order', function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('status', Order::STATUS_PAYED);
+            })->count();
+    }
+
+    protected function getPublishedProductsCountAttribute()
+    {
+        return $this->products()->where('status', '>=', Product::STATUS_APPROVED)
+            ->where('status', '<=', Product::STATUS_AVAILABLE)->count();
+    }
+
+    protected function getSoldProductsCountAttribute()
+    {
+        return $this->products()->where('status', '>=', Product::STATUS_PAYMENT)
+            ->where('status', '<=', Product::STATUS_SOLD_RETURNED)->count();
+    }
+    #                                   #
+    # End Products Information methods. #
+    #                                   #
+
+
     #                                   #
     # Begin CreditsTransaction methods. #
     #                                   #
@@ -238,7 +274,6 @@ class User extends Authenticatable
     #                                 #
     # End CreditsTransaction methods. #
     #                                 #
-
 
     #                                   #
     # Begin Following-Follower methods. #
