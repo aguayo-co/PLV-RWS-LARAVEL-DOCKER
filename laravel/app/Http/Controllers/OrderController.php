@@ -160,7 +160,7 @@ class OrderController extends Controller
      */
     protected function validationRules(array $data, ?Model $order)
     {
-        $availableCredits = $order ? $order->user->credits + $order->used_credits : 0;
+        $availableCredits = $order ? $order->user->credits : 0;
         return [
             'address_id' => [
                 'integer',
