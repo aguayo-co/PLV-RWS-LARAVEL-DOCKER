@@ -306,11 +306,11 @@ Order:
     coupon_discount: integer
     shipping_information: object
     coupon_id?: string
+    used_credits?: integer
 OrderExpanded:
   type: Order
   properties:
     credits_transactions?: CreditsTransaction[]
-    used_credits: integer
     sales: Sale[]
     coupon?: Coupon
 

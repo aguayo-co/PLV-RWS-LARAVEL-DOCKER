@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Order;
 
+use App\Order;
 use App\Sale;
 use Illuminate\Support\Facades\DB;
 
@@ -72,6 +73,19 @@ trait OrderControllerRules
                 if ($sale->status > Sale::STATUS_SHOPPING_CART) {
                     return $fail(__('No se puede modificar Orden que no está en ShoppingCart.'));
                 }
+            }
+        };
+    }
+
+    /**
+     * Rule that validates that the given order is still in a ShoppingCart.
+     */
+    protected function getOrderInShoppingCartRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            // If no Order found, skip.
+            if ($order && $order->status > Order::STATUS_SHOPPING_CART) {
+                return $fail(__('No se puede modificar Orden que no está en ShoppingCart.'));
             }
         };
     }

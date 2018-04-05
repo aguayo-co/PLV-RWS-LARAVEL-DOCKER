@@ -181,7 +181,11 @@ class OrderController extends Controller
             'remove_product_ids' => 'array',
             'remove_product_ids.*' => 'integer|exists:products,id',
 
-            'used_credits' => 'integer|between:0,' . $availableCredits,
+            'used_credits' => [
+                'integer',
+                'between:0,' . $availableCredits,
+                $this->getorderInShoppingCartRule($order),
+            ],
 
             'sales' => 'array',
             'sales.*' => [
