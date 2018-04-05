@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Order;
 use App\Traits\HasSingleFile;
 use App\Traits\SaveLater;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -267,9 +268,16 @@ class User extends Authenticatable
         return $this->hasMany('App\CreditsTransaction');
     }
 
+    /**
+     * Calculate available credits, including the ones being used
+     * on the current shopping cart.
+     */
     protected function getCreditsAttribute()
     {
-        return $this->CreditsTransactions->sum('amount');
+        $user = $this;
+        return $this->CreditsTransactions()->whereDoesntHave('order', function ($query) use ($user) {
+            $query->where(['user_id' => $user->id, 'status' => Order::STATUS_SHOPPING_CART]);
+        })->sum('amount');
     }
     #                                 #
     # End CreditsTransaction methods. #
