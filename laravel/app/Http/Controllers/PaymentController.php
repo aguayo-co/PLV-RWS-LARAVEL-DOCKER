@@ -82,8 +82,12 @@ class PaymentController extends Controller
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Some sales do not have a ShippingMethod.');
         }
 
-        if (!$order->shipping_address) {
+        if (!data_get($order, 'shipping_information.address')) {
             abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order needs shipping address.');
+        }
+
+        if (!data_get($order, 'shipping_information.phone')) {
+            abort(Response::HTTP_UNPROCESSABLE_ENTITY, 'Order needs shipping phone.');
         }
     }
 
