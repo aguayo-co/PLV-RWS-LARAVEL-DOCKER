@@ -295,7 +295,7 @@ class OrderController extends Controller
                 ['amount' => -$usedCredits, 'extra' => ['origin' => 'order']]
             );
         }
-        if ($usedCredits === 0) {
+        if ((string) $usedCredits === "0") {
             $transaction = CreditsTransaction::where(
                 ['order_id' => $order->id, 'user_id' => $order->user->id, 'extra->origin' => 'order']
             )->first();
