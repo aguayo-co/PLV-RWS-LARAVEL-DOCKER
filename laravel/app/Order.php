@@ -92,7 +92,7 @@ class Order extends Model
         $total = $this->products->sum('price');
         $credited = $this->used_credits;
         $discount = $this->coupon_discount;
-        return $total - $credited - $discount;
+        return round($total - $credited - $discount, 2);
     }
 
     /**
@@ -112,7 +112,7 @@ class Order extends Model
         $productsTotal = $discountedProducts->sum('price');
 
         if ($coupon->discount_type === '%') {
-            $discountValue = $productsTotal * $coupon->discount_value / 100;
+            $discountValue = round($productsTotal * $coupon->discount_value / 100, 2);
         }
 
         return min($discountValue, $productsTotal);
