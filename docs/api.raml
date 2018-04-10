@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.9.0
+version: 0.9.1
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -317,11 +317,14 @@ traits:
               current_page: integer
               first_page_url: string
               from: integer
+              last_page: integer
+              last_page_url: string
               next_page_url: string
               path: string
               per_page: integer
               prev_page_url: string
               to: integer
+              total: integer
               data: <<resourcePathName | !singularize | !uppercamelcase>>Expanded[]
 
   sortable:

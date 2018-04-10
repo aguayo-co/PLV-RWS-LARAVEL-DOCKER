@@ -139,7 +139,7 @@ class Controller extends BaseController
         $alter = $this->alterIndexQuery();
         $query = call_user_func($this->modelClass . '::when', $alter, $alter);
         $query = $this->applyParamsToQuery($request, $query);
-        return $query->simplePaginate($request->items);
+        return $query->Paginate($request->items);
     }
 
     /**
