@@ -25,7 +25,7 @@ class OwnerOrAdmin
         switch (true) {
             case !$object:
             case $user->is($object->user):
-            case $object->owners && $object->owners->pluck('id')->contains($user->id):
+            case $object->owners_ids && $object->owners_ids->contains($user->id):
             case $user->hasRole('admin'):
             case $user->is($object):
                 return $next($request);

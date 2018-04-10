@@ -42,9 +42,9 @@ class SaleReturn extends Model
         return $this->sales->first();
     }
 
-    protected function getOwnersAttribute()
+    protected function getOwnersIdsAttribute()
     {
-        return collect([$this->sale->user, $this->sale->order->user]);
+        return collect([$this->sale->user_id, $this->sale->order->user_id]);
     }
 
     protected function getProductsIdsAttribute()
