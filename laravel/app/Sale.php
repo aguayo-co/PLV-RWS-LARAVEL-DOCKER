@@ -96,14 +96,14 @@ class Sale extends Model
     public function getCommissionAttribute()
     {
         return $this->products->sum(function ($product) {
-            return (int)($product->price * $product->commission / 100);
+            return round($product->price * $product->commission / 100);
         });
     }
 
     public function getReturnedCommissionAttribute()
     {
         return $this->products->whereIn('id', $this->returnedProductsIds)->sum(function ($product) {
-            return (int)($product->price * $product->commission / 100);
+            return round($product->price * $product->commission / 100);
         });
     }
 

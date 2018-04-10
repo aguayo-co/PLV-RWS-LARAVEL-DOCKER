@@ -69,7 +69,7 @@ class OrderCouponTest extends TestCase
             ]);
 
         $response->assertStatus(200)
-            ->assertJson(['due' => $product->price * (100 - $coupon->discount_value) / 100]);
+            ->assertJson(['due' => round($product->price * (100 - $coupon->discount_value) / 100)]);
     }
 
     public function testCouponBrandFilters()
