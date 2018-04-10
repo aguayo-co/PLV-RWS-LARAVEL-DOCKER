@@ -11,24 +11,55 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ThreadController extends Controller
+class MessageController extends Controller
 {
+    protected $modelClass = Message::class;
+
+    public function __construct()
+    {
+        parent::__construct();
+        // Add owner_or_admin access control to `store` method.
+        $this->middleware('owner_or_admin')->only('store');
+    }
+
+    protected function validationRules(array $data, ?Model $message)
+    {
+        $required = !$message ? 'required|' : '';
+        return [
+            'body' => $required . 'string',
+            'recipients' => 'array',
+            'recipients.*' => 'integer|exists:users,id',
+        ];
+    }
+
+    protected function alterFillData($data, Model $message = null)
+    {
+        // Remove 'user_id' from $data.
+        array_forget($data, 'user_id');
+        if (!$message) {
+            $data['user_id'] = auth()->id();
+        }
+
+        // Remove 'thread_id' from $data.
+        array_forget($data, 'thread_id');
+        if (!$message) {
+            $user = request()->route('thread');
+            $data['thread_id'] = $user->id;
+        }
+
+        return $data;
+    }
+
     /**
      * Adds a new message to a current thread.
      *
      * @param $id
      * @return mixed
      */
-    public function create(Request $request, Model $thread)
+    public function postStore(Request $request, Model $message)
     {
+        $thread = $message->thread;
         $thread->activateAllParticipants();
-
-        // Message
-        Message::create([
-            'thread_id' => $thread->id,
-            'user_id' => auth()->id(),
-            'body' => $request->message,
-        ]);
 
         // Add replier as a participant
         $participant = Participant::firstOrCreate([
@@ -43,6 +74,6 @@ class ThreadController extends Controller
             $thread->addParticipant($request->recipients);
         }
 
-        return $thread;
+        return parent::postStore($request, $thread);
     }
 }

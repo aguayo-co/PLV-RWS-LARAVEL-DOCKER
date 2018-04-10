@@ -366,3 +366,48 @@ ShippingMethod:
   type: [ShippingMethodRequest, PropertyBaseObject]
 ShippingMethodExpanded:
   type: ShippingMethod
+
+##############################################
+##  Threads and Messages related            ##
+##############################################
+
+Participant:
+  type: BaseObject
+  properties:
+    thread_id: integer
+    user_id: integer
+    last_read: datetime
+
+MessageRequest:
+  properties:
+    thread_id: integer
+    user_id: integer
+    body: string
+    recipients: integer[]
+Message:
+  type: BaseObject
+  properties:
+    thread_id: integer
+    user_id: integer
+    body: string
+MessageExpanded:
+  type: Message
+
+ThreadRequest:
+  properties:
+    subject: string
+    private: boolean
+    product_id?: integer
+    recipients: integer[]
+    body: string
+Thread:
+  type: BaseObject
+  properties:
+    subject: string
+    private: boolean
+    product_id?: integer
+ThreadExpanded:
+  type: Thread
+  properties:
+    participants: Participant[]
+    messages: Message[]

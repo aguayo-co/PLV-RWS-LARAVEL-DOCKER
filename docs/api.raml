@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.8.3
+version: 0.9.0
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -29,17 +29,7 @@ resourceTypes:
         application/json:
           type: <<resourcePathName | !singularize | !uppercamelcase>>Request
     delete:
-      is: [ responseError, needAdmin ]
-      description: Delete the given <<resourcePathName | !singularize | !uppercamelcase>>
-      responses:
-        200:
-          body:
-            application/json:
-              type: DetailedAnswer
-              example:
-                {
-                  "message": "Object deleted"
-                }
+      is: [ responseError, needAdmin, singleItemDelete ]
 
 /api/users:
   description: !include users-description.md
@@ -283,6 +273,22 @@ resourceTypes:
     get:
       is: [needOwner, needAdmin]
 
+/api/threads:
+  description: !include threads-description.md
+  type: collection
+  get:
+    is: [needOwner, needAdmin]
+  /{thread-id}:
+    get:
+      is: [ singleItemResponse, needOwner, needAdmin ]
+    delete:
+      is: [ responseError, needAdmin, singleItemDelete ]
+    /messages:
+      post:
+        is: [ createItemPost, needOwner, needAdmin ]
+      /{message-id}:
+        delete:
+          is: [ responseError, needAdmin, singleItemDelete ]
 
 ##############################################
 ##  Trait definitions                       ##
@@ -362,6 +368,18 @@ traits:
     is: [ hasType: {type: <<resourcePathName | !singularize | !uppercamelcase>>Expanded} ]
       404:
         description: "<<resourcePathName | !singularize | !uppercamelcase>> not found."
+
+  singleItemDelete:
+    description: Delete the given <<resourcePathName | !singularize | !uppercamelcase>>
+    responses:
+      200:
+        body:
+          application/json:
+            type: DetailedAnswer
+            example:
+              {
+                "message": "Object deleted"
+              }
 
   createItemPost:
     description: Create a new <<resourcePathName | !singularize | !uppercamelcase>>

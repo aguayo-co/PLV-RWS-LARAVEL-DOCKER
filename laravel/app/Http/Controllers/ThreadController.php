@@ -13,64 +13,86 @@ use Illuminate\Support\Facades\Auth;
 
 class ThreadController extends Controller
 {
-    /**
-     * Show all of the message threads to the user.
-     *
-     * @return mixed
-     */
-    public function index(Request $request)
+    protected $modelClass = Thread::class;
+    public static $allowedWhereIn = ['product_id'];
+
+    public function __construct()
     {
-        // All threads, ignore deleted/archived participants
-        $threads = Thread::getAllLatest()->get();
+        parent::__construct();
+        // Add owner_or_admin access control to `show` method.
+        $this->middleware('owner_or_admin')->only('show');
+    }
 
-        // All threads that user is participating in
-        // $threads = Thread::forUser(auth()->id())->latest('updated_at')->get();
-
-        // All threads that user is participating in, with new messages
-        // $threads = Thread::forUserWithNewMessages(auth()->id())->latest('updated_at')->get();
-
-        return $threads;
+    protected function validationRules(array $data, ?Model $thread)
+    {
+        $required = !$thread ? 'required|' : '';
+        return [
+            'subject' => $required . 'string',
+            'private' => $required . 'boolean',
+            'product_id' => 'integer|exists:products,id',
+            'body' => $required . 'string',
+            'recipients' => $required . 'array',
+            'recipients.*' => 'integer|exists:users,id',
+        ];
     }
 
     /**
-     * Shows a message thread.
+     * Return a Closure that modifies the index query.
+     * The closure receives the $query as a parameter.
      *
-     * @param $id
-     * @return mixed
+     * @return Closure
+     */
+    protected function alterIndexQuery()
+    {
+        return function ($query) {
+            if (!request()->query('product_id')) {
+                $filterUnread = (bool) array_get(request()->query('filter'), 'unread');
+
+                if ($filterUnread) {
+                    // All threads that user is participating in, with new messages
+                    $query = $query->forUserWithNewMessages(auth()->id())->latest('updated_at');
+                }
+
+                if (!$filterUnread) {
+                    // All threads that user is participating in
+                    $query = $query->forUser(auth()->id());
+                }
+            }
+
+            return $query->latest('updated_at');
+        };
+    }
+
+    /**
+     * Return a thread and mark it as read by current user.
      */
     public function show(Request $request, Model $thread)
     {
-        $userId = auth()->id();
-        $thread->markAsRead($userId);
+        $thread = parent::show($request, $thread);
+        if ($userId = auth()->id()) {
+            $thread->markAsRead($userId);
+        }
 
         return $thread;
     }
 
     /**
-     * Stores a new message thread.
-     *
-     * @return mixed
+     * Stores data related to the new thread.
      */
-    public function store(Request $request)
+    public function postStore(Request $request, Model $thread)
     {
-        $thread = Thread::create([
-            'subject' => $request->subject,
-        ]);
-
         // Message
         Message::create([
             'thread_id' => $thread->id,
             'user_id' => auth()->id(),
-            'body' => $request->message,
-            'private' => $request->private,
-            'product_id' => $request->product_id,
+            'body' => $request->body,
         ]);
 
         // Sender
         Participant::create([
             'thread_id' => $thread->id,
             'user_id' => auth()->id(),
-            'last_read' => new Carbon,
+            'last_read' => now(),
         ]);
 
         // Recipients
@@ -78,6 +100,6 @@ class ThreadController extends Controller
             $thread->addParticipant($request->recipients);
         }
 
-        return $thread;
+        return parent::postStore($request, $thread);
     }
 }

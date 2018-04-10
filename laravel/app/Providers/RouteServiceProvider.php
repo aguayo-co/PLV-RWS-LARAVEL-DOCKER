@@ -38,6 +38,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('group', \App\Group::class);
         Route::model('menu_item', \App\MenuItem::class);
         Route::model('menu', \App\Menu::class);
+        Route::model('message', \Cmgmyr\Messenger\Models\Message::class);
         Route::model('order', \App\Order::class);
         Route::model('product', \App\Product::class);
         Route::model('sale', \App\Sale::class);

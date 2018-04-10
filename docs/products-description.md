@@ -44,8 +44,8 @@ Se debe pasar:
 ````
 {
     "images_remove": [
-    "qwe1234567890",
-    "asd0987654321.gif"
+        "qwe1234567890",
+        "asd0987654321.gif"
     ]
 }
 ```

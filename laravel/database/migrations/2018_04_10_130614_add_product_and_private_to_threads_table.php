@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddProductToThreadsTable extends Migration
+class AddProductAndPrivateToThreadsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,7 +15,8 @@ class AddProductToThreadsTable extends Migration
     public function up()
     {
         Schema::table(Models::table('threads'), function (Blueprint $table) {
-            $table->integer('product_id')->unsigned();
+            $table->boolean('private');
+            $table->integer('product_id')->unsigned()->nullable();
             $table->foreign('product_id')->references('id')->on('products');
         });
     }
@@ -30,6 +31,7 @@ class AddProductToThreadsTable extends Migration
         Schema::table(Models::table('threads'), function (Blueprint $table) {
             $table->dropForeign(['product_id']);
             $table->dropColumn('product_id');
+            $table->dropColumn('private');
         });
     }
 }
