@@ -5,6 +5,7 @@ namespace App;
 use App\Order;
 use App\Traits\HasSingleFile;
 use App\Traits\SaveLater;
+use Cmgmyr\Messenger\Traits\Messagable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
@@ -15,6 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
+    use Messagable;
     use Notifiable;
     use HasRoles;
     use HasApiTokens;

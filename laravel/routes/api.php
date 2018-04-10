@@ -67,6 +67,9 @@ Route::name('api.')->group(function () {
     # Auth routes.
     # Only authenticated requests here.
     Route::middleware('auth:api')->group(function () {
+        Route::prefix('threads')
+        ->group(base_path('routes/api/threads.php'));
+
         # Routes for user account and profile administration.
         Route::patch('users/{user}', 'Auth\UserController@update')->name('user.update')->where('user', ID_REGEX);
         Route::get('users/{user}/addresses', 'AddressController@index')
