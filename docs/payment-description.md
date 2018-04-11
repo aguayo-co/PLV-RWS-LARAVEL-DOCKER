@@ -1,7 +1,9 @@
 Un pago puede tener los siguientes estados:
 
-- **00**: Esperando confirmación
+- **0**: Esperando confirmación
+- **1**: Procesando
 - **10**: Pagada
+- **98**: Error (Rechazada)
 - **99**: Cancelada
 
 El pago tiene la siguiente información:
