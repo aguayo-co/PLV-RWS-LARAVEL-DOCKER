@@ -23,7 +23,7 @@ class ProcessOldPayments extends Command
      *
      * @var string
      */
-    protected $description = 'Mark payments old payments (pending or rejected) as canceled.';
+    protected $description = 'Mark old payments (pending or rejected) as canceled.';
 
     /**
      * Create a new command instance.
