@@ -2,22 +2,25 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasSingleFile;
 use App\Traits\HasStatuses;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 
 class Payment extends Model
 {
     use HasStatuses;
+    use HasSingleFile;
 
-    const STATUS_PENDING = 00;
-    const STATUS_PROCESSING = 01;
+    const STATUS_PENDING = 0;
+    const STATUS_PROCESSING = 1;
     const STATUS_SUCCESS = 10;
     const STATUS_ERROR = 98;
     const STATUS_CANCELED = 99;
 
     protected $fillable = ['order_id', 'status'];
     protected $hidden = ['request'];
-    protected $appends = ['request_data'];
+    protected $appends = ['request_data', 'transfer_receipt'];
 
     protected static function boot()
     {
@@ -69,5 +72,15 @@ class Payment extends Model
     public function getAttemptsAttribute($value)
     {
         return json_decode($value, true);
+    }
+
+    protected function getTransferReceiptAttribute()
+    {
+        return $this->getFileUrl('transfer_receipt');
+    }
+
+    protected function setTransferReceiptAttribute(?UploadedFile $transferReceipt)
+    {
+        $this->setFile('transfer_receipt', $transferReceipt);
     }
 }

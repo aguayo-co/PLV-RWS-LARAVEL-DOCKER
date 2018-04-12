@@ -16,7 +16,7 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
             $table->string('uniqid');
-            $table->integer('order_id')->unsigned();
+            $table->integer('order_id')->unsigned()->unique();
             $table->foreign('order_id')->references('id')->on('orders');
             $table->string('gateway');
             $table->tinyInteger('status')->unsigned();

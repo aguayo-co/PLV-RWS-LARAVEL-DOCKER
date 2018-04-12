@@ -214,7 +214,13 @@ class OrderController extends Controller
                 'nullable',
                 'string',
                 'exists:coupons,code',
-            ], $this->getCouponRules($order))
+            ], $this->getCouponRules($order)),
+
+            'transfer_receipt' => [
+                'image',
+                $this->paymentIsTransferRule($order)
+            ],
+
         ];
     }
 
@@ -286,6 +292,10 @@ class OrderController extends Controller
 
         if ($sales = $request->sales) {
             $this->processSalesData($order, $sales);
+        }
+
+        if ($transferReceipt = $request->transfer_receipt) {
+            $order->payments[0]->transfer_receipt = $transferReceipt;
         }
 
         $usedCredits = $request->used_credits;

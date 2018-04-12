@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Order;
 
 use App\Order;
+use App\Payment;
 use App\Sale;
 use Illuminate\Support\Facades\DB;
 
@@ -125,6 +126,25 @@ trait OrderControllerRules
             // Do not go back in status.
             if ($value <= $sale->status) {
                 return $fail(__('validation.min.numeric', ['min' => $sale->status + 1]));
+            }
+        };
+    }
+
+    /**
+     * Rule that validates that an order has a Payment with gateway Transfer.
+     */
+    protected function paymentIsTransferRule($order)
+    {
+        return function ($attribute, $value, $fail) use ($order) {
+            $payment = data_get($order, 'payments.0', null);
+            if (!$payment) {
+                return $fail(__('No Existe un pago en la orden.'));
+            }
+            if ($payment->gateway !== 'Transfer') {
+                return $fail(__('El pago no es de tipo Transferencia.'));
+            }
+            if ($payment->status !== Payment::STATUS_PENDING) {
+                return $fail(__('El pago ya no acepta recibos.'));
             }
         };
     }
