@@ -9,6 +9,7 @@ use App\Http\Controllers\Order\CouponRules;
 use App\Http\Controllers\Order\OrderControllerRules;
 use App\Http\Traits\CurrentUserOrder;
 use App\Order;
+use App\Payment;
 use App\Product;
 use App\Sale;
 use Illuminate\Database\Eloquent\Model;
