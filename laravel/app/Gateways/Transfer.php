@@ -12,7 +12,7 @@ class Transfer implements PaymentGateway
 
     public function getPaymentRequest(Payment $payment, $data)
     {
-        $payment->status = Payment::STATUS_PROCESSING;
+        $payment->status = Payment::STATUS_PENDING;
         return [
             'public_data' => [
                 'amount' => $payment->total,

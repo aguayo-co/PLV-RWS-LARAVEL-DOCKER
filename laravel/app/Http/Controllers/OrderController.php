@@ -295,7 +295,9 @@ class OrderController extends Controller
         }
 
         if ($transferReceipt = $request->transfer_receipt) {
+            $order->payments[0]->status = Payment::STATUS_PROCESSING;
             $order->payments[0]->transfer_receipt = $transferReceipt;
+            $order->payments[0]->save();
         }
 
         $usedCredits = $request->used_credits;
