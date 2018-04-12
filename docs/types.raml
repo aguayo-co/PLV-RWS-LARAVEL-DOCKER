@@ -289,6 +289,7 @@ OrderRequest:
     add_product_ids?: integer[]
     remove_product_ids?: integer[]
     coupon_code?: string
+    transfer_receipt?: file
     sales?:
       properties:
         /^[0-9]*$/:
@@ -344,6 +345,7 @@ Payment:
     request: object
     attempts: object
     request_data: object
+    transfer_receipt: string
 
 CreditsTransactionRequest:
   properties:
