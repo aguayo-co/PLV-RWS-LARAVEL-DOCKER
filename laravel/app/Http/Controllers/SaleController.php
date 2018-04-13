@@ -127,7 +127,7 @@ class SaleController extends Controller
 
     protected function setVisibility($data)
     {
-        $data = $data->load(['order']);
+        $data = $data->load(['order.user']);
         $this->hideOrderSales($data);
         return $data;
     }
