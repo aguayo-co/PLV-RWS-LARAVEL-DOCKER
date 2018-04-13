@@ -120,6 +120,11 @@ class SaleController extends Controller
         return $this->setVisibility(parent::postStore($request, $sale));
     }
 
+    public function postUpdate(Request $request, Model $sale)
+    {
+        return $this->setVisibility(parent::postUpdate($request, $sale));
+    }
+
     public function show(Request $request, Model $sale)
     {
         return $this->setVisibility(parent::show($request, $sale));
