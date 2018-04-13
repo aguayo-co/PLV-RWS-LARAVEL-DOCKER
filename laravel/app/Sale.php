@@ -107,7 +107,6 @@ class Sale extends Model
         });
     }
 
-
     public function returns()
     {
         return $this->belongsToMany('App\SaleReturn', 'product_sale');

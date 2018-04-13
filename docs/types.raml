@@ -314,6 +314,11 @@ OrderExpanded:
     credits_transactions?: CreditsTransaction[]
     sales: Sale[]
     coupon?: Coupon
+SaleOrder:
+  type: Order
+  properties:
+    credits_transactions?: CreditsTransaction[]
+    coupon?: Coupon
 
 SaleRequest:
   properties:
@@ -332,6 +337,7 @@ SaleExpanded:
   type: Sale
   properties:
     credits_transactions: CreditsTransaction[]
+    order: SaleOrder
     products: Product[]
     shipping_method: ShippingMethod
 

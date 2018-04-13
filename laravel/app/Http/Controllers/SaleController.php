@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Sale;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
@@ -102,5 +104,41 @@ class SaleController extends Controller
                 return $fail(__('Información ya no se puede modificar.'));
             }
         };
+    }
+
+    public function index(Request $request)
+    {
+        $pagination = parent::index($request);
+        $sales = $pagination->getCollection();
+        $sales = $this->setVisibility($sales);
+        $pagination->setCollection($sales);
+        return $pagination;
+    }
+
+    public function postStore(Request $request, Model $sale)
+    {
+        return $this->setVisibility(parent::postStore($request, $sale));
+    }
+
+    public function show(Request $request, Model $sale)
+    {
+        return $this->setVisibility(parent::show($request, $sale));
+    }
+
+    protected function setVisibility($data)
+    {
+        $data = $data->load(['order']);
+        $this->hideOrderSales($data);
+        return $data;
+    }
+
+    protected function hideOrderSales($data)
+    {
+        if (! $data instanceof Collection) {
+            $data = new Collection([$data]);
+        }
+        $data->each(function ($item) {
+            $item->order->makeHidden('sales');
+        });
     }
 }
