@@ -17,7 +17,7 @@ trait HasSingleFile
 
         $snakeClass = snake_case(class_basename(self::class));
         $snakeAttribute = snake_case($attribute);
-        return 'public/' . $snakeClass . '/' . $snakeAttribute . '/' . $this->id . '/';
+        return 'uploads/' . $snakeClass . '/' . $snakeAttribute . '/' . $this->id . '/';
     }
 
     protected function setFile($attribute, ?UploadedFile $file)
@@ -41,7 +41,7 @@ trait HasSingleFile
     {
         $path = $this->getBasePathFor($attribute);
         if ($files = Storage::files($path)) {
-            return asset(Storage::url($files[0]));
+            return Storage::temporaryUrl($files[0], now()->addMinutes(30));
         }
         return;
     }
