@@ -1,3 +1,6 @@
 [submodule "laravel"]
 	path = laravel
 	url = https://jmfederico@bitbucket.org/aguayopublicidad/prilov-laravel.git
+[submodule "migration"]
+	path = migration
+	url = https://jmfederico@bitbucket.org/aguayopublicidad/prilov-laravel-migration.git
