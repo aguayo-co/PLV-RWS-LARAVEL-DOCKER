@@ -1,5 +1,7 @@
 <?php
 
+$emailPrefix = env('SMTP_PREFIX', '');
+
 return [
 
     /*
@@ -29,7 +31,7 @@ return [
     |
     */
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+    'host' => env($emailPrefix . 'SMTP_SERVER'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +44,7 @@ return [
     |
     */
 
-    'port' => env('MAIL_PORT', 587),
+    'port' => env($emailPrefix . 'SMTP_PORT', 587),
 
     /*
     |--------------------------------------------------------------------------
@@ -71,7 +73,7 @@ return [
     |
     */
 
-    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+    'encryption' => env($emailPrefix . 'SMTP_ENCRYPTION', 'tls'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,9 +86,9 @@ return [
     |
     */
 
-    'username' => env('MAIL_USERNAME'),
+    'username' => env($emailPrefix . 'SMTP_LOGIN'),
 
-    'password' => env('MAIL_PASSWORD'),
+    'password' => env($emailPrefix . 'SMTP_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
