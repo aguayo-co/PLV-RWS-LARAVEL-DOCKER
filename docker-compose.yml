@@ -4,7 +4,6 @@ services:
     build: ./php-fpm
     restart: always
     env_file:
-      - laravel/.env
       - php-fpm/.env
     volumes:
       - ./laravel:/srv/caddy/html
