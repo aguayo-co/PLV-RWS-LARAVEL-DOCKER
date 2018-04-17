@@ -23,14 +23,13 @@ Generar archivos .env y completar:
     $ cp php-fpm/.env.example php-fpm/.env
     $ cp mysql/.env.example mysql/.env
 
-Instalar y configurar Laravel.
+Instalar y configurar Laravel localmente.
 
 .. code-block:: bash
 
     $ cd laravel
     $ cp .env.example .env
     $ composer install
-    $ php artisan storage:link
     # php artisan migrate --step
     $ php artisan key:generate
     $ php artisan passport:keys
