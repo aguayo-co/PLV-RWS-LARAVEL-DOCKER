@@ -1,24 +1,14 @@
-Una venta (`Sale`) es el punto de entrada de las ventas hechas en el portal por un vendedor. Una venta tiene
-los productos que un usuario le ha comprado a un vendedor en una sola orden.
+Una devolución (SaleReturn) se genera cuando un comprador quiere devolver uno o más de los productos de una venta (Sale).
 
-Una venta puede tener los siguientes estados:
-
-- **10**: Carro de compras
-- **20**: En pago
-- **30**: Pagada
+- **0**: Pendiente
 - **40**: Enviada
 - **41**: Entregada
 - **49**: Recibida
+- **50**: Manejo de administrador
 - **90**: Completada
-- **91**: Completada con devolución
-- **92**: Completada con devolución parcial
 - **99**: Cancelada
 
-Las rutas `/sales` son para las modificaciones que hace el vendedor sobre las ventas. Las modificaciones
-se pueden hacer una vez la venta ha sido pagada.
-
-El vendedor puede ingresar información sobre el despacho en la propiedad `shipment_details`, y puede marcar
-la orden como despachada o entregada con la propiedad `status`.
+Se puede ingresar información sobre el despacho en la propiedad `shipment_details`.
 
 La información de despacho debe ser un objeto. **NO tiene una estructura definida, y los datos enviados
 no se validan**.

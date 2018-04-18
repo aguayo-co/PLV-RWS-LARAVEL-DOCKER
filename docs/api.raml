@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.9.1
+version: 0.9.2
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -260,6 +260,16 @@ resourceTypes:
   get:
     is: [needOwner, needAdmin]
   /{sale-id}:
+    type: singleItem
+    get:
+      is: [needOwner, needAdmin]
+
+/api/sale_returns:
+  description: !include sale-returns-description.md
+  type: collection
+  get:
+    is: [needOwner, needAdmin]
+  /{sale_return-id}:
     type: singleItem
     get:
       is: [needOwner, needAdmin]

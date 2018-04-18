@@ -341,6 +341,21 @@ SaleExpanded:
     order: SaleOrder
     products: Product[]
     shipping_method: ShippingMethod
+    returned_products_ids: integer[]
+    returns: SaleReturn[]
+
+SaleReturnRequest:
+  properties:
+    reason?: string
+    sale_id?: integer
+    products_ids?: integer[]
+    status?: integer
+    shipment_details?: object
+SaleReturn:
+  type: [SaleReturnRequest, BaseObject]
+  status_history: object
+SaleReturnExpanded:
+  type: SaleReturn
 
 Payment:
   type: BaseObject
