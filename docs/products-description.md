@@ -1,3 +1,15 @@
+Un producto puede tener los siguientes estados:
+
+- **0**: No publicado
+- **1**: Rechazado
+- **2**: Escondido
+- **10**: Aprobado
+- **19**: Disponible
+- **20**: No Disponible
+- **30**: En pago
+- **31**: Vendido
+- **32**: Vendido y devuelto
+
 ##### Ordenamiento
 
 Aparte de los criterios globales, los productos se pueden ordenar por los siguientes criterios:
