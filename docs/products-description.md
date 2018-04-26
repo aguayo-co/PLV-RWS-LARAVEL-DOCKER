@@ -10,6 +10,10 @@ Un producto puede tener los siguientes estados:
 - **31**: Vendido
 - **32**: Vendido y devuelto
 
+##### Búsqueda
+
+Los productos aceptan búsquedas de texto `?q=`, y se realizan en los campos `title` y `description`.
+
 ##### Ordenamiento
 
 Aparte de los criterios globales, los productos se pueden ordenar por los siguientes criterios:

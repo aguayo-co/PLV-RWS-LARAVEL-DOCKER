@@ -1,3 +1,7 @@
+##### Búsqueda
+
+Los usuarios aceptan búsquedas de texto `?q=`, y se realizan en los campos `first_name` y `last_name`.
+
 ##### Seguimiento de usuarios
 
 Los campos `followers*` tienen información sobre los usuarios que siguen al consultado.

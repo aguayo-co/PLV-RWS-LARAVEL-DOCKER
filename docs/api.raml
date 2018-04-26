@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.9.2
+version: 0.9.3
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -35,7 +35,7 @@ resourceTypes:
   description: !include users-description.md
   type: getCollection
   get:
-    is: [ needAdmin ]
+    is: [ needAdmin, searchable ]
     queryParameters:
       email:
         type: string
@@ -212,6 +212,12 @@ resourceTypes:
           gateway:
             type: string
             description: "La pasarela de pagos a usar."
+
+/api/payments:
+  description: !include payments-description.md
+  type: getCollection
+  get:
+    is: [ needAdmin ]
 
 /api/shopping_cart:
   description: !include shopping-cart-description.md

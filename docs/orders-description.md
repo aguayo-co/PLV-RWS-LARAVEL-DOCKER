@@ -91,3 +91,11 @@ cómo propiedades. Ejemplo:
 
 Información adicional sobre la estructura de el modelo Sale se encuentra en la documentación de la
 ruta `/sales`.
+
+##### Filtrado
+
+Aparte de los criterios de filtrado globales, los órdenes se pueden filtrar por los siguientes criterios:
+
+|filtro|tipo|
+|------|----|
+|status|Entre|

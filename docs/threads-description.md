@@ -33,3 +33,8 @@ Un usuario se vuelve participante de una conversación pública en tres momentos
  - Al momento de ser creada, si es incluida en esta.
  - Cuando un usuario crea un nuevo mensaje y lo agrega en el mismo.
  - Cuando comenta en una conversación en la que no era participante.
+
+##### Consultas sin autenticación
+
+Es posible consultar conversaciones para usuarios sin autenticación, que pertenezcan a un producto y que sean
+públicas. Se debe usar el filtro de `product_id` para tal caso.

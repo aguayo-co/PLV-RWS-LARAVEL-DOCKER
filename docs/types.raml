@@ -365,9 +365,11 @@ Payment:
     gateway: string
     status: integer
     request: object
-    attempts: object
+    attempts: object[]
     request_data: object
     transfer_receipt: string
+PaymentExpanded:
+  type: Payment
 
 CreditsTransactionRequest:
   properties:
