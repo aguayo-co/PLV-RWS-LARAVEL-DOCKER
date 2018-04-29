@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.9.3
+version: 0.9.4
 baseUri: https://prilov.aguayo.co
 documentation: !include documentation.raml
 
@@ -280,6 +280,14 @@ resourceTypes:
     get:
       is: [needOwner, needAdmin]
 
+/api/ratings:
+  description: !include ratings-description.md
+  type: getCollection
+  /{rating-id}:
+    type: singleItem
+    patch:
+      is: [needOwner, needAdmin]
+
 /api/credits_transactions:
   type: collection
   get:
@@ -292,11 +300,9 @@ resourceTypes:
 /api/threads:
   description: !include threads-description.md
   type: collection
-  get:
-    is: [needOwner, needAdmin]
   /{thread-id}:
     get:
-      is: [ singleItemResponse, needOwner, needAdmin ]
+      is: [ singleItemResponse ]
     delete:
       is: [ responseError, needAdmin, singleItemDelete ]
     /messages:

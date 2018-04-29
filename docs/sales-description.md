@@ -64,7 +64,7 @@ Ejemplos:
 
 ##### Filtrado
 
-Aparte de los criterios de filtrado globales, los ventas se pueden filtrar por los siguientes criterios:
+Aparte de los criterios de filtrado globales, las ventas se pueden filtrar por los siguientes criterios:
 
 |filtro|tipo|
 |------|----|

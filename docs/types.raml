@@ -162,10 +162,12 @@ ProductRequest:
   properties:
     images: file[]
     images_remove?: string[]
+    image_instagram: file
 Product:
   type: [ProductBase, BaseObject]
   properties:
     images: string[]
+    image_instagram: string
     slug: string
 ProductExpanded:
   type: Product
@@ -185,13 +187,17 @@ ProductExpanded:
 
 AddressRequest:
   properties:
-    user_id: integer
-    address: string
-    region: string
-    city: string
-    zone: string
+    number: string
+    street: string
+    additional: string
+    commune: string
 Address:
   type: [AddressRequest, BaseObject]
+  properties:
+    user_id: integer
+    geoname_id: string
+    region: string
+    province: string
 AddressExpanded:
   type: Address
 
@@ -232,10 +238,7 @@ User:
 UserExpanded:
   type: User
   properties:
-    addresses: Address[]
-    groups: Group[]
     shipping_methods: ShippingMethod[]
-    roles: string[]
     followers_ids: integer[]
     following_ids: integer[]
     followers_count: integer
@@ -356,6 +359,22 @@ SaleReturn:
   status_history: object
 SaleReturnExpanded:
   type: SaleReturn
+
+RatingRequest:
+  properties:
+    sale_id?: string
+    seller_rating?: integer
+    seller_comment?: string
+    buyer_rating?: integer
+    buyer_comment?: string
+Rating:
+  type: [RatingRequest]
+  properties:
+    status: integer
+    created_at?: datetime
+    updated_at?: datetime
+RatingExpanded:
+  type: Rating
 
 Payment:
   type: BaseObject

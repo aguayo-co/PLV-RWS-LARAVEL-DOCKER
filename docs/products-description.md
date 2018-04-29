@@ -30,13 +30,14 @@ Aparte de los criterios de filtrado globales, los productos se pueden filtrar po
 |filtro|tipo|
 |------|----|
 |price|Entre|
-|user_id|ContenidoEn|
-|color_ids|ContenidoEn|
-|campaign_ids|ContenidoEn|
 |brand_id|ContenidoEn|
+|campaign_ids|ContenidoEn|
 |category_id|ContenidoEn|
+|color_ids|ContenidoEn|
 |condition_id|ContenidoEn|
+|size_id|ContenidoEn|
 |status|ContenidoEn|
+|user_id|ContenidoEn|
 
 ##### Agregar imágenes
 
