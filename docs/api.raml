@@ -1,7 +1,6 @@
 #%RAML 1.0
 title: Prilov Api
-version: 0.9.4
-baseUri: https://prilov.aguayo.co
+version: 0.9.5
 documentation: !include documentation.raml
 
 types: !include types.raml
@@ -289,9 +288,12 @@ resourceTypes:
       is: [needOwner, needAdmin]
 
 /api/credits_transactions:
+  description: !include credits-transaction-description.md
   type: collection
   get:
     is: [needOwner, needAdmin]
+  post:
+    is: [ needOwner ]
   /{sale-id}:
     type: singleItem
     get:
