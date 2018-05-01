@@ -17,7 +17,7 @@ Una vez la calificación se publica, esta no puede ser modificada.
 Mientras una calificación se encuentra no publicada, sólo un administrador y la persona que califica pueden ver
 la calificación otorgada a la parte calificada.
 
-##### Filtrado
+##### Puntaje o calificación
 
 Una calificación puede ser positiva (`1`), neutra (`0`) o negativa (`-1`).
 
