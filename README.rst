@@ -47,3 +47,9 @@ Cargar datos de prueba
 .. code-block:: bash
 
     $ php artisan migration:refresh --step --seed
+
+Unit testing
+
+.. code-block:: bash
+
+    :laravel$ phpunit
