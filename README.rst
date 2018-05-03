@@ -41,3 +41,9 @@ Ejecutar docker
 .. code-block:: bash
 
     $ docker-compose up --build -d
+
+Cargar datos de prueba
+
+.. code-block:: bash
+
+    $ php artisan migration:refresh --step --seed
