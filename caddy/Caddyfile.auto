@@ -1,7 +1,8 @@
 {$DOMAIN} {
-  tls {$EMAIL}
+  tls {$TLS}
   root /srv/caddy/html/public
   log stdout
+  errors stderr
 
   fastcgi / php-fpm:9000 php
   rewrite {
