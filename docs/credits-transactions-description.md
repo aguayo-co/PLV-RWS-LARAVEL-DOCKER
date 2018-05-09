@@ -14,3 +14,12 @@ Sin importar el estado de la transferencia, los créditos de la misma son descon
 Cuando un usuario agrega créditos a el pago de una orden en el carro de compras, pero no procede con el pago de
 la orden, la transacción generada para dicho pago queda en el sistema pero estos créditos no son descontados del
 total disponible del usuario.
+
+##### Filtrado
+
+Aparte de los criterios de filtrado globales, las transacciones de créditos se pueden filtrar por los
+siguientes criterios:
+
+|filtro|tipo|
+|------|----|
+|transfer_status|Entre|
