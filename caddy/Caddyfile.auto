@@ -1,6 +1,8 @@
 {$DOMAIN} {
   tls {$EMAIL}
   root /srv/caddy/html/public
+  log stdout
+
   fastcgi / php-fpm:9000 php
   rewrite {
     to {path} {path}/ /index.php?{query}
