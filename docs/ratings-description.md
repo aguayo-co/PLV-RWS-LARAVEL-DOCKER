@@ -32,3 +32,12 @@ Aparte de los criterios de filtrado globales, las calificaciones se pueden filtr
 |buyer_id|ContenidoEn|
 |seller_rating|ContenidoEn|
 |buyer_rating|ContenidoEn|
+
+##### Datos
+
+- **seller_id**: Es el ID de el usuario que realizó la venta.
+- **buyer_id**: Es el ID de el usuario que realizó la compra.
+- **seller_rating**: Es la calificación dada por el usuario que realizó la venta. Es decir, la calificación
+dada al comprador.
+- **buyer_rating**: Es la calificación dada por el usuario que realizó la compra. Es decir, la calificación
+dada al vendedor.
