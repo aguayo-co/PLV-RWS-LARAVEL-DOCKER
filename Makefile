@@ -4,14 +4,12 @@
 help:
 	@perl -nle'print $& if m{^[a-zA-Z_-]+:.*?## .*$$}' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
 
-docs/api.raml:
-
-docs/api.html: docs/api.raml
-	raml2html docs/api.raml > docs/api.html
+laravel/storage/docs/api.html: laravel/storage/docs/api.raml
+	raml2html laravel/storage/docs/api.raml > laravel/storage/docs/api.html
 
 .PHONY: raml
-raml: docs/api.html ## Render and open api docs with in html.
-	open docs/api.html
+raml: laravel/storage/docs/api.html ## Render and open api docs with in html.
+	open laravel/storage/docs/api.html
 
 .PHONY: build
 build: ## Build docker containers.

@@ -1,0 +1,11 @@
+{
+  "name": "prilov-docs",
+  "dependencies": {
+    "nodemon": "^1.17.5",
+    "raml2html": "^7.1.0"
+  },
+  "scripts": {
+    "watch": "nodemon -w raml -L -e raml,md --exec \"npm run docs\"",
+    "docs": "raml2html -i raml/api.raml -o raml/api.html"
+  }
+}

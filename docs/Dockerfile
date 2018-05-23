@@ -1,9 +1,9 @@
-FROM node:9.7-alpine
+FROM node:10-alpine
 
 WORKDIR /srv/docs
 
-RUN npm install -g raml2html nodemon
+COPY package.* ./
 
-VOLUME /srv/docs
+RUN npm install
 
-CMD nodemon -L -e raml,md --exec "raml2html -i api.raml -o api.html"
+CMD npm run watch
