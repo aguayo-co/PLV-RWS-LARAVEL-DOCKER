@@ -8,4 +8,6 @@ RUN apk add --no-cache $PHPIZE_DEPS libxml2-dev libjpeg-turbo-dev libpng-dev fre
 COPY php-fpm.d/*.conf /usr/local/etc/php-fpm.d/
 COPY conf.d/*.ini /usr/local/etc/php/conf.d
 
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
 WORKDIR /srv/caddy/html
