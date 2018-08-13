@@ -1,6 +1,6 @@
-{$DOMAIN} {
-  tls {$TLS}
-  root /srv/caddy/html/public
+{$CADDY_DOMAIN} {
+  tls {$CADDY_TLS}
+  root html/public
   log stdout
   errors stderr
 

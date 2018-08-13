@@ -1,6 +1,6 @@
-{$DOMAIN} {
-  tls {$LETSENCRYPT_CERT} {$LETSENCRYPT_KEY}
-  root /srv/caddy/html/public
+{$CADDY_DOMAIN} {
+  tls {$CADDY_CERT} {$CADDY_PRIVKEY}
+  root html/public
   log stdout
   errors stderr
 

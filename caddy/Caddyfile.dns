@@ -1,6 +1,8 @@
-{$DOMAIN} {
-  tls self_signed
-  root /srv/caddy/html/public
+{$CADDY_DOMAIN} {
+  tls {$CADDY_TLS} {
+    dns {$CADDY_DNS_PROVIDER}
+  }
+  root html/public
   log stdout
   errors stderr
 
