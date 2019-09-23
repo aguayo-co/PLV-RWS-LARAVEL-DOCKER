@@ -1,11 +1,14 @@
 {$CADDY_DOMAIN} {
-  tls {$CADDY_TLS}
+
+  import tls_mode/Caddyfile.{$CADDY_TLS_MODE}
+
   root html/public
   log stdout
   errors stderr
 
   fastcgi / php-fpm:9000 php
+
   rewrite {
-    to {path} {path}/ /index.php?{query}
+    to {path} {path}/ /index.php
   }
 }

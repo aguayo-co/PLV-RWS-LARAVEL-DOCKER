@@ -1,32 +1,17 @@
-FROM golang:alpine as caddy-build
+FROM abiosoft/caddy:1.0.3
 
-RUN apk add --no-cache git
-RUN go get -u github.com/mholt/caddy
-RUN go get -u github.com/caddyserver/builds
-RUN go get -u github.com/caddyserver/dnsproviders/cloudflare
-
-WORKDIR $GOPATH/src/github.com/mholt/caddy/caddy
-
-RUN sed -i 's|// This is where other plugins get plugged in (imported)|_ "github.com/caddyserver/dnsproviders/cloudflare"|' caddymain/run.go
-
-RUN go run build.go -goos=linux -goarch=amd64
-
-
-FROM alpine:3.7
-
-RUN apk --no-cache add curl
-
-RUN mkdir -p /srv/caddy/html \
-    /srv/caddy/.caddy
+RUN mkdir -p /srv/caddy/html
 
 WORKDIR /srv/caddy
 
-ENV CADDYPATH=/srv/caddy/.caddy
-
-COPY Caddyfile* /srv/caddy/
-COPY --from=caddy-build /go/src/github.com/mholt/caddy/caddy/caddy /usr/local/bin/
+ARG MKCERT_VERSION=1.4.0
+RUN wget -O /usr/local/bin/mkcert https://github.com/FiloSottile/mkcert/releases/download/v${MKCERT_VERSION}/mkcert-v${MKCERT_VERSION}-linux-amd64
+RUN chmod +x /usr/local/bin/mkcert
 
 EXPOSE 80/tcp
 EXPOSE 443/tcp
 
-CMD ["caddy", "-agree"]
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["/bin/parent", "caddy", "--agree=$ACME_AGREE"]

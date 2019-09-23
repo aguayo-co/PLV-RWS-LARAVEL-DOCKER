@@ -28,6 +28,7 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ${BASE_DATA_DIR:-/srv/prilov}/caddy:/srv/caddy/.caddy:cached
-      - ${BASE_DATA_DIR:-/srv/prilov}/ssl:/srv/caddy/ssl:cached
+      - ${BASE_DATA_DIR:-/srv/prilov}/caddy:/root/.caddy:cached
+      - ${BASE_DATA_DIR:-/srv/prilov}/ssl:/srv/certs:cached
+      - ./caddy/conf:/srv/caddy:cached
       - ./laravel:/srv/caddy/html:cached
