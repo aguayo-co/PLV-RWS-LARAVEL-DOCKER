@@ -1,6 +1,6 @@
 [submodule "laravel"]
 	path = laravel
-	url=../prilov-laravel.git
+	url=../plv-rws-laravel.git
 [submodule "migration"]
 	path = migration
-	url=../prilov-laravel-migration.git
+	url=../plv-rws-laravel-migration.git
